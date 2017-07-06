@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/inv/!svn/ver/761/inventory/src/main/resources/core
+END
+spring-servlet.xml
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/inv/!svn/ver/761/inventory/src/main/resources/core/spring-servlet.xml
+END
+applicationContext.xml
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/inv/!svn/ver/298/inventory/src/main/resources/core/applicationContext.xml
+END
+log4j.xml
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/inv/!svn/ver/298/inventory/src/main/resources/core/log4j.xml
+END

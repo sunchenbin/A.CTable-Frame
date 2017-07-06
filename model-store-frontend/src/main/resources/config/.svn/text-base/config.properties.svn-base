@@ -1,0 +1,44 @@
+#hibernate.dialect=com.bky.util.Oracle10gDialect
+#driverClassName=oracle.jdbc.driver.OracleDriver
+#validationQuery=SELECT 1 FROM DUAL
+#jdbc_url=jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=Baikeyang)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=orcl)))
+#jdbc_username=sshe
+#jdbc_password=1234
+
+#hibernate.dialect=org.hibernate.dialect.Oracle9Dialect
+#driverClassName=oracle.jdbc.driver.OracleDriver
+#validationQuery=SELECT 1 FROM DUAL
+#jdbc_url=jdbc:oracle:thin:@127.0.0.1:1521:orcl
+#jdbc_username=sshe
+#jdbc_password=1234
+
+#hibernate.dialect=org.hibernate.dialect.MySQL5InnoDBDialect
+#driverClassName=com.mysql.jdbc.Driver
+#validationQuery=SELECT 1
+jdbc.driverClassName=com.mysql.jdbc.Driver
+db.jdbc.url=jdbc:mysql://localhost:3306/inventory?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+db.jdbc.username=root
+db.jdbc.password=root
+
+#validationQuery=SELECT 1
+#jdbc_url=jdbc:mysql://localhost:3306/bkytest?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull
+#jdbc_username=root
+#jdbc_password=123456
+
+#hibernate.dialect=org.hibernate.dialect.SQLServer2008Dialect
+#driverClassName=net.sourceforge.jtds.jdbc.Driver
+#validationQuery=SELECT 1
+#jdbc_url=jdbc:jtds:sqlserver://127.0.0.1:1433/dbName
+#jdbc_username=sa
+#jdbc_password=123456
+
+#jndiName=java:comp/env/BenDiShuJuYuan
+
+#hibernate.hbm2ddl.auto=update
+#hibernate.show_sql=true
+#hibernate.format_sql=true
+#hibernate.use_sql_comments=true
+
+#sessionInfoName=sessionInfo
+
+#uploadPath=/ssheUploadFile
