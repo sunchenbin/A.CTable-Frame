@@ -4,12 +4,14 @@
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
-######### mybatis增加功能自动创建表——A.C.Table################
-1. 该版本修复了以往的一些bug，并且增加了对唯一约束的支持
-2. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用
-3. 再次声明A.C.Table目前仅支持mysql数据库
+######### mybatis增加功能自动创建表——A.C.Table版本说明################
+1. 该版本修复了修改主键同时修改其类型引起的error
+2. 该版本修复了根据model创建时没有创建父类中的字段的问题（ps：目前只支持扫描一层继承）
+3. 该笨笨增加了对唯一约束的支持
+4. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用
+5. 再次声明A.C.Table目前仅支持mysql数据库
 
-# 使用步骤方法
+ **使用步骤方法** 
 1. 使用该功能的项目需要依赖mybatis-enhance-actable-0.0.1-SNAPSHOT.jar
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
@@ -67,7 +69,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
 	
-# 代码用途讲解
+**代码用途讲解** 
 
     1.SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
 
@@ -79,9 +81,9 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
     5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
-# demo代码的地址
+ **demo代码的地址** 
     码云地址：http://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo
     代码下载地址：https://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo.git
 
-# 之前的旧项目地址
+ **之前的旧项目地址** 
 http://git.oschina.net/sunchenbin/Mybatis_BuildTable_V0.2
