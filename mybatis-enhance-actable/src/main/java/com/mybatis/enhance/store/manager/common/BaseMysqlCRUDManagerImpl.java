@@ -18,7 +18,7 @@ import com.mybatis.enhance.store.dao.common.BaseMysqlCRUDMapper;
 
 @Transactional
 @Service("baseMysqlCRUDManager")
-public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
+public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
 
 	private static final Logger	log	= LoggerFactory.getLogger(BaseMysqlCRUDManagerImpl.class);
 	
@@ -49,7 +49,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				}
 
 				// 如果是主键，并且不是空的时候，这时候应该是更新操作
-				if (column.isKey() && field.get(obj) != null) {
+				if (column.isKey() && field.get(obj) != null && Integer.parseInt((String) field.get(obj)) > 0) {
 					isSave = false;
 					keyFieldMap.put(field.getName(), field.get(obj));
 				}
