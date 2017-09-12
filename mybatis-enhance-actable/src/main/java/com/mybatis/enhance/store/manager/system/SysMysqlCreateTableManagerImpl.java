@@ -119,6 +119,10 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		for (Class<?> clas : classes){
 
 			Table table = clas.getAnnotation(Table.class);
+			// 没有打注解不需要创建变
+			if(null == table){
+				continue;
+			}
 
 			// 用于存新增表的字段
 			List<Object> newFieldList = new ArrayList<Object>();
