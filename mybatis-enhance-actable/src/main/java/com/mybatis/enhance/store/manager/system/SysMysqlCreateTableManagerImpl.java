@@ -157,7 +157,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 				// 从sysColumns中取出我们需要比较的列的List
 				// 先取出name用来筛选出增加和删除的字段
-				List<String> columnNames = ClassTools.getPropertyValueList(tableColumnList, SysMysqlColumns.COLUMN_NAME);
+				List<String> columnNames = ClassTools.getPropertyValueList(tableColumnList, SysMysqlColumns.COLUMN_NAME_KEY);
 
 				// 验证对比从model中解析的fieldList与从数据库查出来的columnList
 				// 1. 找出增加的字段
