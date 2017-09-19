@@ -1,6 +1,6 @@
 # mybatis-enhance-actable-0.0.1
 
-该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
+该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
@@ -82,8 +82,8 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
 **共通的CUDR功能使用** 	
-	使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口然后给一个泛型就可以了
-	注意：接口的泛型就是你要操作的表对应的model
+    1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口然后给一个泛型就可以了
+    2.注意：接口的泛型就是你要操作的表对应的model
 
  **demo代码的地址** 
     
