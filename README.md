@@ -81,6 +81,10 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
     5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
+**共通的CUDR功能使用** 	
+	使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口然后给一个泛型就可以了
+	注意：接口的泛型就是你要操作的表对应的model
+
  **demo代码的地址** 
     
     1.码云地址：http://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo
