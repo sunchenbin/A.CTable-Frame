@@ -1,13 +1,22 @@
-######### mybatis增加功能自动创建表################
-1. 该版本修复了以往的一些bug，并且增加了对唯一约束的支持
-2. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用
-3. 再次声明mybatis-enhance-actable-0.0.1-SNAPSHOT目前仅支持mysql数据库
+# mybatis-enhance-actable-0.0.1
 
-##使用步骤方法
+该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
+
+A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
+
+ **######### mybatis增加功能自动创建表——A.C.Table版本说明################** 
+1. 该版本修复了修改主键同时修改其类型引起的error
+2. 该版本修复了根据model创建时没有创建父类中的字段的问题（ps：目前只支持扫描一层继承）
+3. 该笨笨增加了对唯一约束的支持
+4. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用
+5. 再次声明A.C.Table目前仅支持mysql数据库
+
+ **使用步骤方法** 
 1. 使用该功能的项目需要依赖mybatis-enhance-actable-0.0.1-SNAPSHOT.jar
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
 	mybatis.table.auto=update
+
 	mybatis.model.pack=com.sunchenbin.store.model
 	
 	本系统提供三种模式：
@@ -61,14 +70,30 @@
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
 	
-##代码用途讲解
+**代码用途讲解** 
 
-1.SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
+    1.SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
 
-2.LengthCount.java是一个自定义的注解，用于标记在SysMysqlColumns.java里面配置的数据类型上的，标记该类型需要设置几个长度，如datetime/varchar(1)/decimal(5,2)，分别是需要设置0个1个2个
+    2.LengthCount.java是一个自定义的注解，用于标记在SysMysqlColumns.java里面配置的数据类型上的，标记该类型需要设置几个长度，如datetime/varchar(1)/decimal(5,2)，分别是需要设置0个1个2个
 
-3.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
+    3.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
 
-4.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
+    4.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
 
-ok，系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
+    5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
+
+ **共通的CUDR功能使用**
+
+    1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口就可以了
+
+    2.注意：接口调用save、delete等方法时传入的对象必须是modle中用于创建表的对象
+
+ **demo代码的地址** 
+    
+    1.码云地址：http://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo
+    
+    2.代码下载地址：https://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo.git
+
+ **之前的旧项目地址** 
+
+    http://git.oschina.net/sunchenbin/Mybatis_BuildTable_V0.2
