@@ -84,9 +84,9 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **共通的CUDR功能使用**
 
-    1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口然后给一个泛型就可以了
+    1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口就可以了
 
-    2.注意：接口的泛型就是你要操作的表对应的model
+    2.注意：接口调用save、delete等方法时传入的对象必须是modle中用于创建表的对象
 
  **demo代码的地址** 
     
