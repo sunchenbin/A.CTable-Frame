@@ -18,7 +18,7 @@ import com.mybatis.enhance.store.dao.common.BaseMysqlCRUDMapper;
 
 @Transactional
 @Service("baseMysqlCRUDManager")
-public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
+public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 
 	private static final Logger	log	= LoggerFactory.getLogger(BaseMysqlCRUDManagerImpl.class);
 	
@@ -27,7 +27,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
 	@Autowired
 	private BaseMysqlCRUDMapper	baseMysqlCRUDMapper;
 
-	public void save(Object obj){
+	public <T> void save(T obj){
 		boolean isSave = true;
 		Table tableName = obj.getClass().getAnnotation(Table.class);
 		if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
@@ -79,7 +79,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
 		}
 	}
 
-	public void delete(Object obj){
+	public <T> void delete(T obj){
 
 		// 得到表名
 		Table tableName = obj.getClass().getAnnotation(Table.class);
@@ -113,7 +113,8 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
 		baseMysqlCRUDMapper.delete(tableMap);
 	}
 
-	public List query(Object obj){
+	@SuppressWarnings("unchecked")
+	public <T> List<T> query(T obj){
 		// 得到表名
 		Table tableName = obj.getClass().getAnnotation(Table.class);
 		if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
@@ -145,10 +146,10 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
 		tableMap.put(tableName.name(), dataMap);
 		List<Map<String, Object>> query = baseMysqlCRUDMapper.query(tableMap);
 		
-		List<Object> list = new ArrayList<Object>();
+		List<T> list = new ArrayList<T>();
 		try{
 			for (Map<String, Object> map : query){
-				Object newInstance = obj.getClass().newInstance();
+				T newInstance = (T) obj.getClass().newInstance();
 				Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
 				for (Field field : declaredFields2){
 					field.setAccessible(true);
@@ -164,10 +165,8 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager<Object>{
 				list.add(newInstance);
 			}
 		}catch (InstantiationException e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}catch (IllegalAccessException e){
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
