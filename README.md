@@ -82,18 +82,78 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
     5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
+ **model的写法例子**
+```
+@Table(name = "test")
+public class Test extends BaseModel{
+
+	private static final long serialVersionUID = 5199200306752426433L;
+
+	@Column(name = "id",type = MySqlTypeConstant.INT,length = 11,isKey = true,isAutoIncrement = true)
+	private Integer	id;
+
+	@Column(name = "name",type = MySqlTypeConstant.VARCHAR,length = 111)
+	private String	name;
+
+	@Column(name = "description",type = MySqlTypeConstant.TEXT)
+	private String	description;
+
+	@Column(name = "create_time",type = MySqlTypeConstant.DATETIME)
+	private Date	create_time;
+
+	@Column(name = "update_time",type = MySqlTypeConstant.DATETIME)
+	private Date	update_time;
+
+	@Column(name = "number",type = MySqlTypeConstant.BIGINT,length = 5,isUnique=true)
+	private Long	number;
+
+	@Column(name = "lifecycle",type = MySqlTypeConstant.CHAR,length = 1,isNull=false)
+	private String	lifecycle;
+
+	@Column(name = "dekes",type = MySqlTypeConstant.DOUBLE,length = 5,decimalLength = 2)
+	private Double	dekes;
+        
+        // get和set方法这里就不例举了太多
+}
+```
  **共通的CUDR功能使用**
 
     1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口就可以了
 
     2.注意：接口调用save、delete等方法时传入的对象必须是modle中用于创建表的对象
-
- **demo代码的地址** 
-    
-    1.码云地址：http://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo
-    
-    2.代码下载地址：https://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo.git
-
- **之前的旧项目地址** 
-
-    http://git.oschina.net/sunchenbin/Mybatis_BuildTable_V0.2
+代码事例：
+```
+@Controller
+public class TestController{
+	
+	@Autowired
+	private TestManager testManager;
+	
+	@Autowired
+	private BaseMysqlCRUDManager baseMysqlCRUDManager;
+	
+	/**
+	 * 首页
+	 */
+	@RequestMapping("/testDate")
+	@ResponseBody
+	public String testDate(){
+		Test2 test2 = new Test2();
+		test2.setNumber(3L);
+		baseMysqlCRUDManager.save(test2);
+		
+		Test test = new Test();
+		test.setName("aaae333");
+		test.setNumber(9L);
+		test.setDescription("adfsdfe");
+		
+		baseMysqlCRUDManager.delete(test);
+		baseMysqlCRUDManager.save(test);
+		int count = testManager.findTestCount();
+		System.out.println(count);
+		List<Test> query = baseMysqlCRUDManager.query(test);
+		String json = JsonUtil.format(query);
+		return json;
+	}
+}
+```
