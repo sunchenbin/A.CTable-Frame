@@ -337,14 +337,14 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					continue;
 				}
 
-				// 7.验证是否可以为null
-				if (sysColumn.getIs_nullable().equals("NO")) {
+				// 7.验证是否可以为null(主键不参与是否为null的更新)
+				if (sysColumn.getIs_nullable().equals("NO") && !createTableParam.isFieldIsKey()) {
 					if (createTableParam.isFieldIsNull()) {
 						// 一个是可以一个是不可用，所以需要更新该字段
 						modifyFieldList.add(createTableParam);
 						continue;
 					}
-				}else if (sysColumn.getIs_nullable().equals("YES")) {
+				}else if (sysColumn.getIs_nullable().equals("YES") && !createTableParam.isFieldIsKey()) {
 					if (!createTableParam.isFieldIsNull()) {
 						// 一个是可以一个是不可用，所以需要更新该字段
 						modifyFieldList.add(createTableParam);
@@ -446,11 +446,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	private void tableFieldsConstruct(Map<String, Object> mySqlTypeAndLengthMap,Class<?> clas,List<Object> newFieldList){
 		Field[] fields = clas.getDeclaredFields();
 		
-		// 判断是否有父类，如果有拉取父类的field，这里只支持一层继承
-		if(clas.getSuperclass()!=null){
-			Class clsSup = clas.getSuperclass();
-			fields = (Field[]) ArrayUtils.addAll(fields,clsSup.getDeclaredFields());
-		}
+		// 判断是否有父类，如果有拉取父类的field，这里只支持多层继承
+		fields = recursionParents(clas, fields);
 		
 		for (Field field : fields){
 			// 判断方法中是否有指定注解类型的注解
@@ -463,7 +460,12 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				param.setFieldType(column.type().toLowerCase());
 				param.setFieldLength(column.length());
 				param.setFieldDecimalLength(column.decimalLength());
-				param.setFieldIsNull(column.isNull());
+				// 主键或唯一键时设置必须不为null
+				if (column.isKey() || column.isUnique()) {
+					param.setFieldIsNull(false);
+				}else{					
+					param.setFieldIsNull(column.isNull());
+				}
 				param.setFieldIsKey(column.isKey());
 				param.setFieldIsAutoIncrement(column.isAutoIncrement());
 				param.setFieldDefaultValue(column.defaultValue());
@@ -473,6 +475,21 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				newFieldList.add(param);
 			}
 		}
+	}
+
+	/**
+	 * 递归扫描父类的fields
+	 * @param clas
+	 * @param fields
+	 */
+	@SuppressWarnings("rawtypes")
+	private Field[] recursionParents(Class<?> clas, Field[] fields) {
+		if(clas.getSuperclass()!=null){
+			Class clsSup = clas.getSuperclass();
+			fields = (Field[]) ArrayUtils.addAll(fields,clsSup.getDeclaredFields());
+			fields = recursionParents(clsSup, fields);
+		}
+		return fields;
 	}
 
 	/**
