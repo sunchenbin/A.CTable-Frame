@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +35,10 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			log.error("必须使用model中的对象！");
 			return;
 		}
+		Field[] declaredFields = getAllFields(obj);
 		Map<Object, Map<Object, Object>> tableMap = new HashMap<Object, Map<Object, Object>>();
 		Map<Object, Object> dataMap = new HashMap<Object, Object>();
 		Map<String, Object> keyFieldMap = new HashMap<String, Object>();
-		Field[] declaredFields = obj.getClass().getDeclaredFields();
 		for (Field field : declaredFields){
 			try{
 				// 私有属性需要设置访问权限
@@ -79,6 +80,14 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}
 	}
 
+	private <T> Field[] getAllFields(T obj) {
+		Field[] declaredFields = obj.getClass().getDeclaredFields();
+		
+		// 递归扫描父类的filed
+		declaredFields = recursionParents(obj.getClass(), declaredFields);
+		return declaredFields;
+	}
+
 	public <T> void delete(T obj){
 
 		// 得到表名
@@ -87,11 +96,9 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			log.error("必须使用model中的对象！");
 			return;
 		}
+		Field[] declaredFields = getAllFields(obj);
 		Map<Object, Map<Object, Object>> tableMap = new HashMap<Object, Map<Object, Object>>();
 		Map<Object, Object> dataMap = new HashMap<Object, Object>();
-		
-		Field[] declaredFields = obj.getClass().getDeclaredFields();
-		
 		for (Field field : declaredFields){
 			// 设置访问权限
 			field.setAccessible(true);
@@ -121,11 +128,9 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			log.error("必须使用model中的对象！");
 			return null;
 		}
+		Field[] declaredFields = getAllFields(obj);
 		Map<Object, Map<Object, Object>> tableMap = new HashMap<Object, Map<Object, Object>>();
 		Map<Object, Object> dataMap = new HashMap<Object, Object>();
-		
-		Field[] declaredFields = obj.getClass().getDeclaredFields();
-		
 		for (Field field : declaredFields){
 			// 设置访问权限
 			field.setAccessible(true);
@@ -171,6 +176,21 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * 递归扫描父类的fields
+	 * @param clas
+	 * @param fields
+	 */
+	@SuppressWarnings("rawtypes")
+	private Field[] recursionParents(Class<?> clas, Field[] fields) {
+		if(clas.getSuperclass()!=null){
+			Class clsSup = clas.getSuperclass();
+			fields = (Field[]) ArrayUtils.addAll(fields,clsSup.getDeclaredFields());
+			fields = recursionParents(clsSup, fields);
+		}
+		return fields;
 	}
 
 }
