@@ -30,7 +30,8 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	2.4mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
 	
 3. spring的配置文件中需要做如下配置：
-	<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
+```
+<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
 	<context:component-scan base-package="com.mybatis.enhance.store.manager.*" />
 	
 	<!-- 这是mybatis-enhance-actable的功能开关配置文件,其实就是将上面第2点说的autoCreateTable.properties文件注册到spring中，以便底层的mybatis-enhance-actable的方法能够获取到-->
@@ -69,6 +70,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 		<property name="basePackage" value="com.sunchenbin.store.dao.*;com.mybatis.enhance.store.dao.*" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
+```
 	
 **代码用途讲解** 
 
