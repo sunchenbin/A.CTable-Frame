@@ -19,7 +19,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 	mybatis.model.pack=com.sunchenbin.store.model
 
-        mybatis.database.type=mysql
+	mybatis.database.type=mysql
 	
 	本系统提供三种模式：
 
@@ -31,7 +31,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 	2.4 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
         
-        2.5 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
+	2.5 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
 	
 3. spring的配置文件中需要做如下配置：
 ```
