@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +40,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 	@Autowired
 	private CreateMysqlTablesMapper	createMysqlTablesMapper;
-	
+
 	/**
 	 * 要扫描的model所在的pack
 	 */
@@ -58,8 +56,13 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	/**
 	 * 读取配置文件的三种状态（创建表、更新表、不做任何事情）
 	 */
-	@PostConstruct
 	public void createMysqlTable(){
+		
+		// 不做任何事情
+		if("none".equals(tableAuto)){
+			log.info("配置mybatis.table.auto=none，不需要做任何事情");
+			return;
+		}
 		
 		Map<String, Object> mySqlTypeAndLengthMap = mySqlTypeAndLengthMap();
 
@@ -111,11 +114,6 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			Map<String, List<Object>> removeTableMap,
 			Map<String, List<Object>> dropKeyTableMap,
 			Map<String, List<Object>> dropUniqueTableMap){
-		if("none".equals(tableAuto)){
-			// 不做任何事情
-			return;
-		}
-		
 		for (Class<?> clas : classes){
 
 			Table table = clas.getAnnotation(Table.class);
@@ -661,5 +659,4 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		}
 		return map;
 	}
-
 }
