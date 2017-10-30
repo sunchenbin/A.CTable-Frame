@@ -36,7 +36,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 3. spring的配置文件中需要做如下配置：
 ```
 <!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
-	<context:component-scan base-package="com.mybatis.enhance.store.manager.*" />
+	<context:component-scan base-package="com.gitee.sunchenbin.mybatis.actable.manager.*" />
 	
 	<!-- 这是mybatis-enhance-actable的功能开关配置文件,其实就是将上面第2点说的autoCreateTable.properties文件注册到spring中，以便底层的mybatis-enhance-actable的方法能够获取到-->
 	<bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -51,8 +51,8 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     </bean>
 	
 	<!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
-	1. classpath*:com/mybatis/enhance/store/mapping/*/*.xml
-	2. com.mybatis.enhance.store.dao.*
+	1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+	2. com.gitee.sunchenbin.mybatis.actable.dao.*
 	
 	举例这两个配置配置的详细位置
 	
@@ -63,7 +63,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 		<property name="mapperLocations">
 			<array>
               <value>classpath*:com/sunchenbin/store/mapping/*/*.xml</value>
-              <value>classpath*:com/mybatis/enhance/store/mapping/*/*.xml</value>
+              <value>classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml</value>
           	</array>
 		</property>
 		<property name="typeAliasesPackage" value="com.sunchenbin.store.model.*" />
@@ -71,7 +71,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	</bean>
 	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.sunchenbin.store.dao.*;com.mybatis.enhance.store.dao.*" />
+		<property name="basePackage" value="com.sunchenbin.store.dao.*;com.gitee.sunchenbin.mybatis.actable.dao.*" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
 ```
