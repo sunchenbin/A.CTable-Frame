@@ -54,4 +54,92 @@
 		</resources>
 
 	</build>
+	
+
+    <name>com.gitee.sunchenbin.mybatis.actable:mybatis-enhance-actable</name>
+    <description>A.CTable is a Maven project based on Spring and Mybatis, which enhances the function of Mybatis</description>
+    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+	<licenses>
+	     <license>
+		       <name>The Apache License, Version 2.0</name>
+		       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	     </license>
+    </licenses>
+	 
+	<developers>
+	    <developer>
+	        <name>sunchenbin</name>
+	        <email>458757617@qq.com</email>
+	    </developer>
+	</developers>
+	
+	<scm>
+	    <connection>scm:git@gitee.com:sunchenbin/mybatis-enhance.git</connection>
+	    <developerConnection>scm:git@gitee.com:sunchenbin/mybatis-enhance.git</developerConnection>
+	    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+	</scm>
+	 
+	<profiles>
+	    <profile>
+	        <id>release</id>
+	        <distributionManagement>
+	            <!-- 初步审核通过后，会给你这个内容，在上面已经给出 -->
+	            <snapshotRepository>
+	                <id>oss</id>
+	                <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+	            </snapshotRepository>
+	            <!-- 初步审核通过后，会给你这个内容，在上面已经给出 -->
+	            <repository>
+	                <id>oss</id>
+	                <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	            </repository>
+	        </distributionManagement>
+	        <build>
+	            <plugins>
+	                <!-- Source -->
+	                <plugin>
+	                    <groupId>org.apache.maven.plugins</groupId>
+	                    <artifactId>maven-source-plugin</artifactId>
+	                    <version>2.2.1</version>
+	                    <executions>
+	                        <execution>
+	                            <phase>package</phase>
+	                            <goals>
+	                                <goal>jar-no-fork</goal>
+	                            </goals>
+	                        </execution>
+	                    </executions>
+	                </plugin>
+	                <!-- Javadoc -->
+	                <plugin>
+	                    <groupId>org.apache.maven.plugins</groupId>
+	                    <artifactId>maven-javadoc-plugin</artifactId>
+	                    <version>2.9.1</version>
+	                    <executions>
+	                        <execution>
+	                            <phase>package</phase>
+	                            <goals>
+	                                <goal>jar</goal>
+	                            </goals>
+	                        </execution>
+	                    </executions>
+	                </plugin>
+	                <plugin>
+	                    <groupId>org.apache.maven.plugins</groupId>
+	                    <artifactId>maven-gpg-plugin</artifactId>
+	                    <version>1.5</version>
+	                    <executions>
+	                        <execution>
+	                            <id>sign-artifacts</id>
+	                            <phase>verify</phase>
+	                            <goals>
+	                                <goal>sign</goal>
+	                            </goals>
+	                        </execution>
+	                    </executions>
+	                </plugin>
+	            </plugins>
+	        </build>
+	    </profile>
+	</profiles>
 </project>

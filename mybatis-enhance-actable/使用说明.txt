@@ -10,6 +10,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 3. 该笨笨增加了对唯一约束的支持
 4. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用
 5. 再次声明A.C.Table目前仅支持mysql数据库
+6. 使用了jdk1.7
 
  **使用步骤方法** 
 1. 使用该功能的项目需要依赖mybatis-enhance-actable-0.0.1-SNAPSHOT.jar
