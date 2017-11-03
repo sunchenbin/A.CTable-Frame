@@ -27,8 +27,8 @@ public class ClassTools{
 	/**
 	 * 从包package中获取所有的Class
 	 * 
-	 * @param pack
-	 * @return
+	 * @param pack 扫描的包
+	 * @return 该包下的class
 	 */
 	public static Set<Class<?>> getClasses(String pack){
 

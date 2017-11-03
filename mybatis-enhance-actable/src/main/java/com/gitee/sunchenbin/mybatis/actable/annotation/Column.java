@@ -26,63 +26,63 @@ public @interface Column{
 	/**
 	 * 字段名
 	 * 
-	 * @return
+	 * @return 字段名
 	 */
 	public String name();
 
 	/**
 	 * 字段类型
 	 * 
-	 * @return
+	 * @return 字段类型
 	 */
 	public String type();
 
 	/**
 	 * 字段长度，默认是255
 	 * 
-	 * @return
+	 * @return 字段长度，默认是255
 	 */
 	public int length() default 255;
 
 	/**
 	 * 小数点长度，默认是0
 	 * 
-	 * @return
+	 * @return 小数点长度，默认是0
 	 */
 	public int decimalLength() default 0;
 
 	/**
 	 * 是否为可以为null，true是可以，false是不可以，默认为true
 	 * 
-	 * @return
+	 * @return 是否为可以为null，true是可以，false是不可以，默认为true
 	 */
 	public boolean isNull() default true;
 
 	/**
 	 * 是否是主键，默认false
 	 * 
-	 * @return
+	 * @return 是否是主键，默认false
 	 */
 	public boolean isKey() default false;
 
 	/**
 	 * 是否自动递增，默认false 只有主键才能使用
 	 * 
-	 * @return
+	 * @return 是否自动递增，默认false 只有主键才能使用
 	 */
 	public boolean isAutoIncrement() default false;
 
 	/**
 	 * 默认值，默认为null
 	 * 
-	 * @return
+	 * @return 默认值，默认为null
 	 */
 	public String defaultValue() default "NULL";
 	
 	/**
 	 * 是否是唯一，默认false
 	 * 
-	 * @return
+	 * @return 是否是唯一，默认false
 	 */
 	public boolean isUnique() default false;
 }

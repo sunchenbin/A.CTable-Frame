@@ -1,5 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<parent>
+	    <groupId>org.sonatype.oss</groupId>
+	    <artifactId>oss-parent</artifactId>
+	    <version>7</version>
+	</parent>
+	  
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	<artifactId>mybatis-enhance-actable</artifactId>
@@ -40,9 +46,10 @@
 	        <scope>provided</scope>	        
 	    </dependency>
 		
-	</dependencies>
+	</dependencies>	
+	
 	<build>
-		<resources>
+	  	<resources>
 			<resource>
 				<directory>src/main/java</directory>
 				<includes>
@@ -52,94 +59,135 @@
 				<filtering>false</filtering>
 			</resource>
 		</resources>
-
-	</build>
+	    <plugins>
+	      <plugin>
+	        <!-- Source -->
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-source-plugin</artifactId>
+	        <version>2.2.1</version>
+	        <executions>
+	          <execution>
+	            <id>attach-sources</id>
+	            <phase>package</phase>
+	            <goals>
+	              <goal>jar-no-fork</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	      </plugin>
 	
+	      <!-- JavaDoc -->
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-javadoc-plugin</artifactId>
+	        <version>2.9.1</version>
+	        <configuration>
+	          <charset>UTF-8</charset>
+	          <encoding>UTF-8</encoding>
+	        </configuration>
+	        <executions>
+	          <execution>
+	            <id>attach-javadocs</id>
+	            <phase>package</phase>
+	            <goals>
+	              <goal>jar</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	      </plugin>
+	
+	      <!-- GPG -->
+	      <!-- <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-gpg-plugin</artifactId>
+	        <version>1.5</version>
+	        <executions>
+	          <execution>
+	            <id>sign-artifacts</id>
+	            <phase>verify</phase>
+	            <goals>
+	              <goal>sign</goal>
+	            </goals>
+	          </execution>
+	        </executions>
+	      </plugin> -->
+	
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-compiler-plugin</artifactId>
+	        <version>3.0</version>
+	        <configuration>
+	          <source>1.6</source>
+	          <target>1.6</target>
+	          <fork>true</fork>
+	          <verbose>true</verbose>
+	          <encoding>UTF-8</encoding>
+	          <showWarnings>true</showWarnings>
+	        </configuration>
+	      </plugin>
+	
+	      <!-- JNA -->
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-surefire-plugin</artifactId>
+	        <configuration>
+	          <environmentVariables>
+	            <LD_LIBRARY_PATH>/usr/local/lib</LD_LIBRARY_PATH>
+	          </environmentVariables>
+	        </configuration>
+	      </plugin>
+	
+	      <plugin>
+	        <groupId>org.apache.maven.plugins</groupId>
+	        <artifactId>maven-release-plugin</artifactId>
+	        <version>2.5.1</version>
+	      </plugin>
+	    </plugins>
+	  </build>
 
     <name>com.gitee.sunchenbin.mybatis.actable:mybatis-enhance-actable</name>
     <description>A.CTable is a Maven project based on Spring and Mybatis, which enhances the function of Mybatis</description>
     <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+    
 	<licenses>
-	     <license>
-		       <name>The Apache License, Version 2.0</name>
-		       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-	     </license>
-    </licenses>
+	   <license>
+	      <name>The Apache Software License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	      <distribution>actable</distribution>
+	   </license>
+	</licenses>
 	 
 	<developers>
 	    <developer>
 	        <name>sunchenbin</name>
 	        <email>458757617@qq.com</email>
+	        <organization>sunchenbin</organization>
+	        <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
 	    </developer>
 	</developers>
 	
 	<scm>
-	    <connection>scm:git@gitee.com:sunchenbin/mybatis-enhance.git</connection>
-	    <developerConnection>scm:git@gitee.com:sunchenbin/mybatis-enhance.git</developerConnection>
+	    <connection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</connection>
+	    <developerConnection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</developerConnection>
 	    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+	    <tag>HEAD</tag>
 	</scm>
-	 
-	<profiles>
-	    <profile>
-	        <id>release</id>
-	        <distributionManagement>
-	            <!-- 初步审核通过后，会给你这个内容，在上面已经给出 -->
-	            <snapshotRepository>
-	                <id>oss</id>
-	                <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-	            </snapshotRepository>
-	            <!-- 初步审核通过后，会给你这个内容，在上面已经给出 -->
-	            <repository>
-	                <id>oss</id>
-	                <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-	            </repository>
-	        </distributionManagement>
-	        <build>
-	            <plugins>
-	                <!-- Source -->
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-source-plugin</artifactId>
-	                    <version>2.2.1</version>
-	                    <executions>
-	                        <execution>
-	                            <phase>package</phase>
-	                            <goals>
-	                                <goal>jar-no-fork</goal>
-	                            </goals>
-	                        </execution>
-	                    </executions>
-	                </plugin>
-	                <!-- Javadoc -->
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-javadoc-plugin</artifactId>
-	                    <version>2.9.1</version>
-	                    <executions>
-	                        <execution>
-	                            <phase>package</phase>
-	                            <goals>
-	                                <goal>jar</goal>
-	                            </goals>
-	                        </execution>
-	                    </executions>
-	                </plugin>
-	                <plugin>
-	                    <groupId>org.apache.maven.plugins</groupId>
-	                    <artifactId>maven-gpg-plugin</artifactId>
-	                    <version>1.5</version>
-	                    <executions>
-	                        <execution>
-	                            <id>sign-artifacts</id>
-	                            <phase>verify</phase>
-	                            <goals>
-	                                <goal>sign</goal>
-	                            </goals>
-	                        </execution>
-	                    </executions>
-	                </plugin>
-	            </plugins>
-	        </build>
-	    </profile>
-	</profiles>
+	
+	<distributionManagement>
+	    <snapshotRepository>
+	      <!-- 这个id需要在setting.xml中设置，后边讲到  --> 
+	      <id>oss</id>
+	      <name>OSS Snapshots Repository</name>
+	      <!-- 这里的url就是Issue中回复的snapshots 的repo地址--> 
+	      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>  
+	    </snapshotRepository>
+	    <repository>
+	      <id>oss</id>
+	      <name>OSS Staging Repository</name>
+	      <!-- 这里的url就是Issue中回复的staging 的repo地址--> 
+	      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	    </repository>
+	  </distributionManagement>
+	
+	  
 </project>

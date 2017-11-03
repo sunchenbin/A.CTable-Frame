@@ -15,26 +15,25 @@ public interface BaseMysqlCRUDMapper {
 
 	/**
 	 * 保存
-	 * @param tableMap
+	 * @param tableMap 表结构的map
 	 */
 	public void save(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
 	
 	/**
 	 * 更新
-	 * @param tableMap
+	 * @param tableMap 表结构的map
 	 */
 	public void update(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
 	
 	/**
 	 * 删除
-	 * @param tableMap
+	 * @param tableMap 表结构的map
 	 */
 	public void delete(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
 	
 	/**
 	 * 查询
-	 * @param <T>
-	 * @param tableMap
+	 * @param tableMap 表结构的map
 	 */
 	public List<Map<String,Object>> query(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
 

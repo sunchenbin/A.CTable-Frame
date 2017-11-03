@@ -8,5 +8,8 @@ package com.gitee.sunchenbin.mybatis.actable.manager.handler;
  */
 public interface StartUpHandler {
 
+	/**
+	 * 建表开始
+	 */
 	void startHandler();
 }
