@@ -169,7 +169,7 @@
 	    <connection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</connection>
 	    <developerConnection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</developerConnection>
 	    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
-	    <tag>head</tag>
+	    <tag>1.0</tag>
 	</scm>
 	
 	<distributionManagement>
