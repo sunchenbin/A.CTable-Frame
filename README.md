@@ -18,7 +18,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.0</version>
+	    <version>1.0.1</version>
 	</dependency>
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
