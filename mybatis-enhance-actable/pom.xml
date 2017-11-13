@@ -1,14 +1,43 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+	<artifactId>mybatis-enhance-actable</artifactId>
+	<version>1.0.0</version>
+	
 	<parent>
 	    <groupId>org.sonatype.oss</groupId>
 	    <artifactId>oss-parent</artifactId>
 	    <version>7</version>
 	</parent>
-	  
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
-	<artifactId>mybatis-enhance-actable</artifactId>
-	<version>head</version>
+	
+	<name>com.gitee.sunchenbin.mybatis.actable:mybatis-enhance-actable</name>
+    <description>A.CTable is a Maven project based on Spring and Mybatis, which enhances the function of Mybatis</description>
+    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+    
+	<licenses>
+	   <license>
+	      <name>The Apache Software License, Version 2.0</name>
+	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+	      <distribution>actable</distribution>
+	   </license>
+	</licenses>
+	 
+	<developers>
+	    <developer>
+	        <name>sunchenbin</name>
+	        <email>458757617@qq.com</email>
+	        <organization>sunchenbin</organization>
+	        <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+	    </developer>
+	</developers>
+	
+	<scm>
+	    <connection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</connection>
+	    <developerConnection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</developerConnection>
+	    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
+	    <tag>1.0</tag>
+	</scm>
 
 	<properties>
 		<spring.version>4.1.4.RELEASE</spring.version>
@@ -143,34 +172,6 @@
 	      </plugin>
 	    </plugins>
 	  </build>
-
-    <name>com.gitee.sunchenbin.mybatis.actable:mybatis-enhance-actable</name>
-    <description>A.CTable is a Maven project based on Spring and Mybatis, which enhances the function of Mybatis</description>
-    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
-    
-	<licenses>
-	   <license>
-	      <name>The Apache Software License, Version 2.0</name>
-	      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-	      <distribution>actable</distribution>
-	   </license>
-	</licenses>
-	 
-	<developers>
-	    <developer>
-	        <name>sunchenbin</name>
-	        <email>458757617@qq.com</email>
-	        <organization>sunchenbin</organization>
-	        <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
-	    </developer>
-	</developers>
-	
-	<scm>
-	    <connection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</connection>
-	    <developerConnection>scm:git:git@gitee.com:sunchenbin/mybatis-enhance.git</developerConnection>
-	    <url>https://gitee.com/sunchenbin/mybatis-enhance</url>
-	    <tag>1.0</tag>
-	</scm>
 	
 	<distributionManagement>
 	    <snapshotRepository>
