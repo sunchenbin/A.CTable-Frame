@@ -13,6 +13,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **使用步骤方法** 
 1. 使用该功能的项目需要依赖mybatis-enhance-actable-0.0.1-SNAPSHOT.jar
+
+        已上传至maven中央仓库，使用时pom文件中增加如下依赖
+        <dependency>
+	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+	    <artifactId>mybatis-enhance-actable</artifactId>
+	    <version>1.0.0</version>
+	</dependency>
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
 	mybatis.table.auto=update
