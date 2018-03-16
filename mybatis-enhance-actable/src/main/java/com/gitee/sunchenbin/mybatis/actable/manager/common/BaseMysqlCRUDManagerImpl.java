@@ -50,7 +50,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				}
 
 				// 如果是主键，并且不是空的时候，这时候应该是更新操作
-				if (column.isKey() && field.get(obj) != null && Integer.parseInt((String) field.get(obj)) > 0) {
+				if (column.isKey() && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
 					isSave = false;
 					keyFieldMap.put(field.getName(), field.get(obj));
 				}
@@ -61,7 +61,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 					continue;
 				}
 
-				dataMap.put(field.getName(), field.get(obj));
+				dataMap.put(column.name(), field.get(obj));
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
 			}catch (IllegalAccessException e){
@@ -164,7 +164,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 						log.info("该field没有配置注解不是表中在字段！");
 						continue;
 					}
-					String name = field.getName();
+					String name = column.name();
 					field.set(newInstance, map.get(name));
 				}
 				list.add(newInstance);

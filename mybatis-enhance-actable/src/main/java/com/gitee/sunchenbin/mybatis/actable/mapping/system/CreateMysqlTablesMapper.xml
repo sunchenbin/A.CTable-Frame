@@ -57,12 +57,12 @@
 	<!-- 验证表是否存在 -->
 	<select id="findTableCountByTableName" resultType="int" parameterType="String">
 		select count(1) from information_schema.tables
-		where table_name = #{tableName}
+		where table_name = #{tableName} and table_schema = (select database())
 	</select>
 	
 	<!-- 根据表名查询表的结构 -->
 	<select id="findTableEnsembleByTableName" resultType="com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns" parameterType="String">
-		select * from information_schema.columns where table_name = #{tableName}
+		select * from information_schema.columns where table_name = #{tableName} and table_schema = (select database())
 	</select>
 	
 	<!-- 增加字段 -->

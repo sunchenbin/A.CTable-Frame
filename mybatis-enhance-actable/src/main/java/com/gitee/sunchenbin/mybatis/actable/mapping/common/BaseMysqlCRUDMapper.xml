@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.gitee.sunchenbin.mybatis.actable.dao.common.BaseMysqlCRUDMapper">
 	<!-- 保存 -->
-	<select id="save" parameterType="java.util.Map">
-		
+	<insert id="save" parameterType="java.util.Map">
+        
 		<foreach collection="tableMap" index="key" item="value">
 			insert into `${key}`(
 				<foreach collection="value" index="field" item="fieldvalue" separator=",">
@@ -22,10 +22,10 @@
 			)
 		</foreach>
 
-	</select>
+	</insert>
 	
 	<!-- 更新 -->
-	<select id="update" parameterType="java.util.Map">
+	<update id="update" parameterType="java.util.Map">
 		
 		<foreach collection="tableMap" index="key" item="value">
 			update `${key}`
@@ -49,7 +49,7 @@
 				</foreach>
 		</foreach>
 
-	</select>
+	</update>
 	
 	<!-- 删除 -->
 	<select id="delete" parameterType="java.util.Map">
