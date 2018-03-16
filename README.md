@@ -5,20 +5,22 @@
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
  **######### mybatis增加功能自动创建表——A.C.Table版本说明################** 
-1. 该版本修复了修改主键同时修改其类型引起的error
-2. 该版本修复了根据model创建时没有创建父类中的字段的问题（ps：目前只支持扫描一层继承）
-3. 该笨笨增加了对唯一约束的支持
-4. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用
-5. 再次声明A.C.Table目前仅支持mysql数据库
+1. 该版本修复了修改主键同时修改其类型引起的error(版本1.0.1)
+2. 该版本修复了根据model创建时没有创建父类中的字段的问题（ps：目前只支持扫描一层继承）(版本1.0.1)
+3. 该笨笨增加了对唯一约束的支持(版本1.0.1)
+4. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用(版本1.0.1)
+5. 再次声明A.C.Table目前仅支持mysql数据库(版本1.0.1)
+6. 修复了不同数据库中有相同表名时，启动报错的问题。(版本1.0.2)
+7. 修复了model属性名与表字段名不一致时公共的查询方法查不出数据的问题。(版本1.0.2)
 
  **使用步骤方法** 
-1. 使用该功能的项目需要依赖mybatis-enhance-actable-1.0.1.jar
+1. 使用该功能的项目需要依赖mybatis-enhance-actable-1.0.2.jar
 
         已上传至maven中央仓库，使用时pom文件中增加如下依赖
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.1</version>
+	    <version>1.0.2</version>
 	</dependency>
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
