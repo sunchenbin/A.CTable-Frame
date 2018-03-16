@@ -1,6 +1,6 @@
 # mybatis-enhance-actable-0.0.1
 
-该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
+该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
@@ -12,11 +12,21 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 5. 再次声明A.C.Table目前仅支持mysql数据库
 
  **使用步骤方法** 
-1. 使用该功能的项目需要依赖mybatis-enhance-actable-0.0.1-SNAPSHOT.jar
+1. 使用该功能的项目需要依赖mybatis-enhance-actable-1.0.1.jar
+
+        已上传至maven中央仓库，使用时pom文件中增加如下依赖
+        <dependency>
+	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+	    <artifactId>mybatis-enhance-actable</artifactId>
+	    <version>1.0.1</version>
+	</dependency>
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
 	mybatis.table.auto=update
+
 	mybatis.model.pack=com.sunchenbin.store.model
+
+	mybatis.database.type=mysql
 	
 	本系统提供三种模式：
 
@@ -26,11 +36,14 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	
 	2.3 当mybatis.table.auto=none时，系统不做任何处理。
 
-	2.4mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
+	2.4 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
+        
+	2.5 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
 	
 3. spring的配置文件中需要做如下配置：
-	<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
-	<context:component-scan base-package="com.mybatis.enhance.store.manager.*" />
+```
+<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
+	<context:component-scan base-package="com.gitee.sunchenbin.mybatis.actable.manager.*" />
 	
 	<!-- 这是mybatis-enhance-actable的功能开关配置文件,其实就是将上面第2点说的autoCreateTable.properties文件注册到spring中，以便底层的mybatis-enhance-actable的方法能够获取到-->
 	<bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
@@ -45,8 +58,8 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     </bean>
 	
 	<!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
-	1. classpath*:com/mybatis/enhance/store/mapping/*/*.xml
-	2. com.mybatis.enhance.store.dao.*
+	1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+	2. com.gitee.sunchenbin.mybatis.actable.dao.*
 	
 	举例这两个配置配置的详细位置
 	
@@ -57,7 +70,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 		<property name="mapperLocations">
 			<array>
               <value>classpath*:com/sunchenbin/store/mapping/*/*.xml</value>
-              <value>classpath*:com/mybatis/enhance/store/mapping/*/*.xml</value>
+              <value>classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml</value>
           	</array>
 		</property>
 		<property name="typeAliasesPackage" value="com.sunchenbin.store.model.*" />
@@ -65,9 +78,10 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	</bean>
 	
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.sunchenbin.store.dao.*;com.mybatis.enhance.store.dao.*" />
+		<property name="basePackage" value="com.sunchenbin.store.dao.*;com.gitee.sunchenbin.mybatis.actable.dao.*" />
 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
 	</bean>
+```
 	
 **代码用途讲解** 
 
@@ -81,12 +95,78 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
     5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
- **demo代码的地址** 
-    
-    1.码云地址：http://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo
-    
-    2.代码下载地址：https://git.oschina.net/sunchenbin/mybatis-enhance-actable-demo.git
+ **model的写法例子**
+```
+@Table(name = "test")
+public class Test extends BaseModel{
 
- **之前的旧项目地址** 
+	private static final long serialVersionUID = 5199200306752426433L;
 
-    http://git.oschina.net/sunchenbin/Mybatis_BuildTable_V0.2
+	@Column(name = "id",type = MySqlTypeConstant.INT,length = 11,isKey = true,isAutoIncrement = true)
+	private Integer	id;
+
+	@Column(name = "name",type = MySqlTypeConstant.VARCHAR,length = 111)
+	private String	name;
+
+	@Column(name = "description",type = MySqlTypeConstant.TEXT)
+	private String	description;
+
+	@Column(name = "create_time",type = MySqlTypeConstant.DATETIME)
+	private Date	create_time;
+
+	@Column(name = "update_time",type = MySqlTypeConstant.DATETIME)
+	private Date	update_time;
+
+	@Column(name = "number",type = MySqlTypeConstant.BIGINT,length = 5,isUnique=true)
+	private Long	number;
+
+	@Column(name = "lifecycle",type = MySqlTypeConstant.CHAR,length = 1,isNull=false)
+	private String	lifecycle;
+
+	@Column(name = "dekes",type = MySqlTypeConstant.DOUBLE,length = 5,decimalLength = 2)
+	private Double	dekes;
+        
+        // get和set方法这里就不例举了太多
+}
+```
+ **共通的CUDR功能使用**
+
+    1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口就可以了
+
+    2.注意：接口调用save、delete等方法时传入的对象必须是modle中用于创建表的对象
+代码事例：
+```
+@Controller
+public class TestController{
+	
+	@Autowired
+	private TestManager testManager;
+	
+	@Autowired
+	private BaseMysqlCRUDManager baseMysqlCRUDManager;
+	
+	/**
+	 * 首页
+	 */
+	@RequestMapping("/testDate")
+	@ResponseBody
+	public String testDate(){
+		Test2 test2 = new Test2();
+		test2.setNumber(3L);
+		baseMysqlCRUDManager.save(test2);
+		
+		Test test = new Test();
+		test.setName("aaae333");
+		test.setNumber(9L);
+		test.setDescription("adfsdfe");
+		
+		baseMysqlCRUDManager.delete(test);
+		baseMysqlCRUDManager.save(test);
+		int count = testManager.findTestCount();
+		System.out.println(count);
+		List<Test> query = baseMysqlCRUDManager.query(test);
+		String json = JsonUtil.format(query);
+		return json;
+	}
+}
+```

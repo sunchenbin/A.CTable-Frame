@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Build-Jdk: 1.7.0_21
-Built-By: ubuntu
+Built-By: chenbin.sun
+Build-Jdk: 1.8.0_91
 Created-By: Maven Integration for Eclipse
 
