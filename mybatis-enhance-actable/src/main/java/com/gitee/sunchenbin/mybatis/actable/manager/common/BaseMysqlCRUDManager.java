@@ -8,8 +8,9 @@ public interface BaseMysqlCRUDManager{
 	 * 保存，如果主键有值则进行更新操作
 	 * @param <T> model类型
 	 * @param t 要保存的model类型数据
+	 * @return id 操作数据的id
 	 */
-	<T> void save(T t);
+	<T> Integer save(T t);
 	
 	/**
 	 * 根据传入对象非空的条件删除

@@ -1,14 +1,5 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.system;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
-import com.gitee.sunchenbin.mybatis.actable.annotation.LengthCount;
-import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
-import com.gitee.sunchenbin.mybatis.actable.command.CreateTableParam;
-import com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns;
-import com.gitee.sunchenbin.mybatis.actable.constants.OracleTypeConstant;
 import com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper;
-import com.gitee.sunchenbin.mybatis.actable.utils.ClassTools;
 
 /**
  * 项目启动时自动扫描配置的目录中的model，根据配置的规则自动创建或更新表

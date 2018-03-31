@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
+import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseMysqlCRUDMapper;
 
 @Transactional
@@ -28,12 +29,12 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 	@Autowired
 	private BaseMysqlCRUDMapper	baseMysqlCRUDMapper;
 
-	public <T> void save(T obj){
+	public <T> Integer save(T obj){
 		boolean isSave = true;
 		Table tableName = obj.getClass().getAnnotation(Table.class);
 		if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
 			log.error("必须使用model中的对象！");
-			return;
+			return null;
 		}
 		Field[] declaredFields = getAllFields(obj);
 		Map<Object, Map<Object, Object>> tableMap = new HashMap<Object, Map<Object, Object>>();
@@ -70,13 +71,17 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}
 		if (isSave) {
 			tableMap.put(tableName.name(), dataMap);
+			SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
 			// 执行保存操作
-			baseMysqlCRUDMapper.save(tableMap);
+			baseMysqlCRUDMapper.save(saveOrUpdateDataCommand);
+			return saveOrUpdateDataCommand.getId();
 		}else{
 			dataMap.put(KEYFIELDMAP, keyFieldMap);
 			tableMap.put(tableName.name(), dataMap);
+			SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
 			// 执行更新操作根据主键
-			baseMysqlCRUDMapper.update(tableMap);
+			baseMysqlCRUDMapper.update(saveOrUpdateDataCommand);
+			return saveOrUpdateDataCommand.getId();
 		}
 	}
 
