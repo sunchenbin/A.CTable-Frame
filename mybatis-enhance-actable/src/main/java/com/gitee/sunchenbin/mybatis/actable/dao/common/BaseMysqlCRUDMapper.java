@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 
 
 /**
@@ -11,19 +14,20 @@ import org.apache.ibatis.annotations.Param;
  * @author sunchenbin
  *
  */
+@Transactional
 public interface BaseMysqlCRUDMapper {
 
 	/**
 	 * 保存
 	 * @param tableMap 表结构的map
 	 */
-	public void save(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
+	public void save(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 	
 	/**
 	 * 更新
 	 * @param tableMap 表结构的map
 	 */
-	public void update(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
+	public void update(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 	
 	/**
 	 * 删除

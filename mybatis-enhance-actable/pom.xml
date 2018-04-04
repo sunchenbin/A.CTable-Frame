@@ -40,7 +40,7 @@
 	</scm>
 
 	<properties>
-		<spring.version>4.1.4.RELEASE</spring.version>
+		<spring.version>4.3.7.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
@@ -67,12 +67,26 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<dependency>
+		<!-- <dependency>
 	        <groupId>org.mybatis.scripting</groupId>
 	        <artifactId>mybatis-velocity</artifactId>
 	        <version>1.2</version>
 	        <scope>provided</scope>	        
-	    </dependency>
+	    </dependency> -->
+	    
+	    <dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.4.3</version>
+			<scope>provided</scope>	
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+			<scope>provided</scope>	
+		</dependency>
 		
 	</dependencies>	
 	
