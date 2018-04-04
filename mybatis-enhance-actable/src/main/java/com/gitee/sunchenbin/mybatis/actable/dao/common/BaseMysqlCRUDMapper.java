@@ -19,13 +19,13 @@ public interface BaseMysqlCRUDMapper {
 
 	/**
 	 * 保存
-	 * @param tableMap 表结构的map
+	 * @param saveOrUpdateDataCommand id+表结构的map
 	 */
 	public void save(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 	
 	/**
 	 * 更新
-	 * @param tableMap 表结构的map
+	 * @param saveOrUpdateDataCommand id+表结构的map
 	 */
 	public void update(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 	
