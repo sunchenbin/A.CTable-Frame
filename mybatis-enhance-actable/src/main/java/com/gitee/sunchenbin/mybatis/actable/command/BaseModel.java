@@ -14,17 +14,24 @@ public class BaseModel implements Serializable{
 	private static final long serialVersionUID = -2467322075253424352L;
 	
 	/**
-	 * 当前页码
+	 * 当前页码,请先设置pageSize,否则使用默认的10
 	 */
 	public int currentPage;
 	
 	/**
 	 * 每页显示多少条，默认10条
 	 */
-	public int pageSize;
+	public int pageSize = 10;
 	
 	public int start;// (currentPage-1)*pageSize
+	
+	public String orderField;
+	
+	public String sortStr = DESC;
 
+	public static String DESC = "desc";
+
+	public static String ASC = "asc";
 	
 	public int getCurrentPage(){
 		return currentPage;
@@ -38,10 +45,6 @@ public class BaseModel implements Serializable{
 
 	
 	public int getPageSize(){
-		if (this.pageSize == 0) {
-			// 默认值设为10
-			this.pageSize = 10;
-		}
 		return pageSize;
 	}
 
@@ -60,6 +63,28 @@ public class BaseModel implements Serializable{
 	public void setStart(int start){
 		this.start = start;
 	}
+
+
+	public String getOrderField() {
+		return orderField;
+	}
+
+
+	public void setOrderField(String orderField) {
+		this.orderField = orderField;
+	}
+
+
+	public String getSortStr() {
+		return sortStr;
+	}
+
+
+	public void setSortStr(String sortStr) {
+		this.sortStr = sortStr;
+	}
+
+
 
 	
 }

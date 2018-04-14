@@ -39,8 +39,12 @@ public interface BaseMysqlCRUDMapper {
 	 * 查询
 	 * @param tableMap 表结构的map
 	 */
-	public List<Map<String,Object>> query(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
+	public List<Map<String,Object>> query(@Param("tableMap") Map<Object, Object> tableMap);
 
-	
+	/**
+	 * 查询的count
+	 * @param tableMap 表结构的map
+	 */
+	public int queryCount(@Param("tableMap") Map<Object, Object> tableMap);
 
 }

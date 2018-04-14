@@ -38,11 +38,11 @@
 					</if>
 				</foreach>
 			
-			where
+			where 1=1 
 			  	<foreach collection="value" index="keyfield" item="keyvalues">
 					<if test="keyfield == 'keyFieldMap'">
 						<foreach collection="keyvalues" index="field" item="fieldvalue">
-							`${field}` = #{fieldvalue}
+							 and `${field}` = #{fieldvalue}
 						</foreach>
 					</if>
 				</foreach>
@@ -54,10 +54,10 @@
 		
 		<foreach collection="tableMap" index="key" item="value">
 			delete from `${key}`
-			where 
-			<foreach collection="value" index="field" item="fieldvalue" separator=" and ">
+			where 1=1 
+			<foreach collection="value" index="field" item="fieldvalue">
 				<if test="fieldvalue != null">
-					`${field}` = #{fieldvalue}
+					 and `${field}` = #{fieldvalue}
 				</if>
 			</foreach>
 			
@@ -69,16 +69,40 @@
 	<select id="query" parameterType="java.util.Map" resultType="java.util.HashMap">
 		
 		<foreach collection="tableMap" index="key" item="value">
-			select * from `${key}`
-			where 
-			<foreach collection="value" index="field" item="fieldvalue" separator=" and ">
-				<if test="fieldvalue != null">
-					`${field}` = #{fieldvalue}
-				</if>
-			</foreach>
-			
+			<if test="key != 'start' and key != 'pageSize' and key != 'orderField' and key != 'sortStr'">
+				select * from `${key}`
+				where 1=1 
+				<foreach collection="value" index="field" item="fieldvalue">
+					<if test="fieldvalue != null">
+						 and `${field}` = #{fieldvalue} 
+					</if>
+				</foreach>
+			</if>
 		</foreach>
-
+		
+		<if test="tableMap.orderField != null and tableMap.orderField != ''">
+			 order by `${tableMap.orderField}` ${tableMap.sortStr} 
+		</if>
+		
+		<if test="tableMap.start != null and tableMap.pageSize != null">
+			 limit #{tableMap.start},#{tableMap.pageSize}
+		</if>
+	</select>
+	
+	<!-- 查询总记录数 -->
+	<select id="queryCount" parameterType="java.util.Map" resultType="int">
+		
+		<foreach collection="tableMap" index="key" item="value">
+			<if test="key != 'start' and key != 'pageSize' and key != 'orderField' and key != 'sortStr'">
+				select count(1) from `${key}`
+				where 1=1 
+				<foreach collection="value" index="field" item="fieldvalue">
+					<if test="fieldvalue != null">
+						 and `${field}` = #{fieldvalue}
+					</if>
+				</foreach>
+			</if>
+		</foreach>
 	</select>
 	
 </mapper>
