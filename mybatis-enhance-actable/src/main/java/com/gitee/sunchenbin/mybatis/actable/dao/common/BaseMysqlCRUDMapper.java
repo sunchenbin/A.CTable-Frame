@@ -19,13 +19,13 @@ public interface BaseMysqlCRUDMapper {
 
 	/**
 	 * 保存
-	 * @param tableMap 表结构的map
+	 * @param saveOrUpdateDataCommand id+表结构的map
 	 */
 	public void save(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 	
 	/**
 	 * 更新
-	 * @param tableMap 表结构的map
+	 * @param saveOrUpdateDataCommand id+表结构的map
 	 */
 	public void update(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 	
@@ -39,8 +39,12 @@ public interface BaseMysqlCRUDMapper {
 	 * 查询
 	 * @param tableMap 表结构的map
 	 */
-	public List<Map<String,Object>> query(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
+	public List<Map<String,Object>> query(@Param("tableMap") Map<Object, Object> tableMap);
 
-	
+	/**
+	 * 查询的count
+	 * @param tableMap 表结构的map
+	 */
+	public int queryCount(@Param("tableMap") Map<Object, Object> tableMap);
 
 }

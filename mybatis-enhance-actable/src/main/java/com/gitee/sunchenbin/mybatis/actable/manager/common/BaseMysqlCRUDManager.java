@@ -2,6 +2,8 @@ package com.gitee.sunchenbin.mybatis.actable.manager.common;
 
 import java.util.List;
 
+import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
+
 public interface BaseMysqlCRUDManager{
 
 	/**
@@ -24,5 +26,5 @@ public interface BaseMysqlCRUDManager{
 	 * @param <T> model类型
 	 * @param t 要查询的model类型数据
 	 */
-	<T> List<T> query(T t);
+	<T> PageResultCommand<T> query(T t);
 }
