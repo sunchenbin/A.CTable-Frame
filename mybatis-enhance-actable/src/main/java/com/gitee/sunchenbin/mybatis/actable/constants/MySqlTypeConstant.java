@@ -23,7 +23,13 @@ public class MySqlTypeConstant {
 	
 	@LengthCount(LengthCount=0)
 	public static final  String TEXT = "text";
-	
+
+	@LengthCount(LengthCount=0)
+	public static final  String MEDIUMTEXT = "mediumtext";
+
+	@LengthCount(LengthCount=0)
+	public static final  String LONGTEXT = "longtext";
+
 	@LengthCount(LengthCount=0)
 	public static final  String DATETIME = "datetime";
 	
