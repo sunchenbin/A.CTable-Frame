@@ -3,6 +3,7 @@ package com.gitee.sunchenbin.mybatis.actable.manager.common;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 	@Autowired
 	private BaseMysqlCRUDMapper	baseMysqlCRUDMapper;
 
+	@Override
 	public <T> Integer save(T obj){
 		boolean isSave = true;
 		Table tableName = obj.getClass().getAnnotation(Table.class);
@@ -48,7 +50,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				field.setAccessible(true);
 				Column column = field.getAnnotation(Column.class);
 				if (column == null) {
-					log.info("该field没有配置注解不是表中在字段！");
+					log.debug("该field没有配置注解不是表中在字段！");
 					continue;
 				}
 
@@ -61,7 +63,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 
 				// 如果是自增,并且是保存的场合，不需要添加到map中做保存
 				if (isSave && column.isAutoIncrement()) {
-					log.info("字段：" + field.getName() + "是自增的不需要添加到map中");
+					log.debug("字段：" + field.getName() + "是自增的不需要添加到map中");
 					continue;
 				}
 
@@ -96,6 +98,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		return declaredFields;
 	}
 
+	@Override
 	public <T> void delete(T obj){
 
 		// 得到表名
@@ -113,7 +116,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			// 得到字段的配置
 			Column column = field.getAnnotation(Column.class);
 			if (column == null) {
-				log.info("该field没有配置注解不是表中在字段！");
+				log.debug("该field没有配置注解不是表中在字段！");
 				continue;
 			}
 			try{
@@ -128,18 +131,17 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		baseMysqlCRUDMapper.delete(tableMap);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
-	public <T> PageResultCommand<T> query(T obj){
+	public <T> PageResultCommand<T> search(T obj){
 		String startKey = "start";
 		String sizeKey = "pageSize";
 		String currentPageKey = "currentPage";
-		String orderFieldKey = "orderField";
-		String sortKey = "sortStr";
+		String orderByKey = "orderBy";
 		Integer startVal = null;
 		Integer sizeVal = null;
 		Integer currentPageVal = null;
-		String orderFieldVal = null;
-		String sortVal = null;
+		LinkedHashMap<String,String> orderByVal = null;
 		PageResultCommand<T> pageResultCommand = new PageResultCommand<T>();
 		// 得到表名
 		Table tableName = obj.getClass().getAnnotation(Table.class);
@@ -164,16 +166,13 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				if(currentPageKey.equals(field.getName())) {
 					currentPageVal = (Integer) field.get(obj);
 				}
-				if(orderFieldKey.equals(field.getName())) {
-					orderFieldVal = (String) field.get(obj);
-				}
-				if(sortKey.equals(field.getName())) {
-					sortVal = (String) field.get(obj);
+				if(orderByKey.equals(field.getName())) {
+					orderByVal = (LinkedHashMap<String,String>) field.get(obj);
 				}
 				// 得到字段的配置
 				Column column = field.getAnnotation(Column.class);
 				if (column == null) {
-					log.info("该field没有配置注解不是表中在字段！");
+					log.debug("该field没有配置注解不是表中在字段！");
 					continue;
 				}
 				if (field.get(obj) instanceof String && field.get(obj) != null && "".equals(field.get(obj))) {
@@ -192,11 +191,10 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			tableMap.put(startKey, startVal);
 			tableMap.put(sizeKey, sizeVal);
 		}
-		if(orderFieldVal != null && orderFieldVal != "") {
-			tableMap.put(orderFieldKey, orderFieldVal);
-			tableMap.put(sortKey, sortVal);
+		if(orderByVal != null && orderByVal.size() > 0) {
+			tableMap.put(orderByKey, orderByVal);
 		}
-		List<Map<String, Object>> query = baseMysqlCRUDMapper.query(tableMap);
+		List<Map<String, Object>> query = baseMysqlCRUDMapper.search(tableMap);
 		
 		List<T> list = new ArrayList<T>();
 		try{
@@ -208,7 +206,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 					// 得到字段的配置
 					Column column = field.getAnnotation(Column.class);
 					if (column == null) {
-						log.info("该field没有配置注解不是表中在字段！");
+						log.debug("该field没有配置注解不是表中在字段！");
 						continue;
 					}
 					String name = column.name();
@@ -223,7 +221,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}
 		if (null != list) {			
 			pageResultCommand.setData(list);
-			int queryCount = baseMysqlCRUDMapper.queryCount(tableMap);
+			int queryCount = baseMysqlCRUDMapper.searchCount(tableMap);
 			pageResultCommand.setRecordsFiltered(queryCount);
 			pageResultCommand.setRecordsTotal(queryCount);
 		}
@@ -244,5 +242,97 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}
 		return fields;
 	}
+
+	@Override
+	public <T> T findPrimaryBy(T t) {
+		PageResultCommand<T> query = search(t);
+		if (query != null && query.getData() != null && query.getData().size() > 0) {
+			return query.getData().get(0);
+		}
+		return null;
+	}
+
+	@Override
+	public List<LinkedHashMap<String, Object>> query(String value) {
+		log.info(value);
+		return baseMysqlCRUDMapper.query(value);
+	}
+	
+	@Override
+	public <T> List<T> query(String sql, Class<T> beanClass) {
+		if(null == beanClass){
+			return null;
+		}
+		List<LinkedHashMap<String, Object>> query = baseMysqlCRUDMapper.query(sql);
+		if(null == query || query.size() == 0){
+			return null;
+		}
+		List<T> list = new ArrayList<T>();
+		for(Map<String, Object> map : query){
+			try{
+			T t = beanClass.newInstance();
+			Field[] fields = t.getClass().getDeclaredFields();
+			for(Field field : fields){
+				field.setAccessible(true);
+				Column annotation = field.getAnnotation(Column.class);
+				String name = (null != annotation && !annotation.name().equals("")) ? annotation.name() : field.getName();
+				if(null == map.get(name)){
+					continue;
+				}
+				field.set(t, map.get(name));
+			}
+			list.add(t);
+			}catch(Exception e){
+				log.error("map转对象失败",e);
+			}
+		}
+		return list;
+	}
+
+    @Override
+    public <T> Integer updateWithNull(T obj){
+        Table tableName = obj.getClass().getAnnotation(Table.class);
+        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+            log.error("必须使用model中的对象！");
+            return null;
+        }
+        Field[] declaredFields = getAllFields(obj);
+        Map<Object, Map<Object, Object>> tableMap = new HashMap<Object, Map<Object, Object>>();
+        Map<Object, Object> dataMap = new HashMap<Object, Object>();
+        Map<String, Object> keyFieldMap = new HashMap<String, Object>();
+        Integer updateId = null;
+        for (Field field : declaredFields){
+            try{
+                // 私有属性需要设置访问权限
+                field.setAccessible(true);
+                Column column = field.getAnnotation(Column.class);
+                if (column == null) {
+                    log.debug("该field没有配置注解不是表中在字段！");
+                    continue;
+                }
+                // 如果是主键，并且不是空的时候，这时候应该是更新操作
+                if (column.isKey() && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
+                    keyFieldMap.put(field.getName(), field.get(obj));
+                    updateId = (Integer) field.get(obj);
+                }
+                dataMap.put(column.name(), field.get(obj));
+            }catch (IllegalArgumentException e){
+                e.printStackTrace();
+            }catch (IllegalAccessException e){
+                e.printStackTrace();
+            }
+        }
+        
+        if(keyFieldMap.isEmpty()) {
+        	log.error("主键不能更新为null！");
+        	return null;
+        }
+        dataMap.put(KEYFIELDMAP, keyFieldMap);
+        tableMap.put(tableName.name(), dataMap);
+        SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
+        // 执行更新操作根据主键
+        baseMysqlCRUDMapper.updateWithNull(saveOrUpdateDataCommand);
+        return updateId;
+    }
 
 }

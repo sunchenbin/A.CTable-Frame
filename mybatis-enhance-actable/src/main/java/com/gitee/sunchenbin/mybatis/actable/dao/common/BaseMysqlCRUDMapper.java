@@ -1,5 +1,6 @@
 package com.gitee.sunchenbin.mybatis.actable.dao.common;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,12 +40,24 @@ public interface BaseMysqlCRUDMapper {
 	 * 查询
 	 * @param tableMap 表结构的map
 	 */
-	public List<Map<String,Object>> query(@Param("tableMap") Map<Object, Object> tableMap);
+	public List<Map<String,Object>> search(@Param("tableMap") Map<Object, Object> tableMap);
 
 	/**
 	 * 查询的count
 	 * @param tableMap 表结构的map
 	 */
-	public int queryCount(@Param("tableMap") Map<Object, Object> tableMap);
+	public int searchCount(@Param("tableMap") Map<Object, Object> tableMap);
+	
+	/**
+	 * 查询
+	 * @param value 动态sql
+	 */
+	public List<LinkedHashMap<String,Object>> query(String value);
+
+    /**
+     * 更新，可以更新null
+     * @param saveOrUpdateDataCommand
+     */
+    public void updateWithNull(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
 
 }
