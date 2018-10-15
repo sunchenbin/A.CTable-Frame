@@ -49,6 +49,30 @@
 		</foreach>
 	</update>
 	
+	<!-- 更新，可以更新null -->
+	<update id="updateWithNull" parameterType="com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand" useGeneratedKeys="true" keyProperty="id">
+
+		<foreach collection="tableMap" index="key" item="value">
+			update `${key}`
+			
+			set 
+				<foreach collection="value" index="field" item="fieldvalue" separator=",">
+					<if test="field != 'keyFieldMap'">
+						`${field}` = #{fieldvalue}
+					</if>
+				</foreach>
+			
+			where 1=1 
+			  	<foreach collection="value" index="keyfield" item="keyvalues">
+					<if test="keyfield == 'keyFieldMap'">
+						<foreach collection="keyvalues" index="field" item="fieldvalue">
+							 and `${field}` = #{fieldvalue}
+						</foreach>
+					</if>
+				</foreach>
+		</foreach>
+	</update>
+	
 	<!-- 删除 -->
 	<select id="delete" parameterType="java.util.Map">
 		
@@ -66,10 +90,10 @@
 	</select>
 	
 	<!-- 查询 -->
-	<select id="query" parameterType="java.util.Map" resultType="java.util.HashMap">
+	<select id="search" parameterType="java.util.Map" resultType="java.util.HashMap">
 		
 		<foreach collection="tableMap" index="key" item="value">
-			<if test="key != 'start' and key != 'pageSize' and key != 'orderField' and key != 'sortStr'">
+			<if test="key != 'start' and key != 'pageSize' and key != 'orderBy'">
 				select * from `${key}`
 				where 1=1 
 				<foreach collection="value" index="field" item="fieldvalue">
@@ -80,8 +104,11 @@
 			</if>
 		</foreach>
 		
-		<if test="tableMap.orderField != null and tableMap.orderField != ''">
-			 order by `${tableMap.orderField}` ${tableMap.sortStr} 
+		<if test="tableMap.orderBy != null">
+			 order by 
+			 <foreach collection="tableMap.orderBy" index="field" item="sort" separator=",">
+					`${field}` ${sort} 
+			 </foreach>
 		</if>
 		
 		<if test="tableMap.start != null and tableMap.pageSize != null">
@@ -90,10 +117,10 @@
 	</select>
 	
 	<!-- 查询总记录数 -->
-	<select id="queryCount" parameterType="java.util.Map" resultType="int">
+	<select id="searchCount" parameterType="java.util.Map" resultType="int">
 		
 		<foreach collection="tableMap" index="key" item="value">
-			<if test="key != 'start' and key != 'pageSize' and key != 'orderField' and key != 'sortStr'">
+			<if test="key != 'start' and key != 'pageSize' and key != 'orderBy'">
 				select count(1) from `${key}`
 				where 1=1 
 				<foreach collection="value" index="field" item="fieldvalue">
@@ -103,6 +130,11 @@
 				</foreach>
 			</if>
 		</foreach>
+	</select>
+	
+	<!-- 动态sql查询-->
+	<select id="query" parameterType="string" resultType="java.util.LinkedHashMap">
+		${value}
 	</select>
 	
 </mapper>

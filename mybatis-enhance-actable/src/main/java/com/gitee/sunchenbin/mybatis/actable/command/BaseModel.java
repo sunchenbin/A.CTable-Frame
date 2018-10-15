@@ -1,6 +1,7 @@
 package com.gitee.sunchenbin.mybatis.actable.command;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 
 /**
@@ -25,9 +26,7 @@ public class BaseModel implements Serializable{
 	
 	public int start;// (currentPage-1)*pageSize
 	
-	public String orderField;
-	
-	public String sortStr = DESC;
+	public LinkedHashMap<String, String> orderBy;
 
 	public static String DESC = "desc";
 
@@ -65,26 +64,13 @@ public class BaseModel implements Serializable{
 	}
 
 
-	public String getOrderField() {
-		return orderField;
+	public LinkedHashMap<String, String> getOrderBy() {
+		return orderBy;
 	}
 
 
-	public void setOrderField(String orderField) {
-		this.orderField = orderField;
+	public void setOrderBy(LinkedHashMap<String, String> orderBy) {
+		this.orderBy = orderBy;
 	}
-
-
-	public String getSortStr() {
-		return sortStr;
-	}
-
-
-	public void setSortStr(String sortStr) {
-		this.sortStr = sortStr;
-	}
-
-
-
 	
 }
