@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper">
 
+
+	<resultMap id="SysMysqlColumnsResultMap" type="com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns">
+		<result property="table_schema" column="table_schema"/>
+		<result property="table_name" column="table_name"/>
+		<result property="column_name" column="column_name"/>
+		<result property="ordinal_position" column="ordinal_position"/>
+		<result property="column_default" column="column_default"/>
+		<result property="is_nullable" column="is_nullable"/>
+		<result property="data_type" column="data_type"/>
+		<result property="character_maximum_length" column="character_maximum_length"/>
+		<result property="character_octet_length" column="character_octet_length"/>
+		<result property="numeric_precision" column="numeric_precision"/>
+		<result property="numeric_scale" column="numeric_scale"/>
+		<result property="character_set_name" column="character_set_name"/>
+		<result property="collation_name" column="collation_name"/>
+		<result property="column_type" column="column_type"/>
+		<result property="column_key" column="column_key"/>
+		<result property="extra" column="extra"/>
+		<result property="privileges" column="privileges"/>
+		<result property="column_comment" column="column_comment"/>
+	</resultMap>
+
 	<!-- 抽取出来的公共部分 -->
 	<sql id="commonSql">
 		<if test="fields.fileTypeLength == 0">
@@ -61,7 +83,7 @@
 	</select>
 	
 	<!-- 根据表名查询表的结构 -->
-	<select id="findTableEnsembleByTableName" resultType="com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns" parameterType="String">
+	<select id="findTableEnsembleByTableName" resultMap="SysMysqlColumnsResultMap" parameterType="String">
 		select * from information_schema.columns where table_name = #{tableName} and table_schema = (select database())
 	</select>
 	
