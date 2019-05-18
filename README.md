@@ -29,7 +29,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 2. 需要配置对于actable支持的配置
 
 ```
-    	mybatis.table.auto=update
+	mybatis.table.auto=update
 	mybatis.model.pack=com.sunchenbin.store.model
 	mybatis.database.type=mysql
 	
@@ -50,7 +50,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 3. 支持actable的mybatis配置
 
 ```
-        <!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
+	<!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
 	1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
 	2. com.gitee.sunchenbin.mybatis.actable.dao.*
 ```
@@ -74,10 +74,10 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 2. 项目的application.properties文件配置例如下面
 
 ```
-        mybatis.table.auto=update
+	mybatis.table.auto=update
 	mybatis.model.pack=com.sunchenbin.store.model
 	mybatis.database.type=mysql
-        mybatis.mapperLocations=classpath*:xxxxxx/*.xml,classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+	mybatis.mapperLocations=classpath*:xxxxxx/*.xml,classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
 ```
 
 3. springboot启动类需要做如下配置
