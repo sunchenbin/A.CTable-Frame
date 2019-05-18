@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper">
 
-
+	<!-- 强制指定查询表结构映射字段，避免被mybatis下划线转驼峰配置影响，导致查询不到值  -->
 	<resultMap id="SysMysqlColumnsResultMap" type="com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns">
 		<result property="table_schema" column="table_schema"/>
 		<result property="table_name" column="table_name"/>

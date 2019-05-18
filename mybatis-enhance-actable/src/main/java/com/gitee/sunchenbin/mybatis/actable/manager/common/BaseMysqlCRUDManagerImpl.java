@@ -228,6 +228,11 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		return pageResultCommand;
 	}
 	
+	@Override
+	public <T> PageResultCommand<T> query(T t) {
+		return search(t);
+	}
+	
 	/**
 	 * 递归扫描父类的fields
 	 * @param clas

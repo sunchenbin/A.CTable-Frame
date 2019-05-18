@@ -42,9 +42,21 @@ public class MySqlTypeConstant {
 	@LengthCount
 	public static final  String CHAR = "char";
 	
-	/**
-	 * 等于java中的long
-	 */
 	@LengthCount
 	public static final  String BIGINT = "bigint";
+	
+	@LengthCount(LengthCount=0)
+	public static final  String BIT = "bit";
+	
+	@LengthCount(LengthCount=0)
+	public static final  String TIMESTAMP = "timestamp";
+	
+	@LengthCount(LengthCount=0)
+	public static final  String DATE = "date";
+	
+	@LengthCount(LengthCount=0)
+	public static final  String TIME = "time";
+	
+	@LengthCount(LengthCount=0)
+	public static final  String FLOAT = "float";
 }

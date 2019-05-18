@@ -28,13 +28,13 @@ public class SysOracleCreateTableManagerImpl implements SysOracleCreateTableMana
 	/**
 	 * 要扫描的model所在的pack
 	 */
-	@Value("#{configProperties['mybatis.model.pack']}")	
+//	@Value("#{configProperties['mybatis.model.pack']}")	
 	private String pack;
 	
 	/**
 	 * 自动创建模式：update表示更新，create表示删除原表重新创建
 	 */
-	@Value("#{configProperties['mybatis.table.auto']}")
+//	@Value("#{configProperties['mybatis.table.auto']}")
 	private String tableAuto;
 
 	/**
