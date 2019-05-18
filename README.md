@@ -29,9 +29,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 2. 需要配置对于actable支持的配置
 
     	mybatis.table.auto=update
-
 	mybatis.model.pack=com.sunchenbin.store.model
-
 	mybatis.database.type=mysql
 	
 	本系统提供三种模式：
@@ -90,9 +88,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
 	mybatis.table.auto=update
-
 	mybatis.model.pack=com.sunchenbin.store.model
-
 	mybatis.database.type=mysql
 	
 3. spring的配置文件中需要做如下配置：
