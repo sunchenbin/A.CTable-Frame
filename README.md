@@ -20,11 +20,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
  **基本使用规范**
 1. 需要依赖mybatis-enhance-actable-1.0.5.jar
 
+```
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
 	    <version>1.0.5</version>
 	</dependency>
+```
 
 2. 需要配置对于actable支持的配置
 
@@ -59,18 +61,22 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 4. 扫描actable的包到spring容器中管理
 
+```
         1. com.gitee.sunchenbin.mybatis.actable.manager.*
+```
 
  **Springboot+Mybatis的项目使用步骤方法**
 
 1. 首先pom文件依赖actable框架
 
+```
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
 	    <version>1.0.5</version>
 	</dependency>
-        
+```
+    
 2. 项目的application.properties文件配置例如下面
 
 ```
@@ -82,27 +88,33 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 3. springboot启动类需要做如下配置
 
+```
         1. 通过注解@ComponentScan配置，扫描actable要注册到spring的包路径"com.gitee.sunchenbin.mybatis.actable.manager.*"
         2. 通过注解@MapperScan配置，扫描mybatis的mapper，路径为"com.gitee.sunchenbin.mybatis.actable.dao.*"
+```
 
  **传统Spring+Mybatis的Web项目使用步骤方法** 
 1. 首先pom文件依赖actable框架
 
+```
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
 	    <version>1.0.5</version>
 	</dependency>
+```
 
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
+```
 	mybatis.table.auto=update
 	mybatis.model.pack=com.sunchenbin.store.model
 	mybatis.database.type=mysql
-	
+```
+
 3. spring的配置文件中需要做如下配置：
 ```
-<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
+	<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
 	<context:component-scan base-package="com.gitee.sunchenbin.mybatis.actable.manager.*" />
 	
 	<!-- 这是mybatis-enhance-actable的功能开关配置文件,其实就是将上面第2点说的autoCreateTable.properties文件注册到spring中，以便底层的mybatis-enhance-actable的方法能够获取到-->
