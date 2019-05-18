@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.0.4
+# mybatis-enhance-actable-1.0.5
 
 该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
 
@@ -14,19 +14,21 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 7. 修复了model属性名与表字段名不一致时公共的查询方法查不出数据的问题。(版本1.0.2)
 8. 增加了对公共的CUDR方法的优化，保存成功会返回id，query查询时可以设置参数进行分页查询（pageSize:int类型标识每页数量，currentPage:int类型标识当前第几页，start:int类型从第几条开始，orderField：string类型排序字段，sortStr：string类型排序方式(desc,asc)）(版本1.0.3)
 9. 增加了对Mysql的longtext和mediumtext两种字段类型的支持，公共的CUDR方法的优化，原query方法更正为search，现query方法支持动态sql查询，原orderField字段只支持单个字段的排序，现修改为orderBy字段，支持数据类型为LinkedHashMap<String, String>，有序，key为字段名，value为排序方式(版本1.0.4)
+10.增加对mysql数据库（timestamp/time/date/float）四种数据类型的支持(版本1.0.5)
+11.增加对springboot框架的支持(版本1.0.5)
 
- **使用步骤方法** 
-1. 使用该功能的项目需要依赖mybatis-enhance-actable-1.0.3.jar
+ **基本使用规范**
+1. 需要依赖mybatis-enhance-actable-1.0.5.jar
 
-        已上传至maven中央仓库，使用时pom文件中增加如下依赖
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.4</version>
+	    <version>1.0.5</version>
 	</dependency>
-2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
-	mybatis.table.auto=update
+2. 需要配置对于actable支持的配置
+
+    	mybatis.table.auto=update
 
 	mybatis.model.pack=com.sunchenbin.store.model
 
@@ -43,6 +45,55 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	2.4 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
         
 	2.5 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
+
+3. 支持actable的mybatis配置
+
+        <!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
+	1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+	2. com.gitee.sunchenbin.mybatis.actable.dao.*
+
+4. 扫描actable的包到spring容器中管理
+
+        1. com.gitee.sunchenbin.mybatis.actable.manager.*
+
+ **Springboot+Mybatis的项目使用步骤方法**
+
+1. 首先pom文件依赖actable框架
+
+        <dependency>
+	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+	    <artifactId>mybatis-enhance-actable</artifactId>
+	    <version>1.0.5</version>
+	</dependency>
+        
+2. 项目的application.properties文件配置例如下面
+
+        mybatis.table.auto=update
+	mybatis.model.pack=com.sunchenbin.store.model
+	mybatis.database.type=mysql
+        mybatis.mapperLocations=classpath*:xxxxxx/*.xml,classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+
+3. springboot启动类需要做如下配置
+
+        1. 通过注解@ComponentScan配置，扫描actable要注册到spring的包路径"com.gitee.sunchenbin.mybatis.actable.manager.*"
+        2. 通过注解@MapperScan配置，扫描mybatis的mapper，路径为"com.gitee.sunchenbin.mybatis.actable.dao.*"
+
+ **传统Spring+Mybatis的Web项目使用步骤方法** 
+1. 首先pom文件依赖actable框架
+
+        <dependency>
+	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+	    <artifactId>mybatis-enhance-actable</artifactId>
+	    <version>1.0.5</version>
+	</dependency>
+
+2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
+
+	mybatis.table.auto=update
+
+	mybatis.model.pack=com.sunchenbin.store.model
+
+	mybatis.database.type=mysql
 	
 3. spring的配置文件中需要做如下配置：
 ```
