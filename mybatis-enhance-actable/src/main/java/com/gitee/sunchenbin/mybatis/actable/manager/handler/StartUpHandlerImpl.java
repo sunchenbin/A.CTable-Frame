@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
 import com.gitee.sunchenbin.mybatis.actable.manager.system.SysMysqlCreateTableManager;
+import com.gitee.sunchenbin.mybatis.actable.manager.util.ConfigurationUtil;
 
 /**
  * 启动时进行处理的实现类
@@ -20,6 +22,9 @@ import com.gitee.sunchenbin.mybatis.actable.manager.system.SysMysqlCreateTableMa
 public class StartUpHandlerImpl implements StartUpHandler {
 	
 	private static final Logger	log	= LoggerFactory.getLogger(StartUpHandlerImpl.class);
+	
+	@Autowired
+	private ConfigurationUtil springContextUtil;
 	
 	/** 数据库类型：mysql */
 	public static String MYSQL = "mysql";
@@ -33,17 +38,16 @@ public class StartUpHandlerImpl implements StartUpHandler {
 	/** 数据库类型：postgresql */
 	public static String POSTGRESQL = "postgresql";
 	
-	/**
-	 * 数据库类型
-	 */
-	@Value("#{configProperties['mybatis.database.type']}")	
-	private String databaseType = MYSQL;
+	/** 数据库类型  */
+	private static String databaseType = null;
 	
 	@Autowired
 	private SysMysqlCreateTableManager sysMysqlCreateTableManager;
 
 	@PostConstruct
 	public void startHandler() {
+		// 获取配置信息
+		databaseType = springContextUtil.getConfig(Constants.DATABASE_TYPE_KEY) == null ? MYSQL : springContextUtil.getConfig(Constants.DATABASE_TYPE_KEY);
 		
 		// 执行mysql的处理方法
 		if (MYSQL.equals(databaseType)) {

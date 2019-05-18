@@ -2,13 +2,13 @@ package com.gitee.sunchenbin.mybatis.actable.manager.system;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,10 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.LengthCount;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import com.gitee.sunchenbin.mybatis.actable.command.CreateTableParam;
 import com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns;
+import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper;
+import com.gitee.sunchenbin.mybatis.actable.manager.util.ConfigurationUtil;
 import com.gitee.sunchenbin.mybatis.actable.utils.ClassTools;
 
 /**
@@ -39,23 +41,27 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 	@Autowired
 	private CreateMysqlTablesMapper createMysqlTablesMapper;
+	
+	@Autowired
+	private ConfigurationUtil springContextUtil;
 
 	/**
 	 * 要扫描的model所在的pack
 	 */
-	@Value("#{configProperties['mybatis.model.pack']}")
-	private String pack;
+	private static String pack = null;
 
 	/**
 	 * 自动创建模式：update表示更新，create表示删除原表重新创建
 	 */
-	@Value("#{configProperties['mybatis.table.auto']}")
-	private String tableAuto;
-
+	private static String tableAuto = null;
+	
 	/**
 	 * 读取配置文件的三种状态（创建表、更新表、不做任何事情）
 	 */
 	public void createMysqlTable() {
+		// 读取配置信息
+		pack = springContextUtil.getConfig(Constants.MODEL_PACK_KEY);
+		tableAuto = springContextUtil.getConfig(Constants.TABLE_AUTO_KEY);
 
 		// 不做任何事情
 		if ("none".equals(tableAuto)) {
@@ -482,7 +488,15 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	private Field[] recursionParents(Class<?> clas, Field[] fields) {
 		if (clas.getSuperclass() != null) {
 			Class clsSup = clas.getSuperclass();
-			fields = (Field[]) ArrayUtils.addAll(fields, clsSup.getDeclaredFields());
+			List<Field> fieldList = new ArrayList<Field>();
+			fieldList.addAll(Arrays.asList(fields));
+			fieldList.addAll(Arrays.asList(clsSup.getDeclaredFields()));
+			fields = new Field[fieldList.size()];
+			int i = 0;
+			for (Object field : fieldList.toArray()) {
+				fields[i] = (Field) field;
+				i++;
+			}
 			fields = recursionParents(clsSup, fields);
 		}
 		return fields;

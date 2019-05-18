@@ -2,12 +2,12 @@ package com.gitee.sunchenbin.mybatis.actable.manager.common;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -242,7 +242,15 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 	private Field[] recursionParents(Class<?> clas, Field[] fields) {
 		if(clas.getSuperclass()!=null){
 			Class clsSup = clas.getSuperclass();
-			fields = (Field[]) ArrayUtils.addAll(fields,clsSup.getDeclaredFields());
+			List<Field> fieldList = new ArrayList<Field>();
+			fieldList.addAll(Arrays.asList(fields));
+			fieldList.addAll(Arrays.asList(clsSup.getDeclaredFields()));
+			fields = new Field[fieldList.size()];
+			int i = 0;
+			for (Object field : fieldList.toArray()) {
+				fields[i] = (Field) field;
+				i++;
+			}
 			fields = recursionParents(clsSup, fields);
 		}
 		return fields;
