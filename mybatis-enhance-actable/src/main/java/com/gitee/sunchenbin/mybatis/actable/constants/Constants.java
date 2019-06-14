@@ -12,4 +12,11 @@ public class Constants {
 	
 	public static final String NULL 					= "NULL";
 	
+	public static final String NEW_TABLE_MAP			= "newTableMap";
+	public static final String MODIFY_TABLE_MAP			= "modifyTableMap";
+	public static final String ADD_TABLE_MAP			= "addTableMap";
+	public static final String REMOVE_TABLE_MAP			= "removeTableMap";
+	public static final String DROPKEY_TABLE_MAP		= "dropKeyTableMap";
+	public static final String DROPUNIQUE_TABLE_MAP		= "dropUniqueTableMap";
+	
 }

@@ -73,24 +73,9 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		// 从包package中获取所有的Class
 		Set<Class<?>> classes = ClassTools.getClasses(pack);
-
-		// 1.用于存需要创建的表名+结构
-		Map<String, List<Object>> newTableMap = new HashMap<String, List<Object>>();
-
-		// 2.用于存需要更新字段类型等的表名+结构
-		Map<String, List<Object>> modifyTableMap = new HashMap<String, List<Object>>();
-
-		// 3.用于存需要增加字段的表名+结构
-		Map<String, List<Object>> addTableMap = new HashMap<String, List<Object>>();
-
-		// 4.用于存需要删除字段的表名+结构
-		Map<String, List<Object>> removeTableMap = new HashMap<String, List<Object>>();
-
-		// 5.用于存需要删除主键的表名+结构
-		Map<String, List<Object>> dropKeyTableMap = new HashMap<String, List<Object>>();
-
-		// 6.用于存需要删除唯一约束的表名+结构
-		Map<String, List<Object>> dropUniqueTableMap = new HashMap<String, List<Object>>();
+		
+		// 初始化用于存储各种操作表结构的容器
+		Map<String, Map<String, List<Object>>> baseTableMap = initTableMap();
 		
 		// 循环全部的model
 		for (Class<?> clas : classes) {
@@ -100,13 +85,32 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				continue;
 			}
 			// 构建出全部表的增删改的map
-			allTableMapConstruct(clas, newTableMap, modifyTableMap, addTableMap,
-					removeTableMap, dropKeyTableMap, dropUniqueTableMap);
+			buildTableMapConstruct(clas, baseTableMap);
 		}
 
 		// 根据传入的map，分别去创建或修改表结构
-		createOrModifyTableConstruct(newTableMap, modifyTableMap, addTableMap, removeTableMap, dropKeyTableMap,
-				dropUniqueTableMap);
+		createOrModifyTableConstruct(baseTableMap);
+	}
+
+	/**
+	 * 初始化用于存储各种操作表结构的容器
+	 * @return
+	 */
+	private Map<String, Map<String, List<Object>>> initTableMap() {
+		Map<String, Map<String, List<Object>>> baseTableMap = new HashMap<String, Map<String, List<Object>>>();
+		// 1.用于存需要创建的表名+结构
+		baseTableMap.put(Constants.NEW_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 2.用于存需要更新字段类型等的表名+结构
+		baseTableMap.put(Constants.MODIFY_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 3.用于存需要增加字段的表名+结构
+		baseTableMap.put(Constants.ADD_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 4.用于存需要删除字段的表名+结构
+		baseTableMap.put(Constants.REMOVE_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 5.用于存需要删除主键的表名+结构
+		baseTableMap.put(Constants.DROPKEY_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 6.用于存需要删除唯一约束的表名+结构
+		baseTableMap.put(Constants.DROPUNIQUE_TABLE_MAP, new HashMap<String, List<Object>>());
+		return baseTableMap;
 	}
 
 	/**
@@ -114,23 +118,10 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 * 
 	 * @param clas
 	 *            package中的model的Class
-	 * @param newTableMap
-	 *            用于存需要创建的表名+结构
-	 * @param modifyTableMap
-	 *            用于存需要更新字段类型等的表名+结构
-	 * @param addTableMap
-	 *            用于存需要增加字段的表名+结构
-	 * @param removeTableMap
-	 *            用于存需要删除字段的表名+结构
-	 * @param dropKeyTableMap
-	 *            用于存需要删除主键的表名+结构
-	 * @param dropUniqueTableMap
-	 *            用于存需要删除唯一约束的表名+结构
+	 * @param baseTableMap
+	 *            用于存储各种操作表结构的容器
 	 */
-	private void allTableMapConstruct(Class<?> clas,
-			Map<String, List<Object>> newTableMap, Map<String, List<Object>> modifyTableMap,
-			Map<String, List<Object>> addTableMap, Map<String, List<Object>> removeTableMap,
-			Map<String, List<Object>> dropKeyTableMap, Map<String, List<Object>> dropUniqueTableMap) {
+	private void buildTableMapConstruct(Class<?> clas, Map<String, Map<String, List<Object>>> baseTableMap) {
 		
 			// 获取model的table注解
 			Table table = clas.getAnnotation(Table.class);
@@ -152,7 +143,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 			// 不存在时
 			if (exist == 0) {
-				newTableMap.put(table.name(), allFieldList);
+				baseTableMap.get(Constants.NEW_TABLE_MAP).put(table.name(), allFieldList);
 				return;
 			}
 
@@ -182,19 +173,19 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			List<Object> dropUniqueFieldList = getDropUniqueFieldList(table, columnNames, tableColumnList, allFieldList);
 			
 			if (addFieldList.size() != 0) {
-				addTableMap.put(table.name(), addFieldList);
+				baseTableMap.get(Constants.ADD_TABLE_MAP).put(table.name(), addFieldList);
 			}
 			if (removeFieldList.size() != 0) {
-				removeTableMap.put(table.name(), removeFieldList);
+				baseTableMap.get(Constants.REMOVE_TABLE_MAP).put(table.name(), removeFieldList);
 			}
 			if (modifyFieldList.size() != 0) {
-				modifyTableMap.put(table.name(), modifyFieldList);
+				baseTableMap.get(Constants.MODIFY_TABLE_MAP).put(table.name(), modifyFieldList);
 			}
 			if (dropKeyFieldList.size() != 0) {
-				dropKeyTableMap.put(table.name(), dropKeyFieldList);
+				baseTableMap.get(Constants.DROPKEY_TABLE_MAP).put(table.name(), dropKeyFieldList);
 			}
 			if (dropUniqueFieldList.size() != 0) {
-				dropUniqueTableMap.put(table.name(), dropUniqueFieldList);
+				baseTableMap.get(Constants.DROPUNIQUE_TABLE_MAP).put(table.name(), dropUniqueFieldList);
 			}
 	}
 
@@ -639,22 +630,19 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 * @param dropUniqueTableMap
 	 *            用于存需要删除唯一约束的表名+结构
 	 */
-	private void createOrModifyTableConstruct(Map<String, List<Object>> newTableMap,
-			Map<String, List<Object>> modifyTableMap, Map<String, List<Object>> addTableMap,
-			Map<String, List<Object>> removeTableMap, Map<String, List<Object>> dropKeyTableMap,
-			Map<String, List<Object>> dropUniqueTableMap) {
+	private void createOrModifyTableConstruct(Map<String, Map<String, List<Object>>> baseTableMap) {
 		// 1. 创建表
-		createTableByMap(newTableMap);
+		createTableByMap(baseTableMap.get(Constants.NEW_TABLE_MAP));
 		// 2. 删除要变更主键的表的原来的字段的主键
-		dropFieldsKeyByMap(dropKeyTableMap);
+		dropFieldsKeyByMap(baseTableMap.get(Constants.DROPKEY_TABLE_MAP));
 		// 3. 删除要变更唯一约束的表的原来的字段的唯一约束
-		dropFieldsUniqueByMap(dropUniqueTableMap);
+		dropFieldsUniqueByMap(baseTableMap.get(Constants.DROPUNIQUE_TABLE_MAP));
 		// 4. 添加新的字段
-		addFieldsByMap(addTableMap);
+		addFieldsByMap(baseTableMap.get(Constants.ADD_TABLE_MAP));
 		// 5. 删除字段
-		removeFieldsByMap(removeTableMap);
+		removeFieldsByMap(baseTableMap.get(Constants.REMOVE_TABLE_MAP));
 		// 6. 修改字段类型等
-		modifyFieldsByMap(modifyTableMap);
+		modifyFieldsByMap(baseTableMap.get(Constants.MODIFY_TABLE_MAP));
 
 	}
 
