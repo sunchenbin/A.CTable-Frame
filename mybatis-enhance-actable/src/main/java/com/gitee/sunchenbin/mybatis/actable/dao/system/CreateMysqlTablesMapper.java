@@ -67,7 +67,33 @@ public interface CreateMysqlTablesMapper {
 	
 	/**
 	 * 根据表名删除表
-	 * @param tableName 表结构的map
+	 * @param tableName 表名
 	 */
 	public void dorpTableByName(@Param("tableName") String tableName);
+	
+	/**
+	 * 查询当前表存在的索引(除了主键索引primary)
+	 * @param tableName 表名
+	 * @return 索引名列表
+	 */
+	public List<String> findTableIndexByTableName(@Param("tableName") String tableName);
+	
+	/**
+	 * 删除表索引
+	 * @param tableMap
+	 */
+	public void dorpTabelIndex(@Param("tableMap") Map<String, Object> tableMap);
+	
+	/**
+	 * 创建索引
+	 * @param tableMap
+	 */
+	public void addTableIndex(@Param("tableMap") Map<String, Object> tableMap);
+	
+	/**
+	 * 创建唯一约束
+	 * @param tableMap
+	 */
+	public void addTableUnique(@Param("tableMap") Map<String, Object> tableMap);
+	
 }

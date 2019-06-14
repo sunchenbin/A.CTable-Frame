@@ -80,9 +80,12 @@ public @interface Column{
 	public String defaultValue() default "NULL";
 	
 	/**
+	 * 废弃方法建议使用@IsUnique注解实现唯一约束的设置
 	 * 是否是唯一，默认false
 	 * 
 	 * @return 是否是唯一，默认false
 	 */
+	@Deprecated
 	public boolean isUnique() default false;
+	
 }

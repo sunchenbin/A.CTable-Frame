@@ -152,4 +152,40 @@
 		DROP TABLE IF EXISTS `${tableName}`;
 	</select>
 	
+	<!-- 查询当前表存在的索引除了主键索引primary -->
+	<select id="findTableIndexByTableName" resultType="String" parameterType="String">
+		select index_name from information_schema.statistics
+		where table_name = #{tableName} and table_schema = (select database()) and lower(index_name) !='primary'
+	</select>
+	
+	<!-- 删除索引 -->
+	<select id="dorpTabelIndex" parameterType="java.util.Map">
+		<foreach collection="tableMap" index="key" item="fields" separator=";">
+				DROP INDEX `${indexName}` on `${tableName}`
+		</foreach>
+	</select>
+	
+	<!-- 创建索引 -->
+	<select id="addTableIndex" parameterType="java.util.Map">
+	
+		<foreach collection="tableMap" index="tableName" item="indexNameMap" separator=";">
+				<foreach collection="indexNameMap" index="indexName" item="columnNames" separator=";">
+					CREATE INDEX indexName
+					ON `${tableName}` (${columnNames})
+				</foreach>
+		</foreach>
+		
+	</select>
+	
+	<!-- 创建唯一约束 -->
+	<select id="addTableUnique" parameterType="java.util.Map">
+	
+		<foreach collection="tableMap" index="tableName" item="indexNameMap" separator=";">
+				<foreach collection="indexNameMap" index="indexName" item="columnNames" separator=";">
+					CREATE UNIQUE INDEX indexName
+					ON `${tableName}` (${columnNames})
+				</foreach>
+		</foreach>
+		
+	</select>
 </mapper>
