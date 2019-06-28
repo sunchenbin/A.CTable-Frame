@@ -1,5 +1,7 @@
 package com.gitee.sunchenbin.mybatis.actable.command;
 
+import java.util.List;
+
 /**
  * 用于存放创建表的字段信息
  *
@@ -57,6 +59,27 @@ public class CreateTableParam{
 	 * 值是否唯一
 	 */
 	private boolean	fieldIsUnique;
+	
+	/**
+	 * 索引名称
+	 */
+	private String filedIndexName;
+	
+	/**
+	 * 所以字段列表
+	 */
+	private List<String> filedIndexValue;
+	
+	/**
+	 * 唯一约束名称
+	 */
+	private String filedUniqueName;
+	
+	/**
+	 * 唯一约束列表
+	 */
+	private List<String> filedUniqueValue;
+	
 
 	public String getFieldName(){
 		return fieldName;
@@ -130,12 +153,46 @@ public class CreateTableParam{
 		this.fileTypeLength = fileTypeLength;
 	}
 
+	@Deprecated
 	public boolean isFieldIsUnique(){
 		return fieldIsUnique;
 	}
 
+	@Deprecated
 	public void setFieldIsUnique(boolean fieldIsUnique){
 		this.fieldIsUnique = fieldIsUnique;
+	}
+
+	public String getFiledIndexName() {
+		return filedIndexName;
+	}
+
+	public void setFiledIndexName(String filedIndexName) {
+		this.filedIndexName = filedIndexName;
+	}
+
+	public List<String> getFiledIndexValue() {
+		return filedIndexValue;
+	}
+
+	public void setFiledIndexValue(List<String> filedIndexValue) {
+		this.filedIndexValue = filedIndexValue;
+	}
+
+	public String getFiledUniqueName() {
+		return filedUniqueName;
+	}
+
+	public void setFiledUniqueName(String filedUniqueName) {
+		this.filedUniqueName = filedUniqueName;
+	}
+
+	public List<String> getFiledUniqueValue() {
+		return filedUniqueValue;
+	}
+
+	public void setFiledUniqueValue(List<String> filedUniqueValue) {
+		this.filedUniqueValue = filedUniqueValue;
 	}
 
 }

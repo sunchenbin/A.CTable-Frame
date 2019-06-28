@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 设置字段唯一约束
+ * 设置字段索引
  *
  * @author sunchenbin
  * @version 2019年6月14日 下午6:12:48
@@ -20,13 +20,13 @@ import java.lang.annotation.Target;
 public @interface Index {
 	
 	/**
-	 * 索引的名字，不设置默认为{idx_当前标记字段名}
+	 * 索引的名字，不设置默认为{idx_当前标记字段名@Column的name}
 	 * @return
 	 */
 	public String name() default "";
 	
 	/**
-	 * 要建立索引的字段名，不设置默认为当前标记字段
+	 * 要建立索引的字段名，不设置默认为当前标记字段名@Column的name
 	 * <p>可设置多个建立联合索引{"login_mobile","login_name"}
 	 * @return
 	 */

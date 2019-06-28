@@ -20,13 +20,13 @@ import java.lang.annotation.Target;
 public @interface Unique {
 
 	/**
-	 * 唯一约束的名字，不设置默认为{uniq_当前标记字段名}
+	 * 唯一约束的名字，不设置默认为{uni_当前标记字段名@Column的name}
 	 * @return
 	 */
 	public String name() default "";
 	
 	/**
-	 * 唯一约束的字段名，不设置默认为当前标记字段
+	 * 唯一约束的字段名，不设置默认为当前标记字段名@Column的name
 	 * <p>可设置多个建立联合唯一{"login_mobile","login_name"}
 	 * @return
 	 */

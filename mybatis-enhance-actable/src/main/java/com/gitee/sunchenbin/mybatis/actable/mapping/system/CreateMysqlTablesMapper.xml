@@ -67,9 +67,6 @@
 				<if test="fields.fieldIsKey">
 					,PRIMARY KEY (`${fields.fieldName}`)
 				</if>
-				<if test="fields.fieldIsUnique">
-					,UNIQUE KEY (`${fields.fieldName}`)
-				</if>
 			</foreach>
 			);
 		</foreach>
@@ -96,9 +93,6 @@
 				<if test="fields.fieldIsKey">
 					PRIMARY KEY 
 				</if>
-				<if test="fields.fieldIsUnique">
-					UNIQUE KEY 
-				</if>
 		</foreach>
 		
 	</select>
@@ -119,9 +113,6 @@
 				<if test="fields.fieldIsKey">
 					PRIMARY KEY 
 				</if>
-				<if test="fields.fieldIsUnique">
-					UNIQUE KEY 
-				</if>
 		</foreach>
 		
 	</select>
@@ -134,15 +125,6 @@
 				alter table `${key}` modify 
 				<include refid="commonSql"></include>
 				,drop primary key
-		</foreach>
-		
-	</select>
-	
-	<!-- 删除唯一约束 -->
-	<select id="dropUniqueTableField" parameterType="java.util.Map">
-	
-		<foreach collection="tableMap" index="key" item="fields" separator=";">
-				alter table `${key}` DROP INDEX `${fields.fieldName}`
 		</foreach>
 		
 	</select>
@@ -160,7 +142,7 @@
 	
 	<!-- 删除索引 -->
 	<select id="dorpTabelIndex" parameterType="java.util.Map">
-		<foreach collection="tableMap" index="key" item="fields" separator=";">
+		<foreach collection="tableMap" index="tableName" item="indexName">
 				DROP INDEX `${indexName}` on `${tableName}`
 		</foreach>
 	</select>
@@ -168,23 +150,43 @@
 	<!-- 创建索引 -->
 	<select id="addTableIndex" parameterType="java.util.Map">
 	
-		<foreach collection="tableMap" index="tableName" item="indexNameMap" separator=";">
-				<foreach collection="indexNameMap" index="indexName" item="columnNames" separator=";">
-					CREATE INDEX indexName
-					ON `${tableName}` (${columnNames})
+		<foreach collection="tableMap" index="tableName" item="fields" separator=";">
+				CREATE INDEX ${fields.filedIndexName}
+				ON `${tableName}` (
+				<foreach collection="fields.filedIndexValue" index="index" item="columnName">
+					<if test="fields.filedIndexValue.size == 1">
+						${columnName}
+					</if>
+					<if test="fields.filedIndexValue.size > 1">
+						${columnName}
+						<if test="fields.filedIndexValue.size != index + 1">
+						,
+						</if>
+					</if>
 				</foreach>
+				)				
 		</foreach>
 		
 	</select>
 	
 	<!-- 创建唯一约束 -->
 	<select id="addTableUnique" parameterType="java.util.Map">
-	
-		<foreach collection="tableMap" index="tableName" item="indexNameMap" separator=";">
-				<foreach collection="indexNameMap" index="indexName" item="columnNames" separator=";">
-					CREATE UNIQUE INDEX indexName
-					ON `${tableName}` (${columnNames})
+		
+		<foreach collection="tableMap" index="tableName" item="fields" separator=";">
+				CREATE UNIQUE INDEX ${fields.filedUniqueName}
+				ON `${tableName}` (
+				<foreach collection="fields.filedUniqueValue" index="index" item="columnName">
+					<if test="fields.filedUniqueValue.size == 1">
+						${columnName}
+					</if>
+					<if test="fields.filedUniqueValue.size > 1">
+						${columnName}
+						<if test="fields.filedUniqueValue.size != index + 1">
+						,
+						</if>
+					</if>
 				</foreach>
+				)				
 		</foreach>
 		
 	</select>

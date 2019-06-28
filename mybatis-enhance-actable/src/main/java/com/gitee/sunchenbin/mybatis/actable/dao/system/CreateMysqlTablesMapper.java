@@ -2,6 +2,7 @@ package com.gitee.sunchenbin.mybatis.actable.dao.system;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -60,12 +61,6 @@ public interface CreateMysqlTablesMapper {
 	public void dropKeyTableField(@Param("tableMap") Map<String, Object> tableMap);
 	
 	/**
-	 * 删除唯一约束字段，不带修改其他字段属性的功能
-	 * @param tableMap 表结构的map
-	 */
-	public void dropUniqueTableField(@Param("tableMap") Map<String, Object> tableMap);
-	
-	/**
 	 * 根据表名删除表
 	 * @param tableName 表名
 	 */
@@ -76,7 +71,7 @@ public interface CreateMysqlTablesMapper {
 	 * @param tableName 表名
 	 * @return 索引名列表
 	 */
-	public List<String> findTableIndexByTableName(@Param("tableName") String tableName);
+	public Set<String> findTableIndexByTableName(@Param("tableName") String tableName);
 	
 	/**
 	 * 删除表索引
