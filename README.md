@@ -1,30 +1,34 @@
-# mybatis-enhance-actable-1.0.5
+# mybatis-enhance-actable-1.0.6.RELEASE
 
-该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续可能会扩展针对其他数据库的支持。
+该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
  **######### mybatis增加功能自动创建表——A.C.Table版本说明################** 
 1. 该版本修复了修改主键同时修改其类型引起的error(版本1.0.1)
 2. 该版本修复了根据model创建时没有创建父类中的字段的问题（ps：目前只支持扫描一层继承）(版本1.0.1)
-3. 该笨笨增加了对唯一约束的支持(版本1.0.1)
+3. 该版本增加了对唯一约束的支持(版本1.0.1)
 4. 从原有的框架中剥离出来，支持任意结构的spring+mybatis的框架使用(版本1.0.1)
 5. 再次声明A.C.Table目前仅支持mysql数据库(版本1.0.1)
 6. 修复了不同数据库中有相同表名时，启动报错的问题。(版本1.0.2)
 7. 修复了model属性名与表字段名不一致时公共的查询方法查不出数据的问题。(版本1.0.2)
 8. 增加了对公共的CUDR方法的优化，保存成功会返回id，query查询时可以设置参数进行分页查询（pageSize:int类型标识每页数量，currentPage:int类型标识当前第几页，start:int类型从第几条开始，orderField：string类型排序字段，sortStr：string类型排序方式(desc,asc)）(版本1.0.3)
 9. 增加了对Mysql的longtext和mediumtext两种字段类型的支持，公共的CUDR方法的优化，原query方法更正为search，现query方法支持动态sql查询，原orderField字段只支持单个字段的排序，现修改为orderBy字段，支持数据类型为LinkedHashMap<String, String>，有序，key为字段名，value为排序方式(版本1.0.4)
-10.增加对mysql数据库（timestamp/time/date/float）四种数据类型的支持(版本1.0.5)
-11.增加对springboot框架的支持(版本1.0.5)
+10. 增加对mysql数据库（timestamp/time/date/float/bit）五种数据类型的支持(版本1.0.5)
+11. 增加对springboot框架的支持(版本1.0.5)
+12. 删除旧版本在@Colum中实现唯一约束的方式(版本1.0.6.RELEASE)
+13. 增加了新的唯一约束实现方式@Unique，支持多字段聚合约束(版本1.0.6.RELEASE)
+14. 增加了索引创建方式@Index，支持多字段聚合索引(版本1.0.6.RELEASE)
+15. 修复query查询方法无法返回父类字段数据的bug(版本1.0.6.RELEASE)
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.0.5.jar
+1. 需要依赖mybatis-enhance-actable-1.0.6.RELEASE.jar
 
 ```
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.5</version>
+	    <version>1.0.6.RELEASE</version>
 	</dependency>
 ```
 
@@ -73,7 +77,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.5</version>
+	    <version>1.0.6.RELEASE</version>
 	</dependency>
 ```
     
@@ -100,7 +104,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.5</version>
+	    <version>1.0.6.RELEASE</version>
 	</dependency>
 ```
 
@@ -164,8 +168,12 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     3.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
 
     4.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
+    
+    5.Index.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建索引，有两个属性一个是设置索引名称，一个是设置索引字段，支持多字段联合索引，如果都不设置默认为当前字段创建索引
 
-    5.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
+    6.Unique.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建唯一约束，有两个属性一个是设置约束名称，一个是设置约束字段，支持多字段联合约束，如果都不设置默认为当前字段创建唯一约束
+
+    7.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
  **model的写法例子**
 ```
@@ -177,6 +185,8 @@ public class Test extends BaseModel{
 	@Column(name = "id",type = MySqlTypeConstant.INT,length = 11,isKey = true,isAutoIncrement = true)
 	private Integer	id;
 
+        @Index
+        @Unique
 	@Column(name = "name",type = MySqlTypeConstant.VARCHAR,length = 111)
 	private String	name;
 
@@ -189,7 +199,8 @@ public class Test extends BaseModel{
 	@Column(name = "update_time",type = MySqlTypeConstant.DATETIME)
 	private Date	update_time;
 
-	@Column(name = "number",type = MySqlTypeConstant.BIGINT,length = 5,isUnique=true)
+        @Index(name="idx_number_name",value={"number","name"})
+	@Column(name = "number",type = MySqlTypeConstant.BIGINT,length = 5)
 	private Long	number;
 
 	@Column(name = "lifecycle",type = MySqlTypeConstant.CHAR,length = 1,isNull=false)

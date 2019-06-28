@@ -284,7 +284,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		for(Map<String, Object> map : query){
 			try{
 			T t = beanClass.newInstance();
-			Field[] fields = t.getClass().getDeclaredFields();
+			Field[] fields = getAllFields(t);
 			for(Field field : fields){
 				field.setAccessible(true);
 				Column annotation = field.getAnnotation(Column.class);

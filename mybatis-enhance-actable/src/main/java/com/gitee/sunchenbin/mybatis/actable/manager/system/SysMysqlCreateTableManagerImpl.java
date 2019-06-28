@@ -4,6 +4,8 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,13 +14,14 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
 import com.gitee.sunchenbin.mybatis.actable.annotation.LengthCount;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Unique;
 import com.gitee.sunchenbin.mybatis.actable.command.CreateTableParam;
 import com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns;
 import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
@@ -41,9 +44,12 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 	@Autowired
 	private CreateMysqlTablesMapper createMysqlTablesMapper;
-	
+
 	@Autowired
 	private ConfigurationUtil springContextUtil;
+	
+	// 获取Mysql的类型，以及类型需要设置几个长度
+	private static Map<String, Object> mySqlTypeAndLengthMap = mySqlTypeAndLengthMap();
 
 	/**
 	 * 要扫描的model所在的pack
@@ -54,7 +60,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 * 自动创建模式：update表示更新，create表示删除原表重新创建
 	 */
 	private static String tableAuto = null;
-	
+
 	/**
 	 * 读取配置文件的三种状态（创建表、更新表、不做任何事情）
 	 */
@@ -62,6 +68,12 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		// 读取配置信息
 		pack = springContextUtil.getConfig(Constants.MODEL_PACK_KEY);
 		tableAuto = springContextUtil.getConfig(Constants.TABLE_AUTO_KEY);
+		
+		// 不做任何事情
+		if (!"none".equals(tableAuto) && !"update".equals(tableAuto) && !"create".equals(tableAuto)) {
+			log.warn("配置mybatis.table.auto错误无法识别，当前配置只支持[none/update/create]三种类型!");
+			return;
+		}
 
 		// 不做任何事情
 		if ("none".equals(tableAuto)) {
@@ -69,86 +81,71 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			return;
 		}
 
-		// 获取Mysql的类型，以及类型需要设置几个长度
-		Map<String, Object> mySqlTypeAndLengthMap = mySqlTypeAndLengthMap();
-
 		// 从包package中获取所有的Class
 		Set<Class<?>> classes = ClassTools.getClasses(pack);
-
-		// 用于存需要创建的表名+结构
-		Map<String, List<Object>> newTableMap = new HashMap<String, List<Object>>();
-
-		// 用于存需要更新字段类型等的表名+结构
-		Map<String, List<Object>> modifyTableMap = new HashMap<String, List<Object>>();
-
-		// 用于存需要增加字段的表名+结构
-		Map<String, List<Object>> addTableMap = new HashMap<String, List<Object>>();
-
-		// 用于存需要删除字段的表名+结构
-		Map<String, List<Object>> removeTableMap = new HashMap<String, List<Object>>();
-
-		// 用于存需要删除主键的表名+结构
-		Map<String, List<Object>> dropKeyTableMap = new HashMap<String, List<Object>>();
-
-		// 用于存需要删除唯一约束的表名+结构
-		Map<String, List<Object>> dropUniqueTableMap = new HashMap<String, List<Object>>();
-
-		// 构建出全部表的增删改的map
-		allTableMapConstruct(mySqlTypeAndLengthMap, classes, newTableMap, modifyTableMap, addTableMap, removeTableMap,
-				dropKeyTableMap, dropUniqueTableMap);
+		
+		// 初始化用于存储各种操作表结构的容器
+		Map<String, Map<String, List<Object>>> baseTableMap = initTableMap();
+		
+		// 循环全部的model
+		for (Class<?> clas : classes) {
+			
+			// 没有打注解不需要创建表
+			if (null == clas.getAnnotation(Table.class)) {
+				continue;
+			}
+			// 构建出全部表的增删改的map
+			buildTableMapConstruct(clas, baseTableMap);
+		}
 
 		// 根据传入的map，分别去创建或修改表结构
-		createOrModifyTableConstruct(newTableMap, modifyTableMap, addTableMap, removeTableMap, dropKeyTableMap,
-				dropUniqueTableMap);
+		createOrModifyTableConstruct(baseTableMap);
+	}
+
+	/**
+	 * 初始化用于存储各种操作表结构的容器
+	 * @return 初始化map
+	 */
+	private Map<String, Map<String, List<Object>>> initTableMap() {
+		Map<String, Map<String, List<Object>>> baseTableMap = new HashMap<String, Map<String, List<Object>>>();
+		// 1.用于存需要创建的表名+结构
+		baseTableMap.put(Constants.NEW_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 2.用于存需要更新字段类型等的表名+结构
+		baseTableMap.put(Constants.MODIFY_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 3.用于存需要增加字段的表名+结构
+		baseTableMap.put(Constants.ADD_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 4.用于存需要删除字段的表名+结构
+		baseTableMap.put(Constants.REMOVE_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 5.用于存需要删除主键的表名+结构
+		baseTableMap.put(Constants.DROPKEY_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 6.用于存需要删除唯一约束的表名+结构
+		baseTableMap.put(Constants.DROPINDEXANDUNIQUE_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 7.用于存需要增加的索引
+		baseTableMap.put(Constants.ADDINDEX_TABLE_MAP, new HashMap<String, List<Object>>());
+		// 8.用于存需要增加的唯一约束
+		baseTableMap.put(Constants.ADDUNIQUE_TABLE_MAP, new HashMap<String, List<Object>>());
+		return baseTableMap;
 	}
 
 	/**
 	 * 构建出全部表的增删改的map
 	 * 
-	 * @param mySqlTypeAndLengthMap
-	 *            获取Mysql的类型，以及类型需要设置几个长度
-	 * @param classes
-	 *            从包package中获取所有的Class
-	 * @param newTableMap
-	 *            用于存需要创建的表名+结构
-	 * @param modifyTableMap
-	 *            用于存需要更新字段类型等的表名+结构
-	 * @param addTableMap
-	 *            用于存需要增加字段的表名+结构
-	 * @param removeTableMap
-	 *            用于存需要删除字段的表名+结构
-	 * @param dropKeyTableMap
-	 *            用于存需要删除主键的表名+结构
-	 * @param dropUniqueTableMap
-	 *            用于存需要删除唯一约束的表名+结构
+	 * @param clas
+	 *            package中的model的Class
+	 * @param baseTableMap
+	 *            用于存储各种操作表结构的容器
 	 */
-	private void allTableMapConstruct(Map<String, Object> mySqlTypeAndLengthMap, Set<Class<?>> classes,
-			Map<String, List<Object>> newTableMap, Map<String, List<Object>> modifyTableMap,
-			Map<String, List<Object>> addTableMap, Map<String, List<Object>> removeTableMap,
-			Map<String, List<Object>> dropKeyTableMap, Map<String, List<Object>> dropUniqueTableMap) {
-		for (Class<?> clas : classes) {
-
+	private void buildTableMapConstruct(Class<?> clas, Map<String, Map<String, List<Object>>> baseTableMap) {
+		
+			// 获取model的table注解
 			Table table = clas.getAnnotation(Table.class);
-			// 没有打注解不需要创建变
-			if (null == table) {
-				continue;
+			
+			// 1. 用于存表的全部字段
+			List<Object> allFieldList = getAllFields(mySqlTypeAndLengthMap, clas);
+			if (allFieldList.size() == 0) {
+				log.warn("扫描model发现" + clas.getName() + "没有建表字段请检查！");
+				return;
 			}
-
-			// 用于存新增表的字段
-			List<Object> newFieldList = new ArrayList<Object>();
-			// 用于存删除的字段
-			List<Object> removeFieldList = new ArrayList<Object>();
-			// 用于存新增的字段
-			List<Object> addFieldList = new ArrayList<Object>();
-			// 用于存修改的字段
-			List<Object> modifyFieldList = new ArrayList<Object>();
-			// 用于存删除主键的字段
-			List<Object> dropKeyFieldList = new ArrayList<Object>();
-			// 用于存删除唯一约束的字段
-			List<Object> dropUniqueFieldList = new ArrayList<Object>();
-
-			// 迭代出所有model的所有fields存到newFieldList中
-			tableFieldsConstruct(mySqlTypeAndLengthMap, clas, newFieldList);
 
 			// 如果配置文件配置的是create，表示将所有的表删掉重新创建
 			if ("create".equals(tableAuto)) {
@@ -160,132 +157,199 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 			// 不存在时
 			if (exist == 0) {
-				newTableMap.put(table.name(), newFieldList);
-			} else {
-				// 已存在时理论上做修改的操作，这里查出该表的结构
-				List<SysMysqlColumns> tableColumnList = createMysqlTablesMapper
-						.findTableEnsembleByTableName(table.name());
+				baseTableMap.get(Constants.NEW_TABLE_MAP).put(table.name(), allFieldList);
+				baseTableMap.get(Constants.ADDINDEX_TABLE_MAP).put(table.name(), getAddIndexList(null, allFieldList));
+				baseTableMap.get(Constants.ADDUNIQUE_TABLE_MAP).put(table.name(), getAddUniqueList(null, allFieldList));
+				return;
+			}
 
-				// 从sysColumns中取出我们需要比较的列的List
-				// 先取出name用来筛选出增加和删除的字段
-				List<String> columnNames = ClassTools.getPropertyValueList(tableColumnList,
-						SysMysqlColumns.COLUMN_NAME_KEY);
+			// 已存在时理论上做修改的操作，这里查出该表的结构
+			List<SysMysqlColumns> tableColumnList = createMysqlTablesMapper
+					.findTableEnsembleByTableName(table.name());
 
-				// 验证对比从model中解析的fieldList与从数据库查出来的columnList
-				// 1. 找出增加的字段
-				// 2. 找出删除的字段
-				// 3. 找出更新的字段
-				buildAddAndRemoveAndModifyFields(mySqlTypeAndLengthMap, modifyTableMap, addTableMap, removeTableMap,
-						dropKeyTableMap, dropUniqueTableMap, table, newFieldList, removeFieldList, addFieldList,
-						modifyFieldList, dropKeyFieldList, dropUniqueFieldList, tableColumnList, columnNames);
+			// 从sysColumns中取出我们需要比较的列的List
+			// 先取出name用来筛选出增加和删除的字段
+			List<String> columnNames = ClassTools.getPropertyValueList(tableColumnList,
+					SysMysqlColumns.COLUMN_NAME_KEY);
 
+			// 验证对比从model中解析的allFieldList与从数据库查出来的columnList
+			// 2. 找出增加的字段
+			List<Object> addFieldList = getAddFieldList(table, allFieldList, columnNames);
+			
+			// 3. 找出删除的字段
+			List<Object> removeFieldList = getRemoveFieldList(table, columnNames, allFieldList);
+			
+			// 4. 找出更新的字段
+			List<Object> modifyFieldList = getModifyFieldList(table, columnNames,tableColumnList, allFieldList);
+			
+			// 5. 找出需要删除主键的字段
+			List<Object> dropKeyFieldList = getDropKeyFieldList(table, columnNames,tableColumnList, allFieldList);
+			
+			// 查询当前表中全部的索引和唯一约束
+			Set<String> allIndexAndUniqueNames = createMysqlTablesMapper.findTableIndexByTableName(table.name());
+			
+			// 6. 找出需要删除的索引和唯一约束
+			List<Object> dropIndexAndUniqueFieldList = getDropIndexAndUniqueList(allIndexAndUniqueNames, allFieldList);
+			
+			// 7. 找出需要新增的索引
+			List<Object> addIndexFieldList = getAddIndexList(allIndexAndUniqueNames, allFieldList);
+			
+			// 8. 找出需要新增的唯一约束
+			List<Object> addUniqueFieldList = getAddUniqueList(allIndexAndUniqueNames, allFieldList);
+			
+			if (addFieldList.size() != 0) {
+				baseTableMap.get(Constants.ADD_TABLE_MAP).put(table.name(), addFieldList);
+			}
+			if (removeFieldList.size() != 0) {
+				baseTableMap.get(Constants.REMOVE_TABLE_MAP).put(table.name(), removeFieldList);
+			}
+			if (modifyFieldList.size() != 0) {
+				baseTableMap.get(Constants.MODIFY_TABLE_MAP).put(table.name(), modifyFieldList);
+			}
+			if (dropKeyFieldList.size() != 0) {
+				baseTableMap.get(Constants.DROPKEY_TABLE_MAP).put(table.name(), dropKeyFieldList);
+			}
+			if (dropIndexAndUniqueFieldList.size() != 0) {
+				baseTableMap.get(Constants.DROPINDEXANDUNIQUE_TABLE_MAP).put(table.name(), dropIndexAndUniqueFieldList);
+			}
+			if (addIndexFieldList.size() != 0) {
+				baseTableMap.get(Constants.ADDINDEX_TABLE_MAP).put(table.name(), addIndexFieldList);
+			}
+			if (addUniqueFieldList.size() != 0) {
+				baseTableMap.get(Constants.ADDUNIQUE_TABLE_MAP).put(table.name(), addUniqueFieldList);
+			}			
+	}
+
+	/**
+	 * 找出需要新建的索引
+	 * 
+	 * @param allIndexAndUniqueNames 
+	 * 				当前数据库的索引很约束名
+	 * @param allFieldList 
+	 * 				model中的所有字段
+	 * @return 需要新建的索引
+	 */
+	private List<Object> getAddIndexList(Set<String> allIndexAndUniqueNames, List<Object> allFieldList) {
+		List<Object> addIndexFieldList = new ArrayList<Object>();		
+		if (null == allIndexAndUniqueNames) {
+			allIndexAndUniqueNames = new HashSet<String>();
+		}
+		for (Object obj : allFieldList) {
+			CreateTableParam createTableParam = (CreateTableParam) obj;
+			if (null != createTableParam.getFiledIndexName() && !allIndexAndUniqueNames.contains(createTableParam.getFiledIndexName())) {
+				addIndexFieldList.add(createTableParam);
 			}
 		}
+		return addIndexFieldList;
 	}
-
+	
 	/**
-	 * 构建增加的删除的修改的字段
+	 * 找出需要新建的唯一约束
 	 * 
-	 * @param mySqlTypeAndLengthMap
-	 *            获取Mysql的类型，以及类型需要设置几个长度
-	 * @param modifyTableMap
-	 *            用于存需要更新字段类型等的表名+结构
-	 * @param addTableMap
-	 *            用于存需要增加字段的表名+结构
-	 * @param removeTableMap
-	 *            用于存需要删除字段的表名+结构
-	 * @param dropKeyTableMap
-	 *            用于存需要删除主键的表名+结构
-	 * @param dropUniqueTableMap
-	 *            用于存需要删除唯一约束的表名+结构
-	 * @param table
-	 *            表
-	 * @param newFieldList
-	 *            用于存新增表的字段
-	 * @param removeFieldList
-	 *            用于存删除的字段
-	 * @param addFieldList
-	 *            用于存新增的字段
-	 * @param modifyFieldList
-	 *            用于存修改的字段
-	 * @param dropKeyFieldList
-	 *            用于存删除主键的字段
-	 * @param dropUniqueFieldList
-	 *            用于存删除唯一约束的字段
-	 * @param tableColumnList
-	 *            已存在时理论上做修改的操作，这里查出该表的结构
-	 * @param columnNames
-	 *            从sysColumns中取出我们需要比较的列的List
+	 * @param allIndexAndUniqueNames 
+	 * 				当前数据库的索引很约束名
+	 * @param allFieldList 
+	 * 				model中的所有字段
+	 * @return 需要新建的唯一约束
 	 */
-	private void buildAddAndRemoveAndModifyFields(Map<String, Object> mySqlTypeAndLengthMap,
-			Map<String, List<Object>> modifyTableMap, Map<String, List<Object>> addTableMap,
-			Map<String, List<Object>> removeTableMap, Map<String, List<Object>> dropKeyTableMap,
-			Map<String, List<Object>> dropUniqueTableMap, Table table, List<Object> newFieldList,
-			List<Object> removeFieldList, List<Object> addFieldList, List<Object> modifyFieldList,
-			List<Object> dropKeyFieldList, List<Object> dropUniqueFieldList, List<SysMysqlColumns> tableColumnList,
-			List<String> columnNames) {
-		// 1. 找出增加的字段
-		// 根据数据库中表的结构和model中表的结构对比找出新增的字段
-		buildNewFields(addTableMap, table, newFieldList, addFieldList, columnNames);
-
-		// 将fieldList转成Map类型，字段名作为主键
-		Map<String, CreateTableParam> fieldMap = new HashMap<String, CreateTableParam>();
-		for (Object obj : newFieldList) {
-			CreateTableParam createTableParam = (CreateTableParam) obj;
-			fieldMap.put(createTableParam.getFieldName(), createTableParam);
+	private List<Object> getAddUniqueList(Set<String> allIndexAndUniqueNames, List<Object> allFieldList) {
+		List<Object> addUniqueFieldList = new ArrayList<Object>();		
+		if (null == allIndexAndUniqueNames) {
+			allIndexAndUniqueNames = new HashSet<String>();
 		}
-
-		// 2. 找出删除的字段
-		buildRemoveFields(removeTableMap, table, removeFieldList, columnNames, fieldMap);
-
-		// 3. 找出更新的字段
-		buildModifyFields(mySqlTypeAndLengthMap, modifyTableMap, dropKeyTableMap, dropUniqueTableMap, table,
-				modifyFieldList, dropKeyFieldList, dropUniqueFieldList, tableColumnList, fieldMap);
+		for (Object obj : allFieldList) {
+			CreateTableParam createTableParam = (CreateTableParam) obj;
+			if (null != createTableParam.getFiledUniqueName() && !allIndexAndUniqueNames.contains(createTableParam.getFiledUniqueName())) {
+				addUniqueFieldList.add(createTableParam);
+			}
+		}
+		return addUniqueFieldList;
 	}
 
 	/**
-	 * 根据数据库中表的结构和model中表的结构对比找出修改类型默认值等属性的字段
+	 * 找出需要删除的索引和唯一约束
 	 * 
-	 * @param mySqlTypeAndLengthMap
-	 *            获取Mysql的类型，以及类型需要设置几个长度
-	 * @param modifyTableMap
-	 *            用于存需要更新字段类型等的表名+结构
-	 * @param dropKeyTableMap
-	 *            用于存需要删除主键的表名+结构
-	 * @param dropUniqueTableMap
-	 *            用于存需要删除唯一约束的表名+结构
+	 * @param allIndexAndUniqueNames 
+	 * 				当前数据库的索引很约束名
+	 * @param allFieldList 
+	 * 				model中的所有字段
+	 * @return 需要删除的索引和唯一约束
+	 */
+	private List<Object> getDropIndexAndUniqueList(Set<String> allIndexAndUniqueNames, List<Object> allFieldList) {
+		List<Object> dropIndexAndUniqueFieldList = new ArrayList<Object>();
+		if (null == allIndexAndUniqueNames || allIndexAndUniqueNames.size() == 0) {
+			return dropIndexAndUniqueFieldList;
+		}
+		List<String> currentModelIndexAndUnique = new ArrayList<String>();
+		for (Object obj : allFieldList) {
+			CreateTableParam createTableParam = (CreateTableParam) obj;
+			if (null != createTableParam.getFiledIndexName()) {
+				currentModelIndexAndUnique.add(createTableParam.getFiledIndexName());
+			}
+			if (null != createTableParam.getFiledUniqueName()) {
+				currentModelIndexAndUnique.add(createTableParam.getFiledUniqueName());
+			}
+		}
+		for (String string : allIndexAndUniqueNames) {
+			if (!currentModelIndexAndUnique.contains(string)) {
+				dropIndexAndUniqueFieldList.add(string);
+			}
+		}
+		return dropIndexAndUniqueFieldList;
+	}
+
+	/**
+	 * 返回需要删除主键的字段
+	 * 
 	 * @param table
 	 *            表
-	 * @param modifyFieldList
-	 *            用于存修改的字段
-	 * @param dropKeyFieldList
-	 *            用于存删除主键的字段
-	 * @param dropUniqueFieldList
-	 *            用于存删除唯一约束的字段
+	 * @param columnNames
+	 *            数据库中的结构
 	 * @param tableColumnList
-	 *            已存在时理论上做修改的操作，这里查出该表的结构
-	 * @param fieldMap
-	 *            从sysColumns中取出我们需要比较的列的List
+	 * 			  表结构
+	 * @param allFieldList
+	 *            model中的所有字段
+	 * @return 需要删除主键的字段
 	 */
-	private void buildModifyFields(Map<String, Object> mySqlTypeAndLengthMap, Map<String, List<Object>> modifyTableMap,
-			Map<String, List<Object>> dropKeyTableMap, Map<String, List<Object>> dropUniqueTableMap, Table table,
-			List<Object> modifyFieldList, List<Object> dropKeyFieldList, List<Object> dropUniqueFieldList,
-			List<SysMysqlColumns> tableColumnList, Map<String, CreateTableParam> fieldMap) {
+	private List<Object> getDropKeyFieldList(Table table, List<String> columnNames,
+			List<SysMysqlColumns> tableColumnList, List<Object> allFieldList) {
+		Map<String, CreateTableParam> fieldMap = getAllFieldMap(allFieldList);
+		List<Object> dropKeyFieldList = new ArrayList<Object>();
 		for (SysMysqlColumns sysColumn : tableColumnList) {
 			// 数据库中有该字段时
 			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name());
 			if (createTableParam != null) {
-				// 检查是否要删除已有主键和是否要删除已有唯一约束的代码必须放在其他检查的最前面
 				// 原本是主键，现在不是了，那么要去做删除主键的操作
 				if ("PRI".equals(sysColumn.getColumn_key()) && !createTableParam.isFieldIsKey()) {
 					dropKeyFieldList.add(createTableParam);
 				}
 
-				// 原本是唯一，现在不是了，那么要去做删除唯一的操作
-				if ("UNI".equals(sysColumn.getColumn_key()) && !createTableParam.isFieldIsUnique()) {
-					dropUniqueFieldList.add(createTableParam);
-				}
+			}
+		}
+		return dropKeyFieldList;
+	}
 
+	/**
+	 * 根据数据库中表的结构和model中表的结构对比找出修改类型默认值等属性的字段
+	 * 
+	 * @param table
+	 *            表
+	 * @param columnNames
+	 *            数据库中的结构
+	 * @param tableColumnList
+	 * 			  表结构
+	 * @param allFieldList
+	 *            model中的所有字段
+	 * @return 需要修改的字段
+	 */
+	private List<Object> getModifyFieldList(Table table, List<String> columnNames, List<SysMysqlColumns> tableColumnList,
+			List<Object> allFieldList) {
+		Map<String, CreateTableParam> fieldMap = getAllFieldMap(allFieldList);
+		List<Object> modifyFieldList = new ArrayList<Object>();
+		for (SysMysqlColumns sysColumn : tableColumnList) {
+			// 数据库中有该字段时
+			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name());
+			if (createTableParam != null) {
 				// 验证是否有更新
 				// 1.验证类型
 				if (!sysColumn.getData_type().toLowerCase().equals(createTableParam.getFieldType().toLowerCase())) {
@@ -351,45 +415,40 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					}
 				}
 
-				// 8.验证是否唯一
-				if (!"UNI".equals(sysColumn.getColumn_key()) && createTableParam.isFieldIsUnique()) {
-					// 原本不是唯一，现在变成了唯一，那么要去做更新
-					modifyFieldList.add(createTableParam);
-					continue;
-				}
-
 			}
 		}
+		return modifyFieldList;
+	}
 
-		if (modifyFieldList.size() > 0) {
-			modifyTableMap.put(table.name(), modifyFieldList);
+	/**
+	 * 将allFieldList转换为Map结构
+	 * @param allFieldList
+	 * @return
+	 */
+	private Map<String, CreateTableParam> getAllFieldMap(List<Object> allFieldList) {
+		// 将fieldList转成Map类型，字段名作为主键
+		Map<String, CreateTableParam> fieldMap = new HashMap<String, CreateTableParam>();
+		for (Object obj : allFieldList) {
+			CreateTableParam createTableParam = (CreateTableParam) obj;
+			fieldMap.put(createTableParam.getFieldName(), createTableParam);
 		}
-
-		if (dropKeyFieldList.size() > 0) {
-			dropKeyTableMap.put(table.name(), dropKeyFieldList);
-		}
-
-		if (dropUniqueFieldList.size() > 0) {
-			dropUniqueTableMap.put(table.name(), dropUniqueFieldList);
-		}
+		return fieldMap;
 	}
 
 	/**
 	 * 根据数据库中表的结构和model中表的结构对比找出删除的字段
 	 * 
-	 * @param removeTableMap
-	 *            用于存需要删除字段的表名+结构
 	 * @param table
 	 *            表
-	 * @param removeFieldList
-	 *            用于存删除的字段
 	 * @param columnNames
 	 *            数据库中的结构
-	 * @param fieldMap
-	 *            model中的字段，字段名为key
+	 * @param allFieldList
+	 *            model中的所有字段
 	 */
-	private void buildRemoveFields(Map<String, List<Object>> removeTableMap, Table table, List<Object> removeFieldList,
-			List<String> columnNames, Map<String, CreateTableParam> fieldMap) {
+	private List<Object> getRemoveFieldList(Table table, List<String> columnNames, List<Object> allFieldList) {
+		Map<String, CreateTableParam> fieldMap = getAllFieldMap(allFieldList);
+		// 用于存删除的字段
+		List<Object> removeFieldList = new ArrayList<Object>();
 		for (String fieldNm : columnNames) {
 			// 判断该字段在新的model结构中是否存在
 			if (fieldMap.get(fieldNm) == null) {
@@ -397,28 +456,23 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				removeFieldList.add(fieldNm);
 			}
 		}
-		if (removeFieldList.size() > 0) {
-			removeTableMap.put(table.name(), removeFieldList);
-		}
+		return removeFieldList;
 	}
 
 	/**
 	 * 根据数据库中表的结构和model中表的结构对比找出新增的字段
 	 * 
-	 * @param addTableMap
-	 *            用于存需要增加字段的表名+结构
 	 * @param table
 	 *            表
-	 * @param newFieldList
-	 *            model中的结构
-	 * @param addFieldList
-	 *            用于存新增的字段
+	 * @param allFieldList
+	 *            model中的所有字段
 	 * @param columnNames
 	 *            数据库中的结构
+	 * @return 新增的字段
 	 */
-	private void buildNewFields(Map<String, List<Object>> addTableMap, Table table, List<Object> newFieldList,
-			List<Object> addFieldList, List<String> columnNames) {
-		for (Object obj : newFieldList) {
+	private List<Object> getAddFieldList(Table table, List<Object> allFieldList, List<String> columnNames) {
+		List<Object> addFieldList = new ArrayList<Object>();
+		for (Object obj : allFieldList) {
 			CreateTableParam createTableParam = (CreateTableParam) obj;
 			// 循环新的model中的字段，判断是否在数据库中已经存在
 			if (!columnNames.contains(createTableParam.getFieldName())) {
@@ -426,23 +480,20 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				addFieldList.add(obj);
 			}
 		}
-		if (addFieldList.size() > 0) {
-			addTableMap.put(table.name(), addFieldList);
-		}
+		return addFieldList;
 	}
 
 	/**
-	 * 迭代出所有model的所有fields存到newFieldList中
+	 * 迭代出所有model的所有fields
 	 * 
 	 * @param mySqlTypeAndLengthMap
 	 *            mysql数据类型和对应几个长度的map
 	 * @param clas
 	 *            准备做为创建表依据的class
-	 * @param newFieldList
-	 *            用于存新增表的字段
+	 * @return 表的全部字段
 	 */
-	private void tableFieldsConstruct(Map<String, Object> mySqlTypeAndLengthMap, Class<?> clas,
-			List<Object> newFieldList) {
+	private List<Object> getAllFields(Map<String, Object> mySqlTypeAndLengthMap, Class<?> clas) {
+		List<Object> fieldList = new ArrayList<Object>();
 		Field[] fields = clas.getDeclaredFields();
 
 		// 判断是否有父类，如果有拉取父类的field，这里只支持多层继承
@@ -459,8 +510,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				param.setFieldType(column.type().toLowerCase());
 				param.setFieldLength(column.length());
 				param.setFieldDecimalLength(column.decimalLength());
-				// 主键或唯一键时设置必须不为null
-				if (column.isKey() || column.isUnique()) {
+				// 主键时设置必须不为null
+				if (column.isKey()) {
 					param.setFieldIsNull(false);
 				} else {
 					param.setFieldIsNull(column.isNull());
@@ -468,12 +519,24 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				param.setFieldIsKey(column.isKey());
 				param.setFieldIsAutoIncrement(column.isAutoIncrement());
 				param.setFieldDefaultValue(column.defaultValue());
-				param.setFieldIsUnique(column.isUnique());
 				int length = (Integer) mySqlTypeAndLengthMap.get(column.type().toLowerCase());
 				param.setFileTypeLength(length);
-				newFieldList.add(param);
+				// 获取当前字段的@Index注解
+				Index index = field.getAnnotation(Index.class);
+				if (null != index) {
+					param.setFiledIndexName((index.name() == null || index.name().equals("")) ? (Constants.IDX + column.name()) : index.name());
+					param.setFiledIndexValue(index.value().length == 0 ? Arrays.asList(column.name()) : Arrays.asList(index.value()));
+				}
+				// 获取当前字段的@Unique注解
+				Unique unique = field.getAnnotation(Unique.class);
+				if (null != unique) {
+					param.setFiledUniqueName((unique.name() == null || unique.name().equals("")) ? (Constants.UNI + column.name()) : unique.name());
+					param.setFiledUniqueValue(unique.value().length == 0 ? Arrays.asList(column.name()) : Arrays.asList(unique.value()));
+				}
+				fieldList.add(param);
 			}
 		}
+		return fieldList;
 	}
 
 	/**
@@ -505,36 +568,93 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	/**
 	 * 根据传入的map创建或修改表结构
 	 * 
-	 * @param newTableMap
-	 *            用于存需要创建的表名+结构
-	 * @param modifyTableMap
-	 *            用于存需要更新字段类型等的表名+结构
-	 * @param addTableMap
-	 *            用于存需要增加字段的表名+结构
-	 * @param removeTableMap
-	 *            用于存需要删除字段的表名+结构
-	 * @param dropKeyTableMap
-	 *            用于存需要删除主键的表名+结构
-	 * @param dropUniqueTableMap
-	 *            用于存需要删除唯一约束的表名+结构
+	 * @param baseTableMap
+	 *            操作sql的数据结构
 	 */
-	private void createOrModifyTableConstruct(Map<String, List<Object>> newTableMap,
-			Map<String, List<Object>> modifyTableMap, Map<String, List<Object>> addTableMap,
-			Map<String, List<Object>> removeTableMap, Map<String, List<Object>> dropKeyTableMap,
-			Map<String, List<Object>> dropUniqueTableMap) {
+	private void createOrModifyTableConstruct(Map<String, Map<String, List<Object>>> baseTableMap) {
 		// 1. 创建表
-		createTableByMap(newTableMap);
+		createTableByMap(baseTableMap.get(Constants.NEW_TABLE_MAP));
 		// 2. 删除要变更主键的表的原来的字段的主键
-		dropFieldsKeyByMap(dropKeyTableMap);
-		// 3. 删除要变更唯一约束的表的原来的字段的唯一约束
-		dropFieldsUniqueByMap(dropUniqueTableMap);
-		// 4. 添加新的字段
-		addFieldsByMap(addTableMap);
-		// 5. 删除字段
-		removeFieldsByMap(removeTableMap);
-		// 6. 修改字段类型等
-		modifyFieldsByMap(modifyTableMap);
+		dropFieldsKeyByMap(baseTableMap.get(Constants.DROPKEY_TABLE_MAP));
+		// 3. 添加新的字段
+		addFieldsByMap(baseTableMap.get(Constants.ADD_TABLE_MAP));
+		// 4. 删除字段
+		removeFieldsByMap(baseTableMap.get(Constants.REMOVE_TABLE_MAP));
+		// 5. 修改字段类型等
+		modifyFieldsByMap(baseTableMap.get(Constants.MODIFY_TABLE_MAP));
+		// 6. 删除索引和约束
+		dropIndexAndUniqueByMap(baseTableMap.get(Constants.DROPINDEXANDUNIQUE_TABLE_MAP));
+		// 7. 创建索引
+		addIndexByMap(baseTableMap.get(Constants.ADDINDEX_TABLE_MAP));
+		// 8. 创建约束
+		addUniqueByMap(baseTableMap.get(Constants.ADDUNIQUE_TABLE_MAP));
 
+	}
+	
+	/**
+	 * 根据map结构删除索引和唯一约束
+	 * 
+	 * @param dropIndexAndUniqueMap
+	 * 			用于删除索引和唯一约束
+	 */
+	private void dropIndexAndUniqueByMap(Map<String, List<Object>> dropIndexAndUniqueMap) {
+		if (dropIndexAndUniqueMap.size() > 0) {
+			for (Entry<String, List<Object>> entry : dropIndexAndUniqueMap.entrySet()) {
+				for (Object obj : entry.getValue()) {
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put(entry.getKey(), obj);
+					log.info("开始删除表" + entry.getKey() + "中的索引" + obj);
+					createMysqlTablesMapper.dorpTabelIndex(map);
+					log.info("完成删除表" + entry.getKey() + "中的索引" + obj);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 根据map结构创建索引
+	 * 
+	 * @param addIndexMap
+	 *            用于创建索引和唯一约束
+	 */
+	private void addIndexByMap(Map<String, List<Object>> addIndexMap) {
+		if (addIndexMap.size() > 0) {
+			for (Entry<String, List<Object>> entry : addIndexMap.entrySet()) {
+				for (Object obj : entry.getValue()) {
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put(entry.getKey(), obj);
+					CreateTableParam fieldProperties = (CreateTableParam) obj;
+					if (null != fieldProperties.getFiledIndexName()) {						
+						log.info("开始创建表" + entry.getKey() + "中的索引" + fieldProperties.getFiledIndexName());
+						createMysqlTablesMapper.addTableIndex(map);
+						log.info("完成创建表" + entry.getKey() + "中的索引" + fieldProperties.getFiledIndexName());
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 根据map结构创建唯一约束
+	 * 
+	 * @param addUniqueMap
+	 *            用于创建索引和唯一约束
+	 */
+	private void addUniqueByMap(Map<String, List<Object>> addUniqueMap) {
+		if (addUniqueMap.size() > 0) {
+			for (Entry<String, List<Object>> entry : addUniqueMap.entrySet()) {
+				for (Object obj : entry.getValue()) {
+					Map<String, Object> map = new HashMap<String, Object>();
+					map.put(entry.getKey(), obj);
+					CreateTableParam fieldProperties = (CreateTableParam) obj;
+					if (null != fieldProperties.getFiledUniqueName()) {						
+						log.info("开始创建表" + entry.getKey() + "中的唯一约束" + fieldProperties.getFiledUniqueName());
+						createMysqlTablesMapper.addTableUnique(map);
+						log.info("完成创建表" + entry.getKey() + "中的唯一约束" + fieldProperties.getFiledUniqueName());
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -626,31 +746,6 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	}
 
 	/**
-	 * 根据map结构删除要变更表中字段的唯一约束
-	 * 
-	 * @param dropUniqueTableMap
-	 *            用于存需要删除唯一约束的表名+结构
-	 */
-	private void dropFieldsUniqueByMap(Map<String, List<Object>> dropUniqueTableMap) {
-		// 先去做删除唯一约束的操作，这步操作必须在增加和修改字段之前！
-		if (dropUniqueTableMap.size() > 0) {
-			for (Entry<String, List<Object>> entry : dropUniqueTableMap.entrySet()) {
-				for (Object obj : entry.getValue()) {
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put(entry.getKey(), obj);
-					CreateTableParam fieldProperties = (CreateTableParam) obj;
-					log.info("开始为表" + entry.getKey() + "删除唯一约束" + fieldProperties.getFieldName());
-					createMysqlTablesMapper.dropUniqueTableField(map);
-					log.info("完成为表" + entry.getKey() + "删除唯一约束" + fieldProperties.getFieldName());
-					log.info("开始修改表" + entry.getKey() + "中的字段" + fieldProperties.getFieldName());
-					createMysqlTablesMapper.modifyTableField(map);
-					log.info("完成修改表" + entry.getKey() + "中的字段" + fieldProperties.getFieldName());
-				}
-			}
-		}
-	}
-
-	/**
 	 * 根据map结构创建表
 	 * 
 	 * @param newTableMap
@@ -673,7 +768,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 * 获取Mysql的类型，以及类型需要设置几个长度，这里构建成map的样式
 	 * 构建Map(字段名(小写),需要设置几个长度(0表示不需要设置，1表示需要设置一个，2表示需要设置两个))
 	 */
-	public Map<String, Object> mySqlTypeAndLengthMap() {
+	public static Map<String, Object> mySqlTypeAndLengthMap() {
 		Field[] fields = MySqlTypeConstant.class.getDeclaredFields();
 		Map<String, Object> map = new HashMap<String, Object>();
 		for (Field field : fields) {

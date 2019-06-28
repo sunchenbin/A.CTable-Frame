@@ -79,10 +79,4 @@ public @interface Column{
 	 */
 	public String defaultValue() default "NULL";
 	
-	/**
-	 * 是否是唯一，默认false
-	 * 
-	 * @return 是否是唯一，默认false
-	 */
-	public boolean isUnique() default false;
 }
