@@ -82,7 +82,7 @@ public @interface Column{
 	/**
 	 * 数据表字段备注
 	 *
-	 * @return 默认值，默认为null
+	 * @return 默认值，默认为空
 	 */
 	String comment() default "";
 	
