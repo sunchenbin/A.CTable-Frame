@@ -55,6 +55,9 @@
 		<if test="!fields.fieldIsAutoIncrement and fields.fieldIsNull and fields.fieldDefaultValue != 'NULL'">
 			DEFAULT #{fields.fieldDefaultValue} 
 		</if>
+		<if test="fields.fieldComment != ''">
+			COMMENT #{fields.fieldComment}
+		</if>
 	</sql>
 
 	<!-- 创建表的 -->
