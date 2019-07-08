@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	<artifactId>mybatis-enhance-actable</artifactId>
-	<version>1.0.6.RELEASE</version>
+	<version>1.0.7.RELEASE</version>
 	
 	<parent>
 	    <groupId>org.sonatype.oss</groupId>
@@ -73,6 +73,13 @@
 	        <version>1.2</version>
 	        <scope>provided</scope>	        
 	    </dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.8</version>
+			<scope>provided</scope>
+		</dependency>
 		
 	</dependencies>	
 	
