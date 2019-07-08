@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.0.6.RELEASE
+# mybatis-enhance-actable-1.0.7.RELEASE
 
 该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
@@ -20,15 +20,17 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 13. 增加了新的唯一约束实现方式@Unique，支持多字段聚合约束(版本1.0.6.RELEASE)
 14. 增加了索引创建方式@Index，支持多字段聚合索引(版本1.0.6.RELEASE)
 15. 修复query查询方法无法返回父类字段数据的bug(版本1.0.6.RELEASE)
+16. 修复原本是主键，现在依然主键，修改该字段的其他信息时会报multiple primary key defined(例如id为int(11)，改为int(10)后，就可重现次bug)(版本1.0.7.RELEASE)
+17. 增加对字段备注的支持，使用方式@Column的comment属性(版本1.0.7.RELEASE)
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.0.6.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.0.7.RELEASE.jar
 
 ```
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.6.RELEASE</version>
+	    <version>1.0.7.RELEASE</version>
 	</dependency>
 ```
 
@@ -77,7 +79,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.6.RELEASE</version>
+	    <version>1.0.7.RELEASE</version>
 	</dependency>
 ```
     
@@ -104,7 +106,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.6.RELEASE</version>
+	    <version>1.0.7.RELEASE</version>
 	</dependency>
 ```
 
