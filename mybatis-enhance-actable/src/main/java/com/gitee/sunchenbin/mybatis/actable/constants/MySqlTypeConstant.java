@@ -45,7 +45,7 @@ public class MySqlTypeConstant {
 	@LengthCount
 	public static final  String BIGINT = "bigint";
 	
-	@LengthCount(LengthCount=0)
+	@LengthCount(LengthCount=1)
 	public static final  String BIT = "bit";
 	
 	@LengthCount(LengthCount=0)
