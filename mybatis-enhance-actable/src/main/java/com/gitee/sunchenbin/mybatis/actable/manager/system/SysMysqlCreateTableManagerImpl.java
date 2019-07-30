@@ -381,6 +381,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					typeAndLength = typeAndLength + "(" + createTableParam.getFieldLength() + ","
 							+ createTableParam.getFieldDecimalLength() + ")";
 				}
+				
 				// 判断类型+长度是否相同
 				if (!sysColumn.getColumn_type().toLowerCase().equals(typeAndLength)) {
 					modifyFieldList.add(modifyTableParam);
@@ -515,7 +516,17 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				CreateTableParam param = new CreateTableParam();
 				param.setFieldName(column.name());
 				param.setFieldType(column.type().toLowerCase());
-				param.setFieldLength(column.length());
+				// TODO: bit 特殊处理，后期优化
+				if("bit".equals(column.type())){
+					if(column.length() >= 255){
+						param.setFieldLength(1);
+					}
+					if(column.length() <= 64){
+						param.setFieldLength(column.length());
+					}
+				}else{	
+					param.setFieldLength(column.length());
+				}
 				param.setFieldDecimalLength(column.decimalLength());
 				// 主键时设置必须不为null
 				if (column.isKey()) {
@@ -533,12 +544,9 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				Index index = field.getAnnotation(Index.class);
 				if (null != index) {
 					String[] indexValue = index.value();
-					param.setFiledIndexName(
-							(index.name() == null || index.name().equals(""))
-									? (Constants.IDX + ((indexValue.length == 0) ? column.name()
-											: String.valueOf(Arrays.toString(indexValue)).replaceAll(",", "_")
-													.replaceAll(" ", "").replace("[", "").replace("]", "")))
-									: index.name());
+					param.setFiledIndexName((index.name() == null || index.name().equals(""))
+							? (Constants.IDX + ((indexValue.length == 0) ? column.name() : stringArrFormat(indexValue)))
+							: index.name());
 					param.setFiledIndexValue(
 							indexValue.length == 0 ? Arrays.asList(column.name()) : Arrays.asList(indexValue));
 				}
@@ -546,12 +554,10 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				Unique unique = field.getAnnotation(Unique.class);
 				if (null != unique) {
 					String[] uniqueValue = unique.value();
-					param.setFiledUniqueName(
-							(unique.name() == null || unique.name().equals(""))
-									? (Constants.UNI + ((uniqueValue.length == 0) ? column.name()
-											: String.valueOf(Arrays.toString(uniqueValue)).replaceAll(",", "_")
-													.replaceAll(" ", "").replace("[", "").replace("]", "")))
-									: unique.name());
+					param.setFiledUniqueName((unique.name() == null || unique.name().equals(""))
+							? (Constants.UNI
+									+ ((uniqueValue.length == 0) ? column.name() : stringArrFormat(uniqueValue)))
+							: unique.name());
 					param.setFiledUniqueValue(
 							uniqueValue.length == 0 ? Arrays.asList(column.name()) : Arrays.asList(uniqueValue));
 				}
@@ -559,6 +565,16 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			}
 		}
 		return fieldList;
+	}
+
+	/**
+	 * String[] to format xxx_yyy_sss
+	 * @param arr
+	 * @return
+	 */
+	private String stringArrFormat(String[] arr) {
+		return String.valueOf(Arrays.toString(arr)).replaceAll(",", "_").replaceAll(" ", "").replace("[", "")
+				.replace("]", "");
 	}
 
 	/**
