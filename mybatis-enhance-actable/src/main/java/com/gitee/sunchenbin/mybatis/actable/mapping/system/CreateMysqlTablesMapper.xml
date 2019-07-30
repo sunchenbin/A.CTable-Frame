@@ -48,12 +48,44 @@
 		<!-- 不是自增长的才能有默认值 -->
 		<!-- 并且不为null时，因为null是默认的没必要写 -->
 		<if test="!fields.fieldIsAutoIncrement and !fields.fieldIsNull and fields.fieldDefaultValue != 'NULL'">
-			DEFAULT #{fields.fieldDefaultValue} 
+			<if test="fields.fieldType == 'bit'">
+				<if test="fields.fieldDefaultValue == 'true'.toString()">				
+					DEFAULT 1 
+				</if>
+				<if test="fields.fieldDefaultValue == 'false'.toString()">				
+					DEFAULT 0 
+				</if>
+				<if test="fields.fieldDefaultValue == '1'.toString()">				
+					DEFAULT 1 
+				</if>
+				<if test="fields.fieldDefaultValue == '0'.toString()">				
+					DEFAULT 0 
+				</if>
+			</if>
+			<if test="fields.fieldType != 'bit'">				
+				DEFAULT #{fields.fieldDefaultValue} 
+			</if>
 		</if>
 		<!-- 不是自增长的才能有默认值 -->
 		<!-- 不是非空时，并且默认值不是NUll -->
 		<if test="!fields.fieldIsAutoIncrement and fields.fieldIsNull and fields.fieldDefaultValue != 'NULL'">
-			DEFAULT #{fields.fieldDefaultValue} 
+			<if test="fields.fieldType == 'bit'">
+				<if test="fields.fieldDefaultValue == 'true'.toString()">				
+					DEFAULT 1 
+				</if>
+				<if test="fields.fieldDefaultValue == 'false'.toString()">				
+					DEFAULT 0 
+				</if>
+				<if test="fields.fieldDefaultValue == '1'.toString()">				
+					DEFAULT 1 
+				</if>
+				<if test="fields.fieldDefaultValue == '0'.toString()">				
+					DEFAULT 0 
+				</if>
+			</if>
+			<if test="fields.fieldType != 'bit'">				
+				DEFAULT #{fields.fieldDefaultValue} 
+			</if>
 		</if>
 		<if test="fields.fieldComment != ''">
 			COMMENT #{fields.fieldComment}
