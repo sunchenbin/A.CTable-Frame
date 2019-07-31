@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.0.8.RELEASE
+# mybatis-enhance-actable-1.0.8.1.RELEASE
 
 该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
@@ -22,18 +22,18 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 15. 修复query查询方法无法返回父类字段数据的bug(版本1.0.6.RELEASE)
 16. 修复原本是主键，现在依然主键，修改该字段的其他信息时会报multiple primary key defined(例如id为int(11)，改为int(10)后，就可重现次bug)(版本1.0.7.RELEASE)
 17. 增加对字段备注的支持，使用方式@Column的comment属性(版本1.0.7.RELEASE)
-18. 修复issues/IZ6WQ：bit类型的默认值设置失败，默认值可以使用0、1、true、false(版本1.0.8.RELEASE)
-19. 修复issues/IYTJ1：使用@Unique进行联合约束，启动项目自动创建表结构后，删除联合约束报错(版本1.0.8.RELEASE)
-20. 新增功能issues/IYW9F:mybatis.model.pack支持多包扫描","或者";"隔开(版本1.0.8.RELEASE)
+18. 修复issues/IZ6WQ：bit类型的默认值设置失败，默认值可以使用0、1、true、false(版本1.0.8.1.RELEASE)
+19. 修复issues/IYTJ1：使用@Unique进行联合约束，启动项目自动创建表结构后，删除联合约束报错(版本1.0.8.1.RELEASE)
+20. 新增功能issues/IYW9F:mybatis.model.pack支持多包扫描","或者";"隔开(版本1.0.8.1.RELEASE)
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.0.8.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.0.8.1.RELEASE.jar
 
 ```
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.8.RELEASE</version>
+	    <version>1.0.8.1.RELEASE</version>
 	</dependency>
 ```
 
@@ -82,7 +82,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.8.RELEASE</version>
+	    <version>1.0.8.1.RELEASE</version>
 	</dependency>
 ```
     
@@ -109,7 +109,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.8.RELEASE</version>
+	    <version>1.0.8.1.RELEASE</version>
 	</dependency>
 ```
 
