@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.gitee.sunchenbin.mybatis.actable.utils.ColumnUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,14 +56,14 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				}
 
 				// 如果是主键，并且不是空的时候，这时候应该是更新操作
-				if (column.isKey() && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
+				if (ColumnUtils.isKey(field,column) && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
 					isSave = false;
 					keyFieldMap.put(field.getName(), field.get(obj));
 					updateId = (Integer) field.get(obj);
 				}
 
 				// 如果是自增,并且是保存的场合，不需要添加到map中做保存
-				if (isSave && column.isAutoIncrement()) {
+				if (isSave && ColumnUtils.isAutoIncrement(field,column)) {
 					log.debug("字段：" + field.getName() + "是自增的不需要添加到map中");
 					continue;
 				}
@@ -324,7 +325,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
                     continue;
                 }
                 // 如果是主键，并且不是空的时候，这时候应该是更新操作
-                if (column.isKey() && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
+                if (ColumnUtils.isKey(field,column) && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
                     keyFieldMap.put(field.getName(), field.get(obj));
                     updateId = (Integer) field.get(obj);
                 }

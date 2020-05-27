@@ -19,8 +19,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 // 将此注解包含在javadoc中
 @Documented
-// 允许子类继承父类中的注解
-@Inherited
 public @interface Column{
 
 	/**
@@ -28,14 +26,14 @@ public @interface Column{
 	 * 
 	 * @return 字段名
 	 */
-	String name();
+	String name() default "";
 
 	/**
 	 * 字段类型
 	 * 
 	 * @return 字段类型
 	 */
-	String type();
+	String type() default "";
 
 	/**
 	 * 字段长度，默认是255
@@ -45,11 +43,11 @@ public @interface Column{
 	int length() default 255;
 
 	/**
-	 * 小数点长度，默认是0
+	 * 小数点长度，默认是2
 	 * 
-	 * @return 小数点长度，默认是0
+	 * @return 小数点长度，默认是2
 	 */
-	int decimalLength() default 0;
+	int decimalLength() default 2;
 
 	/**
 	 * 是否为可以为null，true是可以，false是不可以，默认为true
