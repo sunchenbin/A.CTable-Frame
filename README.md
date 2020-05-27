@@ -51,6 +51,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     本次迭代至1.0.9.RELEASE，极大的简化了注解的使用复杂度，在保留原有复杂的自定义配置能力的同时，增加了更多的默认适配能力
     也就是对于@Column标签如果对字段命名等没有任何要求的情况下，直接使用标签即可，无需配置类型等参数，会默认根据上面支持的类型去进行匹配转换
 28. 迭代issues/I1ILS6:@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 (版本1.0.9.RELEASE)
+
  **基本使用规范**
 1. 需要依赖mybatis-enhance-actable-1.0.9.RELEASE.jar
 
