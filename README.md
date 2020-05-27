@@ -210,6 +210,8 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
     8.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
 
+    9.新增注解@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 
+
  **model的写法例子**
 ```
 @Table(name = "test")
