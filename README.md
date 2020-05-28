@@ -1,6 +1,6 @@
-# mybatis-enhance-actable-1.0.8.1.RELEASE
+# mybatis-enhance-actable-1.0.9.RELEASE
 
-该项目是从之前写过的一个框架中抽取出来的，本身是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
+A.C.Table是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
@@ -24,16 +24,42 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 17. 增加对字段备注的支持，使用方式@Column的comment属性(版本1.0.7.RELEASE)
 18. 修复issues/IZ6WQ：bit类型的默认值设置失败，默认值可以使用0、1、true、false(版本1.0.8.1.RELEASE)
 19. 修复issues/IYTJ1：使用@Unique进行联合约束，启动项目自动创建表结构后，删除联合约束报错(版本1.0.8.1.RELEASE)
-20. 新增功能issues/IYW9F:mybatis.model.pack支持多包扫描","或者";"隔开(版本1.0.8.1.RELEASE)
+20. 迭代issues/IYW9F:mybatis.model.pack支持多包扫描","或者";"隔开(版本1.0.8.1.RELEASE)
+21. 修复issues/I160LP:drop拼写的问题(版本1.0.9.RELEASE)
+22. 优化issues/I1IENW:@Index,@Unique创建索引和唯一约束的实现逻辑，默认会给索引名和约束名增加前缀actable_idx_和actable_uni_方便更新删除时只针对这两个前缀的进行删除更新，避免删掉手动创建的字段的索引约束  (版本1.0.9.RELEASE)
+23. 修复issues/I16OZQ::@Index,@Unique在只设置了索引名称没有设置索引字段时，报错的bug，并且原有name改为value，原有value改为columns(版本1.0.9.RELEASE)
+24. 迭代issues/I1IF5E:增加对tinyint/smallint/mediumint/year/blob/longblob/mediumblob/tinytext/tinyblob/binary字段类型的支持 (版本1.0.9.RELEASE)
+25. 迭代issues/I1IF5Q:框架模式新增add模式，本模式下只具备，新增表/新增字段/新增索引/新增唯一约束的功能，不会做修改和删除 (版本1.0.9.RELEASE)
+26. 迭代issues/I193FC:@Column的name属性改为非必填，不填默认使用属性名作为表字段名 (版本1.0.9.RELEASE)
+27. 迭代issues/I193FC:@Column的type属性改为非必填，不填默认使用属性的数据类型进行转换，转换失败的字段不会添加 (版本1.0.9.RELEASE)
+    
+    支持java类型转mysql类型如下：
+    
+        java.lang.String
+        java.lang.Long
+        java.lang.Integer
+        java.lang.Boolean
+        java.math.BigInteger
+        java.lang.Float
+        java.lang.Double
+        java.math.BigDecimal
+        java.sql.Date
+        java.util.Date
+        java.sql.Timestamp
+        java.sql.Time
+        
+    本次迭代至1.0.9.RELEASE，极大的简化了注解的使用复杂度，在保留原有复杂的自定义配置能力的同时，增加了更多的默认适配能力
+    也就是对于@Column标签如果对字段命名等没有任何要求的情况下，直接使用标签即可，无需配置类型等参数，会默认根据上面支持的类型去进行匹配转换
+28. 迭代issues/I1ILS6:@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 (版本1.0.9.RELEASE)
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.0.8.1.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.0.9.RELEASE.jar
 
 ```
-        <dependency>
+    <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.8.1.RELEASE</version>
+	    <version>1.0.9.RELEASE</version>
 	</dependency>
 ```
 
@@ -44,7 +70,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	mybatis.model.pack=com.sunchenbin.store.model
 	mybatis.database.type=mysql
 	
-	本系统提供三种模式：
+	本系统提供四种模式：
 
 	2.1 当mybatis.table.auto=create时，系统启动后，会将所有的表删除掉，然后根据model中配置的结构重新建表，该操作会破坏原有数据。
 
@@ -52,9 +78,11 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	
 	2.3 当mybatis.table.auto=none时，系统不做任何处理。
 
-	2.4 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
+    2.4 当mybatis.table.auto=add，新增表/新增字段/新增索引/新增唯一约束的功能，不做做修改和删除 (只在版本1.0.9.RELEASE及以上支持)。
+
+	2.5 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
         
-	2.5 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
+	2.6 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
 
 ```
 
@@ -79,10 +107,10 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 1. 首先pom文件依赖actable框架
 
 ```
-        <dependency>
+    <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.8.1.RELEASE</version>
+	    <version>1.0.9.RELEASE</version>
 	</dependency>
 ```
     
@@ -106,10 +134,10 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 1. 首先pom文件依赖actable框架
 
 ```
-        <dependency>
+    <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.8.1.RELEASE</version>
+	    <version>1.0.9.RELEASE</version>
 	</dependency>
 ```
 
@@ -168,17 +196,21 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
     1.SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
 
-    2.LengthCount.java是一个自定义的注解，用于标记在SysMysqlColumns.java里面配置的数据类型上的，标记该类型需要设置几个长度，如datetime/varchar(1)/decimal(5,2)，分别是需要设置0个1个2个
-
-    3.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
-
-    4.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
+    2.LengthCount.java是一个自定义的注解，用于标记在MySqlTypeConstants.java里面配置的数据类型上的，标记该类型需要设置几个长度，如datetime/varchar(1)/decimal(5,2)，分别是需要设置0个1个2个
     
-    5.Index.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建索引，有两个属性一个是设置索引名称，一个是设置索引字段，支持多字段联合索引，如果都不设置默认为当前字段创建索引
+    3.LengthDefault.java时一个自定义的注解，用于跟LengthCount.java配合使用，用来标记在MySqlTypeConstants.java里面配置的数据类型上的，标记改类型如果没有设置长度时默认的长度。
 
-    6.Unique.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建唯一约束，有两个属性一个是设置约束名称，一个是设置约束字段，支持多字段联合约束，如果都不设置默认为当前字段创建唯一约束
+    4.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
 
-    7.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
+    5.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
+    
+    6.Index.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建索引，有两个属性一个是设置索引名称，一个是设置索引字段，支持多字段联合索引，如果都不设置默认为当前字段创建索引
+
+    7.Unique.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建唯一约束，有两个属性一个是设置约束名称，一个是设置约束字段，支持多字段联合约束，如果都不设置默认为当前字段创建唯一约束
+
+    8.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
+
+    9.新增注解@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 
 
  **model的写法例子**
 ```
@@ -190,21 +222,23 @@ public class Test extends BaseModel{
 	@Column(name = "id",type = MySqlTypeConstant.INT,length = 11,isKey = true,isAutoIncrement = true)
 	private Integer	id;
 
-        @Index
-        @Unique
+    @Index("t_idx_name")
+    @Unique
 	@Column(name = "name",type = MySqlTypeConstant.VARCHAR,length = 111)
 	private String	name;
 
-	@Column(name = "description",type = MySqlTypeConstant.TEXT)
+    // column的简化写法，不配置默认使用当前属性名作为字段名，当前类型默认转换至mysql支持的类型
+	@Column
 	private String	description;
 
-	@Column(name = "create_time",type = MySqlTypeConstant.DATETIME)
+    // column的简化写法，根据需要设置注解属性
+	@Column(name = "createTime")
 	private Date	create_time;
 
 	@Column(name = "update_time",type = MySqlTypeConstant.DATETIME)
 	private Date	update_time;
 
-        @Index(name="idx_number_name",value={"number","name"})
+    @Index(value="idx_number_name",columns={"number","name"})
 	@Column(name = "number",type = MySqlTypeConstant.BIGINT,length = 5)
 	private Long	number;
 

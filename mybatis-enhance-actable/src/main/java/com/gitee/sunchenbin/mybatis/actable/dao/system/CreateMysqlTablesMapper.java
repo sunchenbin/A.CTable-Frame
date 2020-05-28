@@ -64,7 +64,7 @@ public interface CreateMysqlTablesMapper {
 	 * 根据表名删除表
 	 * @param tableName 表名
 	 */
-	public void dorpTableByName(@Param("tableName") String tableName);
+	public void dropTableByName(@Param("tableName") String tableName);
 	
 	/**
 	 * 查询当前表存在的索引(除了主键索引primary)
@@ -77,7 +77,7 @@ public interface CreateMysqlTablesMapper {
 	 * 删除表索引
 	 * @param tableMap
 	 */
-	public void dorpTabelIndex(@Param("tableMap") Map<String, Object> tableMap);
+	public void dropTabelIndex(@Param("tableMap") Map<String, Object> tableMap);
 	
 	/**
 	 * 创建索引

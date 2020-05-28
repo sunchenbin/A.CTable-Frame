@@ -21,7 +21,7 @@ public class Constants {
 	public static final String ADDINDEX_TABLE_MAP				= "addIndexTableMap";
 	public static final String ADDUNIQUE_TABLE_MAP				= "addUniqueTableMap";
 	
-	public static final String IDX								= "idx_";
-	public static final String UNI								= "uni_";
+	public static final String IDX								= "actable_idx_";
+	public static final String UNI								= "actable_uni_";
 	
 }

@@ -20,8 +20,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 //将此注解包含在javadoc中
 @Documented
-//允许子类继承父类中的注解
-@Inherited
 public @interface Table {
 
 	/**
