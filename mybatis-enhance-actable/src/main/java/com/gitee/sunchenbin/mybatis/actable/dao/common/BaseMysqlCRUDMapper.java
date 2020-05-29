@@ -11,11 +11,12 @@ import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 
 
 /**
- * 创建更新表结构的Mapper
+ * 已经废弃请勿使用有bug
  * @author sunchenbin
  *
  */
 @Transactional
+@Deprecated
 public interface BaseMysqlCRUDMapper {
 
 	/**

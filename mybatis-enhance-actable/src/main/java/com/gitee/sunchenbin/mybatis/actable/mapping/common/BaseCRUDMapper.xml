@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.gitee.sunchenbin.mybatis.actable.dao.common.BaseCRUDMapper">
+
+	<!-- 查询 -->
+	<select id="select" parameterType="java.util.Map" resultType="java.util.HashMap">
+
+		<foreach collection="tableMap" index="key" item="value">
+			<if test="key != 'start' and key != 'pageSize' and key != 'orderBy'">
+				select * from `${key}`
+				where 1=1
+				<foreach collection="value" index="field" item="fieldvalue">
+					<if test="fieldvalue != null">
+						and `${field}` = #{fieldvalue}
+					</if>
+				</foreach>
+			</if>
+		</foreach>
+
+		<if test="tableMap.orderBy != null">
+			order by
+			<foreach collection="tableMap.orderBy" index="field" item="sort" separator=",">
+				`${field}` ${sort}
+			</foreach>
+		</if>
+
+		<if test="tableMap.start != null and tableMap.pageSize != null">
+			limit #{tableMap.start},#{tableMap.pageSize}
+		</if>
+	</select>
+
+	<!-- 查询总记录数 -->
+	<select id="selectCount" parameterType="java.util.Map" resultType="int">
+
+		<foreach collection="tableMap" index="key" item="value">
+			<if test="key != 'start' and key != 'pageSize' and key != 'orderBy'">
+				select count(1) from `${key}`
+				where 1=1
+				<foreach collection="value" index="field" item="fieldvalue">
+					<if test="fieldvalue != null">
+						and `${field}` = #{fieldvalue}
+					</if>
+				</foreach>
+			</if>
+		</foreach>
+	</select>
+
+	<!-- 删除 -->
+	<delete id="delete" parameterType="java.util.Map">
+
+		<foreach collection="tableMap" index="key" item="value">
+			delete from `${key}`
+			where 1=1
+			<foreach collection="value" index="field" item="fieldvalue">
+				<if test="fieldvalue != null">
+					and `${field}` = #{fieldvalue}
+				</if>
+			</foreach>
+
+		</foreach>
+
+	</delete>
+
+	<!-- 保存 允许保存null -->
+	<insert id="insert" parameterType="com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand" useGeneratedKeys="true" keyProperty="id">
+
+		<foreach collection="tableMap" index="key" item="value">
+			insert into `${key}`(
+			<foreach collection="value" index="field" item="fieldvalue" separator=",">
+					`${field}`
+			</foreach>
+			)
+
+			values(
+			<foreach collection="value" item="fieldvalue" separator=",">
+					#{fieldvalue}
+			</foreach>
+			)
+		</foreach>
+	</insert>
+
+	<!-- 保存 不允许保存null -->
+	<insert id="insertSelective" parameterType="com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand" useGeneratedKeys="true" keyProperty="id">
+
+		<foreach collection="tableMap" index="key" item="value">
+			insert into `${key}`(
+			<foreach collection="value" index="field" item="fieldvalue" separator=",">
+				<if test="fieldvalue != null">
+					`${field}`
+				</if>
+			</foreach>
+			)
+
+			values(
+			<foreach collection="value" item="fieldvalue" separator=",">
+				<if test="fieldvalue != null">
+					#{fieldvalue}
+				</if>
+			</foreach>
+			)
+		</foreach>
+	</insert>
+
+	<!-- 根据主键更新，可以更新null -->
+	<update id="updateByPrimaryKey" parameterType="com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand">
+
+		<foreach collection="tableMap" index="key" item="value">
+			update `${key}`
+
+			set
+			<foreach collection="value" index="field" item="fieldvalue" separator=",">
+				<if test="field != 'keyFieldMap'">
+					`${field}` = #{fieldvalue}
+				</if>
+			</foreach>
+
+			where 1=1
+			<foreach collection="value" index="keyfield" item="keyvalues">
+				<if test="keyfield == 'keyFieldMap'">
+					<foreach collection="keyvalues" index="field" item="fieldvalue">
+						and `${field}` = #{fieldvalue}
+					</foreach>
+				</if>
+			</foreach>
+		</foreach>
+	</update>
+
+	<!-- 根据主键更新，不可以更新为null -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand" useGeneratedKeys="true" keyProperty="id">
+
+		<foreach collection="tableMap" index="key" item="value">
+			update `${key}`
+
+			set
+			<foreach collection="value" index="field" item="fieldvalue" separator=",">
+				<if test="fieldvalue != null">
+					<if test="field != 'keyFieldMap'">
+						`${field}` = #{fieldvalue}
+					</if>
+				</if>
+			</foreach>
+
+			where 1=1
+			<foreach collection="value" index="keyfield" item="keyvalues">
+				<if test="keyfield == 'keyFieldMap'">
+					<foreach collection="keyvalues" index="field" item="fieldvalue">
+						and `${field}` = #{fieldvalue}
+					</foreach>
+				</if>
+			</foreach>
+		</foreach>
+	</update>
+
+	<!-- 动态sql查询-->
+	<select id="query" parameterType="string" resultType="java.util.LinkedHashMap">
+		${value}
+	</select>
+	
+</mapper>
