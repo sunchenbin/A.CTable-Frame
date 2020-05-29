@@ -68,7 +68,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 					continue;
 				}
 
-				dataMap.put(column.name(), field.get(obj));
+				dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
 			}catch (IllegalAccessException e){
@@ -121,7 +121,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				continue;
 			}
 			try{
-				dataMap.put(column.name(), field.get(obj));
+				dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
 			}catch (IllegalAccessException e){
@@ -177,9 +177,9 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 					continue;
 				}
 				if (field.get(obj) instanceof String && field.get(obj) != null && "".equals(field.get(obj))) {
-					dataMap.put(column.name(), null);
+					dataMap.put(ColumnUtils.getColumnName(field,column), null);
 				}else {					
-					dataMap.put(column.name(), field.get(obj));
+					dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
 				}
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
@@ -210,7 +210,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 						log.debug("该field没有配置注解不是表中在字段！");
 						continue;
 					}
-					String name = column.name();
+					String name = ColumnUtils.getColumnName(field,column);
 					field.set(newInstance, map.get(name));
 				}
 				list.add(newInstance);
@@ -329,7 +329,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
                     keyFieldMap.put(field.getName(), field.get(obj));
                     updateId = (Integer) field.get(obj);
                 }
-                dataMap.put(column.name(), field.get(obj));
+                dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
             }catch (IllegalArgumentException e){
                 e.printStackTrace();
             }catch (IllegalAccessException e){

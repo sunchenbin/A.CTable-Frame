@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.0.9.RELEASE
+# mybatis-enhance-actable-1.0.9.1.RELEASE
 
 A.C.Table是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
@@ -51,15 +51,17 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     本次迭代至1.0.9.RELEASE，极大的简化了注解的使用复杂度，在保留原有复杂的自定义配置能力的同时，增加了更多的默认适配能力
     也就是对于@Column标签如果对字段命名等没有任何要求的情况下，直接使用标签即可，无需配置类型等参数，会默认根据上面支持的类型去进行匹配转换
 28. 迭代issues/I1ILS6:@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 (版本1.0.9.RELEASE)
+29. 紧急修复1.0.9.RELEASE版本CUDR的bug，请不要使用1.0.9.RELEASE版本(版本1.0.9.1.RELEASE)
+
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.0.9.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.0.9.1.RELEASE.jar
 
 ```
     <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.9.RELEASE</version>
+	    <version>1.0.9.1.RELEASE</version>
 	</dependency>
 ```
 
@@ -110,7 +112,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.9.RELEASE</version>
+	    <version>1.0.9.1.RELEASE</version>
 	</dependency>
 ```
     
@@ -137,7 +139,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
 	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.9.RELEASE</version>
+	    <version>1.0.9.1.RELEASE</version>
 	</dependency>
 ```
 
