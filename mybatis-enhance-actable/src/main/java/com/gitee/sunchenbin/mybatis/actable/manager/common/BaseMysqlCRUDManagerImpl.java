@@ -21,8 +21,12 @@ import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
 import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseMysqlCRUDMapper;
 
+/**
+ * 已经废弃请勿使用有bug
+ */
 @Transactional
 @Service("baseMysqlCRUDManager")
+@Deprecated
 public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 
 	private static final Logger	log	= LoggerFactory.getLogger(BaseMysqlCRUDManagerImpl.class);
@@ -56,19 +60,19 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				}
 
 				// 如果是主键，并且不是空的时候，这时候应该是更新操作
-				if (ColumnUtils.isKey(field,column) && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
+				if (ColumnUtils.isKey(field) && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
 					isSave = false;
 					keyFieldMap.put(field.getName(), field.get(obj));
 					updateId = (Integer) field.get(obj);
 				}
 
 				// 如果是自增,并且是保存的场合，不需要添加到map中做保存
-				if (isSave && ColumnUtils.isAutoIncrement(field,column)) {
+				if (isSave && ColumnUtils.isAutoIncrement(field)) {
 					log.debug("字段：" + field.getName() + "是自增的不需要添加到map中");
 					continue;
 				}
 
-				dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
+				dataMap.put(ColumnUtils.getColumnName(field), field.get(obj));
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
 			}catch (IllegalAccessException e){
@@ -121,7 +125,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				continue;
 			}
 			try{
-				dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
+				dataMap.put(ColumnUtils.getColumnName(field), field.get(obj));
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
 			}catch (IllegalAccessException e){
@@ -177,9 +181,9 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 					continue;
 				}
 				if (field.get(obj) instanceof String && field.get(obj) != null && "".equals(field.get(obj))) {
-					dataMap.put(ColumnUtils.getColumnName(field,column), null);
+					dataMap.put(ColumnUtils.getColumnName(field), null);
 				}else {					
-					dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
+					dataMap.put(ColumnUtils.getColumnName(field), field.get(obj));
 				}
 			}catch (IllegalArgumentException e){
 				e.printStackTrace();
@@ -210,7 +214,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 						log.debug("该field没有配置注解不是表中在字段！");
 						continue;
 					}
-					String name = ColumnUtils.getColumnName(field,column);
+					String name = ColumnUtils.getColumnName(field);
 					field.set(newInstance, map.get(name));
 				}
 				list.add(newInstance);
@@ -325,11 +329,11 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
                     continue;
                 }
                 // 如果是主键，并且不是空的时候，这时候应该是更新操作
-                if (ColumnUtils.isKey(field,column) && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
+                if (ColumnUtils.isKey(field) && field.get(obj) != null && (new Integer(field.get(obj).toString())) > 0) {
                     keyFieldMap.put(field.getName(), field.get(obj));
                     updateId = (Integer) field.get(obj);
                 }
-                dataMap.put(ColumnUtils.getColumnName(field,column), field.get(obj));
+                dataMap.put(ColumnUtils.getColumnName(field), field.get(obj));
             }catch (IllegalArgumentException e){
                 e.printStackTrace();
             }catch (IllegalAccessException e){

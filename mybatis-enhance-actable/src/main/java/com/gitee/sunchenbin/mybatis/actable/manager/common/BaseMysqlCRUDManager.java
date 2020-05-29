@@ -5,6 +5,10 @@ import java.util.List;
 
 import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
 
+/**
+ * 已经废弃请勿使用有bug
+ */
+@Deprecated
 public interface BaseMysqlCRUDManager{
 
 	/**

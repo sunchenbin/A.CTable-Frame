@@ -518,7 +518,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				// 根据注解类型返回方法的指定类型注解
 				Column column = field.getAnnotation(Column.class);
 				CreateTableParam param = new CreateTableParam();
-				param.setFieldName(ColumnUtils.getColumnName(field,column));
+				param.setFieldName(ColumnUtils.getColumnName(field));
 
 				// 类型不为空时，因为类型现在可以为空
 				if (!StringUtils.isEmpty(column.type())){
@@ -562,13 +562,13 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				}
 
 				// 主键时设置必须不为null
-				if (ColumnUtils.isKey(field,column)) {
+				if (ColumnUtils.isKey(field)) {
 					param.setFieldIsNull(false);
 				} else {
-					param.setFieldIsNull(ColumnUtils.isNull(field,column));
+					param.setFieldIsNull(ColumnUtils.isNull(field));
 				}
-				param.setFieldIsKey(ColumnUtils.isKey(field,column));
-				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field,column));
+				param.setFieldIsKey(ColumnUtils.isKey(field));
+				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field));
 				param.setFieldDefaultValue(column.defaultValue());
 				param.setFieldComment(column.comment());
 				// 获取当前字段的@Index注解
@@ -576,7 +576,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				if (null != index) {
 					String[] indexValue = index.columns();
 					param.setFiledIndexName((index.value() == null || index.value().equals(""))
-							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field,column) : stringArrFormat(indexValue)))
+							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(indexValue)))
 							: Constants.IDX + index.value());
 					param.setFiledIndexValue(
 							indexValue.length == 0 ? Arrays.asList(field.getName()) : Arrays.asList(indexValue));
@@ -587,7 +587,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					String[] uniqueValue = unique.columns();
 					param.setFiledUniqueName((unique.value() == null || unique.value().equals(""))
 							? (Constants.UNI
-									+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field,column) : stringArrFormat(uniqueValue)))
+									+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(uniqueValue)))
 							: Constants.UNI + unique.value());
 					param.setFiledUniqueValue(
 							uniqueValue.length == 0 ? Arrays.asList(field.getName()) : Arrays.asList(uniqueValue));

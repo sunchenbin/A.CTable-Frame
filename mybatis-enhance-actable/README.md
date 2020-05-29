@@ -1,6 +1,6 @@
-# mybatis-enhance-actable-1.0.9.1.RELEASE
+# mybatis-enhance-actable-1.1.0.RELEASE
 
-A.C.Table是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis，我给他取名叫做 “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
+A.C.Table是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis， “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
 
@@ -52,48 +52,65 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     也就是对于@Column标签如果对字段命名等没有任何要求的情况下，直接使用标签即可，无需配置类型等参数，会默认根据上面支持的类型去进行匹配转换
 28. 迭代issues/I1ILS6:@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 (版本1.0.9.RELEASE)
 29. 紧急修复1.0.9.RELEASE版本CUDR的bug，请不要使用1.0.9.RELEASE版本(版本1.0.9.1.RELEASE)
+30. 迭代issues/I1IVXK:BaseMysqlCRUDManager该工具类废弃，请勿使用，新增工具类BaseCRUDManager，新的insert接口取消了对主键的integer类型的限定，主键可以自由使用类型(版本1.1.0.RELEASE)
 
+    新增工具类BaseCRUDManager的方法列表如下，详细接口文档见文档结尾部分：
+    
+        <T> List<T> select(T t);
+        <T> T selectByPrimaryKey(T t);
+        <T> List<T> selectAll(Class<T> clasz);
+        <T> int selectCount(T t);
+        <T> T selectOne(T t);
+        <T> int delete(T t);
+        <T> int deleteByPrimaryKey(T t);
+        <T> boolean existsByPrimaryKey(T t);
+        <T> T insert(T t);
+        <T> T insertSelective(T t);
+        <T> boolean updateByPrimaryKey(T t);
+        <T> boolean updateByPrimaryKeySelective(T t);
+        <T> List<T> query(String sql, Class<T> beanClass);
+        List<LinkedHashMap<String, Object>> query(String sql);
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.0.9.1.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.1.0.RELEASE.jar
 
 ```
     <dependency>
-	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
-	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.9.1.RELEASE</version>
-	</dependency>
+        <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+        <artifactId>mybatis-enhance-actable</artifactId>
+        <version>1.1.0.RELEASE</version>
+    </dependency>
 ```
 
 2. 需要配置对于actable支持的配置
 
 ```
-	mybatis.table.auto=update
-	mybatis.model.pack=com.sunchenbin.store.model
-	mybatis.database.type=mysql
-	
-	本系统提供四种模式：
-
-	2.1 当mybatis.table.auto=create时，系统启动后，会将所有的表删除掉，然后根据model中配置的结构重新建表，该操作会破坏原有数据。
-
-	2.2 当mybatis.table.auto=update时，系统会自动判断哪些表是新建的，哪些字段要修改类型等，哪些字段要删除，哪些字段要新增，该操作不会破坏原有数据。
-	
-	2.3 当mybatis.table.auto=none时，系统不做任何处理。
-
+    mybatis.table.auto=update
+    mybatis.model.pack=com.sunchenbin.store.model
+    mybatis.database.type=mysql
+    
+    本系统提供四种模式：
+    
+    2.1 当mybatis.table.auto=create时，系统启动后，会将所有的表删除掉，然后根据model中配置的结构重新建表，该操作会破坏原有数据。
+    
+    2.2 当mybatis.table.auto=update时，系统会自动判断哪些表是新建的，哪些字段要修改类型等，哪些字段要删除，哪些字段要新增，该操作不会破坏原有数据。
+    
+    2.3 当mybatis.table.auto=none时，系统不做任何处理。
+    
     2.4 当mybatis.table.auto=add，新增表/新增字段/新增索引/新增唯一约束的功能，不做做修改和删除 (只在版本1.0.9.RELEASE及以上支持)。
-
-	2.5 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
+    
+    2.5 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
         
-	2.6 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
+    2.6 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
 
 ```
 
 3. 支持actable的mybatis配置
 
 ```
-	<!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
-	1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
-	2. com.gitee.sunchenbin.mybatis.actable.dao.*
+    <!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
+    1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+    2. com.gitee.sunchenbin.mybatis.actable.dao.*
 ```
 
 
@@ -101,7 +118,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 4. 扫描actable的包到spring容器中管理
 
 ```
-        1. com.gitee.sunchenbin.mybatis.actable.manager.*
+    1. com.gitee.sunchenbin.mybatis.actable.manager.*
 ```
 
  **Springboot+Mybatis的项目使用步骤方法**
@@ -110,54 +127,55 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 ```
     <dependency>
-	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
-	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.9.1.RELEASE</version>
-	</dependency>
+        <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+        <artifactId>mybatis-enhance-actable</artifactId>
+        <version>1.1.0.RELEASE</version>
+    </dependency>
 ```
     
 2. 项目的application.properties文件配置例如下面
 
 ```
-	mybatis.table.auto=update
-	mybatis.model.pack=com.sunchenbin.store.model
-	mybatis.database.type=mysql
-	mybatis.mapperLocations=classpath*:xxxxxx/*.xml,classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+    mybatis.table.auto=update
+    mybatis.model.pack=com.sunchenbin.store.model
+    mybatis.database.type=mysql
+    mybatis.mapperLocations=classpath*:xxxxxx/*.xml,classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
 ```
 
 3. springboot启动类需要做如下配置
 
 ```
-        1. 通过注解@ComponentScan配置，扫描actable要注册到spring的包路径"com.gitee.sunchenbin.mybatis.actable.manager.*"
-        2. 通过注解@MapperScan配置，扫描mybatis的mapper，路径为"com.gitee.sunchenbin.mybatis.actable.dao.*"
+    1. 通过注解@ComponentScan配置，扫描actable要注册到spring的包路径"com.gitee.sunchenbin.mybatis.actable.manager.*"
+    2. 通过注解@MapperScan配置，扫描mybatis的mapper，路径为"com.gitee.sunchenbin.mybatis.actable.dao.*"
 ```
 
  **传统Spring+Mybatis的Web项目使用步骤方法** 
+ 
 1. 首先pom文件依赖actable框架
 
 ```
     <dependency>
-	    <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
-	    <artifactId>mybatis-enhance-actable</artifactId>
-	    <version>1.0.9.1.RELEASE</version>
-	</dependency>
+        <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
+        <artifactId>mybatis-enhance-actable</artifactId>
+        <version>1.1.0.RELEASE</version>
+    </dependency>
 ```
 
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
 ```
-	mybatis.table.auto=update
-	mybatis.model.pack=com.sunchenbin.store.model
-	mybatis.database.type=mysql
+    mybatis.table.auto=update
+    mybatis.model.pack=com.sunchenbin.store.model
+    mybatis.database.type=mysql
 ```
 
 3. spring的配置文件中需要做如下配置：
 ```
-	<!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
-	<context:component-scan base-package="com.gitee.sunchenbin.mybatis.actable.manager.*" />
-	
-	<!-- 这是mybatis-enhance-actable的功能开关配置文件,其实就是将上面第2点说的autoCreateTable.properties文件注册到spring中，以便底层的mybatis-enhance-actable的方法能够获取到-->
-	<bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <!-- 自动扫描(自动注入mybatis-enhance-actable的Manager)必须要配置，否则扫描不到底层的mananger方法 -->
+    <context:component-scan base-package="com.gitee.sunchenbin.mybatis.actable.manager.*" />
+    
+    <!-- 这是mybatis-enhance-actable的功能开关配置文件,其实就是将上面第2点说的autoCreateTable.properties文件注册到spring中，以便底层的mybatis-enhance-actable的方法能够获取到-->
+    <bean id="configProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
         <property name="locations">
             <list>
                 <value>classpath*:config/autoCreateTable.properties</value>
@@ -167,98 +185,253 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
         <property name="properties" ref="configProperties" />
     </bean>
-	
-	<!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
-	1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
-	2. com.gitee.sunchenbin.mybatis.actable.dao.*
-	
-	举例这两个配置配置的详细位置
-	
-	<!-- myBatis文件 -->
-	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-		<property name="dataSource" ref="dataSource" />
-		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
-		<property name="mapperLocations">
-			<array>
+    
+    <!-- mybatis的配置文件中需要做两项配置，因为mybatis-enhance-actable项目底层是直接依赖mybatis的规范执行sql的，因此需要将其中的mapping和dao映射到一起 -->
+    1. classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+    2. com.gitee.sunchenbin.mybatis.actable.dao.*
+    
+    举例这两个配置配置的详细位置
+    
+    <!-- myBatis文件 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+        <property name="mapperLocations">
+            <array>
               <value>classpath*:com/sunchenbin/store/mapping/*/*.xml</value>
               <value>classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml</value>
-          	</array>
-		</property>
-		<property name="typeAliasesPackage" value="com.sunchenbin.store.model.*" />
-		<!-- <property name="configLocation" value="classpath:core/mybatis-configuration.xml" /> -->
-	</bean>
-	
-	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.sunchenbin.store.dao.*;com.gitee.sunchenbin.mybatis.actable.dao.*" />
-		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
-	</bean>
+            </array>
+        </property>
+        <property name="typeAliasesPackage" value="com.sunchenbin.store.model.*" />
+        <!-- <property name="configLocation" value="classpath:core/mybatis-configuration.xml" /> -->
+    </bean>
+    
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.sunchenbin.store.dao.*;com.gitee.sunchenbin.mybatis.actable.dao.*" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
 ```
 	
 **代码用途讲解** 
 
     1.SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
-
+    
     2.LengthCount.java是一个自定义的注解，用于标记在MySqlTypeConstants.java里面配置的数据类型上的，标记该类型需要设置几个长度，如datetime/varchar(1)/decimal(5,2)，分别是需要设置0个1个2个
     
     3.LengthDefault.java时一个自定义的注解，用于跟LengthCount.java配合使用，用来标记在MySqlTypeConstants.java里面配置的数据类型上的，标记改类型如果没有设置长度时默认的长度。
-
+    
     4.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
-
+    
     5.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
     
     6.Index.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建索引，有两个属性一个是设置索引名称，一个是设置索引字段，支持多字段联合索引，如果都不设置默认为当前字段创建索引
-
+    
     7.Unique.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建唯一约束，有两个属性一个是设置约束名称，一个是设置约束字段，支持多字段联合约束，如果都不设置默认为当前字段创建唯一约束
-
+    
     8.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
-
+    
     9.新增注解@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 
 
  **model的写法例子**
 ```
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "test")
 public class Test extends BaseModel{
 
-	private static final long serialVersionUID = 5199200306752426433L;
-
-	@Column(name = "id",type = MySqlTypeConstant.INT,length = 11,isKey = true,isAutoIncrement = true)
-	private Integer	id;
-
-    @Index("t_idx_name")
+    private static final long serialVersionUID = 5199200306752426433L;
+    
+    // 第一种主键设置方式
+    @Column(name = "id",type = MySqlTypeConstant.INT,length = 11,isKey = true,isAutoIncrement = true)
+    private Integer	id;
+    
+    // 第二种简化的主键设置方式
+    @IsKey
+    @IsAutoIncrement
+    @Column
+    private Integer	id;
+    
+    // 第一种设置索引的方法，这种方法会在数据库默认创建索引名称为actable_idx_{login_name},索引字段为login_name
+    @Index
+    // 第二种设置索引的方法，这种方法会在数据库创建索引名称为actable_idx_{t_idx_login_name},索引字段为login_name
+    @Index("t_idx_login_name")
+    // 第三种设置索引的方法，这种方法会在数据库创建索引名称为actable_idx_{t_idx_login_name},索引字段为login_name
+    @Index(value="t_idx_login_name",columns={"login_name"})
+    // 第四种设置索引的方法，可以设置联合索引，这种方法会在数据库创建索引名称为actable_idx_{login_name_mobile},索引字段为login_name和mobile
+    @Index(columns={"login_name","mobile"})
+    // 第五种设置索引的方法，可以设置联合索引，这种方法会在数据库创建索引名称为actable_idx_{login_name_mobile},索引字段为login_name和mobile
+    @Index(value="t_idx_login_name_mobile",columns={"login_name","mobile"})
+    
+    // 唯一约束的注解的使用方法，跟@Index相同
     @Unique
-	@Column(name = "name",type = MySqlTypeConstant.VARCHAR,length = 111)
-	private String	name;
-
+    @Column(name = "login_name",type = MySqlTypeConstant.VARCHAR,length = 111)
+    private String	loginName;
+    
     // column的简化写法，不配置默认使用当前属性名作为字段名，当前类型默认转换至mysql支持的类型
-	@Column
-	private String	description;
-
+    @Column
+    private String	mobile;
+    
     // column的简化写法，根据需要设置注解属性
-	@Column(name = "createTime")
-	private Date	create_time;
-
-	@Column(name = "update_time",type = MySqlTypeConstant.DATETIME)
-	private Date	update_time;
-
-    @Index(value="idx_number_name",columns={"number","name"})
-	@Column(name = "number",type = MySqlTypeConstant.BIGINT,length = 5)
-	private Long	number;
-
-	@Column(name = "lifecycle",type = MySqlTypeConstant.CHAR,length = 1,isNull=false)
-	private String	lifecycle;
-
-	@Column(name = "dekes",type = MySqlTypeConstant.DOUBLE,length = 5,decimalLength = 2)
-	private Double	dekes;
-        
-        // get和set方法这里就不例举了太多
+    @Column(name = "createTime")
+    private Date	create_time;
+    
+    @Column(name = "update_time",type = MySqlTypeConstant.DATETIME)
+    private Date	update_time;
+    
+    @Column(name = "number",type = MySqlTypeConstant.DECIMAL,length = 10,decimalLength = 2)
+    private BigDecimal	number;
+    
+    // 第一种设置字段非空的方法
+    @Column(name = "lifecycle",type = MySqlTypeConstant.CHAR,length = 1,isNull=false)
+    // 第二种设置字段非空的方法
+    @IsNotNull
+    @Column
+    private String	lifecycle;
+    
+    @Column
+    private String	realName;
 }
 ```
+ **@Column不设置类型时的默认转换规则如下（建议类型使用对象类型不要用基本数据类型）**
+
+        javaToMysqlTypeMap.put("class java.lang.String", MySqlTypeConstant.VARCHAR);
+        javaToMysqlTypeMap.put("class java.lang.Long", MySqlTypeConstant.BIGINT);
+        javaToMysqlTypeMap.put("class java.lang.Integer", MySqlTypeConstant.INT);
+        javaToMysqlTypeMap.put("class java.lang.Boolean", MySqlTypeConstant.BIT);
+        javaToMysqlTypeMap.put("class java.math.BigInteger", MySqlTypeConstant.BIGINT);
+        javaToMysqlTypeMap.put("class java.lang.Float", MySqlTypeConstant.FLOAT);
+        javaToMysqlTypeMap.put("class java.lang.Double", MySqlTypeConstant.DOUBLE);
+        javaToMysqlTypeMap.put("class java.math.BigDecimal", MySqlTypeConstant.DECIMAL);
+        javaToMysqlTypeMap.put("class java.sql.Date", MySqlTypeConstant.DATE);
+        javaToMysqlTypeMap.put("class java.util.Date", MySqlTypeConstant.DATE);
+        javaToMysqlTypeMap.put("class java.sql.Timestamp", MySqlTypeConstant.DATETIME);
+        javaToMysqlTypeMap.put("class java.sql.Time", MySqlTypeConstant.TIME);
+        
  **共通的CUDR功能使用**
 
-    1.使用方法很简单，大家在manager或者Controller中直接注入BaseMysqlCRUDManager这个接口就可以了
+    1.使用方法很简单，大家在manager或者Controller中直接注入BaseCRUDManager这个接口就可以了
+    
+    2.旧的BaseMysqlCRUDManager类废弃了请不要使用
 
-    2.注意：接口调用save、delete等方法时传入的对象必须是modle中用于创建表的对象
-代码事例：
+    3.注意：接口调用方法时传入的对象必须是modle中用于创建表的对象才可以
+    
+ **共通类BaseCRUDManager的CUDR方法接口文档如下**
+ 
+    /**
+      * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return List实体对象列表
+      */
+     <T> List<T> select(T t);
+ 
+     /**
+      * 根据实体对象的@IsKey主键字段的值作为Where条件查询结果，主键字段不能为null
+      * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
+      * @param <T> 实体对象类型
+      * @return 实体对象
+      */
+     <T> T selectByPrimaryKey(T t);
+ 
+     /**
+      * 查询表全部数据
+      * @param clasz 实体对象的class
+      * @param <T> 实体对象类型
+      * @return List实体对象列表
+      */
+     <T> List<T> selectAll(Class<T> clasz);
+ 
+     /**
+      * 根据实体对象的非Null字段作为Where条件查询结果集的Count，如果对象的属性值都为null则Count全表
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 结果数量
+      */
+     <T> int selectCount(T t);
+ 
+     /**
+      * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回结果集的第一条使用的limit 1
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 实体对象
+      */
+     <T> T selectOne(T t);
+ 
+     /**
+      * 根据实体对象的非Null字段作为Where条件进行删除操作，如果对象的属性值都为null则删除表全部数据
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 返回成功条数
+      */
+     <T> int delete(T t);
+ 
+     /**
+      * 根据实体对象的@IsKey主键字段的值作为Where条件进行删除操作，主键字段不能为null
+      * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
+      * @param <T> 实体对象类型
+      * @return 返回成功条数
+      */
+     <T> int deleteByPrimaryKey(T t);
+ 
+     /**
+      * 根据实体对象的@IsKey主键字段的值作为Where条件查询该数据是否存在，主键字段不能为null
+      * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
+      * @param <T> 实体对象类型
+      * @return true存在，fasle不存在
+      */
+     <T> boolean existsByPrimaryKey(T t);
+ 
+     /**
+      * 根据实体对象保存一条数据，主键如果没有设置自增属性则必须不能为null
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 实体对象
+      */
+     <T> T insert(T t);
+ 
+     /**
+      * 根据实体对象保存一条数据，如果属性值为null则不插入默认使用数据库的字段默认值，主键如果没有设置自增属性则必须不能为null
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 实体对象
+      */
+     <T> T insertSelective(T t);
+ 
+     /**
+      * 根据实体对象主键作为Where条件更新其他字段数据，主键必须不能为null
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 更新结果
+      */
+     <T> boolean updateByPrimaryKey(T t);
+ 
+     /**
+      * 根据实体对象主键作为Where条件更新其他字段数据，如果其他字段属性值为null则忽略更新，主键必须不能为null
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return 更新结果
+      */
+     <T> boolean updateByPrimaryKeySelective(T t);
+ 
+     /**
+      * 动态查询方法
+      * @param <T>
+      * @param sql 动态sql
+      * @param beanClass 返回list对象类型，不传默认返回List(Map(String,Object))格式
+      * @return
+      */
+     <T> List<T> query(String sql, Class<T> beanClass);
+ 
+     /**
+      * 动态查询方法
+      * @param sql 动态sql
+      * @return
+      */
+     List<LinkedHashMap<String, Object>> query(String sql);
+    
+ **BaseCRUDManager使用代码示例**
 ```
 @Controller
 public class TestController{
@@ -267,7 +440,7 @@ public class TestController{
 	private TestManager testManager;
 	
 	@Autowired
-	private BaseMysqlCRUDManager baseMysqlCRUDManager;
+	private BaseCRUDManager baseCRUDManager;
 	
 	/**
 	 * 首页
@@ -275,24 +448,20 @@ public class TestController{
 	@RequestMapping("/testDate")
 	@ResponseBody
 	public String testDate(){
-		Test2 test2 = new Test2();
-		test2.setNumber(3L);
-		baseMysqlCRUDManager.save(test2);
-		
-		Test test = new Test();
-		test.setName("aaae333");
-		test.setNumber(9L);
-		test.setDescription("adfsdfe");
-		
-		baseMysqlCRUDManager.delete(test);
-		baseMysqlCRUDManager.save(test);
-		int count = testManager.findTestCount();
-		System.out.println(count);
-		List<Test> search= baseMysqlCRUDManager.search(test);
-                List<LinkedHashMap<String, Object>> query1 = baseMysqlCRUDManager.query("select * from test");
-                List<Test> query2 = baseMysqlCRUDManager.query("select * from test", Test.class);
-		String json = JsonUtil.format(query);
-		return json;
+        UserEntity insert = baseCRUDManager.insert(UserEntity.builder().loginName("111").build());
+        UserEntity insertSelective = baseCRUDManager.insertSelective(UserEntity.builder().loginName("222").build());
+        List<UserEntity> userEntities1 = baseCRUDManager.selectAll(UserEntity.class);
+        boolean b = baseCRUDManager.updateByPrimaryKey(UserEntity.builder().id(1L).mobile("1111").build());
+        boolean b1 = baseCRUDManager.updateByPrimaryKeySelective(UserEntity.builder().id(2L).mobile("1111").build());
+        UserEntity userEntity = baseCRUDManager.selectOne(UserEntity.builder().id(1L).mobile("1111").build());
+        UserEntity userEntity1 = baseCRUDManager.selectByPrimaryKey(UserEntity.builder().id(8L).mobile("1111").build());
+        List<UserEntity> select = baseCRUDManager.select(UserEntity.builder().mobile("1111").build());
+        int i = baseCRUDManager.selectCount(UserEntity.builder().build());
+        int sss = baseCRUDManager.delete(UserEntity.builder().realName("sss").build());
+        int i1 = baseCRUDManager.deleteByPrimaryKey(UserEntity.builder().id(5L).loginName("222").build());
+        boolean b2 = baseCRUDManager.existsByPrimaryKey(UserEntity.builder().id(1L).build());
+        boolean b3 = baseCRUDManager.existsByPrimaryKey(UserEntity.builder().id(222L).build());
+        return "success";
 	}
 }
 ```
