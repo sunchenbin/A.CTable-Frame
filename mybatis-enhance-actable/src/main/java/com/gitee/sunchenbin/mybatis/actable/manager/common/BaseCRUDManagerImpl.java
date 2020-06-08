@@ -34,6 +34,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return List实体对象列表
      */
     @Override
@@ -96,6 +97,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的@IsKey主键字段的值作为Where条件查询结果，主键字段不能为null
      *
      * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
+     * @param <T> 实体类型
      * @return 实体对象
      */
     @Override
@@ -158,6 +160,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 查询表全部数据
      *
      * @param clasz 实体对象的class
+     * @param <T> 实体类型
      * @return List实体对象列表
      */
     @Override
@@ -202,6 +205,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的非Null字段作为Where条件查询结果集的Count，如果对象的属性值都为null则Count全表
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 结果数量
      */
     @Override
@@ -239,6 +243,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回结果集的第一条使用的limit 1
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 实体对象
      */
     @Override
@@ -299,6 +304,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的非Null字段作为Where条件进行删除操作，如果对象的属性值都为null则删除表全部数据
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 返回成功条数
      */
     @Override
@@ -337,6 +343,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的@IsKey主键字段的值作为Where条件进行删除操作，主键字段不能为null
      *
      * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
+     * @param <T> 实体类型
      * @return 返回成功条数
      */
     @Override
@@ -375,6 +382,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象的@IsKey主键字段的值作为Where条件查询该数据是否存在，主键字段不能为null
      *
      * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
+     * @param <T> 实体类型
      * @return true存在，fasle不存在
      */
     @Override
@@ -390,6 +398,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象保存一条数据，允许没有主键，如果有主键的情况下且主键如果没有设置自增属性则必须不能为null
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 实体对象
      */
     @Override
@@ -478,6 +487,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象保存一条数据，如果属性值为null则不插入默认使用数据库的字段默认值，主键如果没有设置自增属性则必须不能为null
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 实体对象
      */
     @Override
@@ -566,6 +576,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象主键作为Where条件更新其他字段数据，可以将字段值更新为null，主键必须不能为null
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 更新结果
      */
     @Override
@@ -625,6 +636,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
      * 根据实体对象主键作为Where条件更新其他字段数据，如果其他字段属性值为null则忽略更新，主键必须不能为null
      *
      * @param t 实体对象
+     * @param <T> 实体类型
      * @return 更新结果
      */
     @Override
@@ -680,12 +692,26 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         return true;
     }
 
+    /**
+     * 直接根据sql查询返回数据
+     *
+     * @param sql 自定义的sql
+     * @return list map结构的数据
+     */
     @Override
-    public List<LinkedHashMap<String, Object>> query(String value) {
-        log.info(value);
-        return baseCRUDMapper.query(value);
+    public List<LinkedHashMap<String, Object>> query(String sql) {
+        log.info(sql);
+        return baseCRUDMapper.query(sql);
     }
 
+    /**
+     * 直接根据sql查询数据，并根据指定的对象类型转化后返回
+     *
+     * @param sql 动态sql
+     * @param beanClass 返回list对象类型
+     * @param <T> 实体对象类型
+     * @return list的实体对象类型
+     */
     @Override
     public <T> List<T> query(String sql, Class<T> beanClass) {
         if(null == beanClass){
@@ -717,4 +743,195 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         }
         return list;
     }
+
+    /**
+     * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll+分页
+     *
+     * @param t 实体对象
+     * @param currentPage 分页参数查询第几页，默认1
+     * @param pageSize 分页参数每页显示的条数，默认10
+     * @param orderby 分页使用的排序，有序的Map结构{key(要排序的字段名),value(desc/asc)}
+     * @param <T> 实体类型
+     * @return PageResultCommand分页对象类型
+     */
+    @Override
+    public <T> PageResultCommand<T> search(T t, Integer currentPage, Integer pageSize,LinkedHashMap<String,String> orderby) {
+        String startKey = "start";
+        String sizeKey = "pageSize";
+        String currentPageKey = "currentPage";
+        String orderByKey = "orderBy";
+        Integer sizeVal = (pageSize == null ? 10 : pageSize);
+        Integer currentPageVal = (currentPage == null ? 1 : currentPage);
+        Integer startVal = (currentPageVal - 1) * sizeVal;
+        LinkedHashMap<String,String> orderByVal = orderby;
+        PageResultCommand<T> pageResultCommand = new PageResultCommand<T>();
+
+        // 得到表名
+        Table tableName = t.getClass().getAnnotation(Table.class);
+        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+            log.error("必须使用model中的对象！");
+            throw new RuntimeException("必须使用model中的对象！");
+        }
+        Field[] declaredFields = FieldUtils.getAllFields(t);
+        Map<Object, Object> tableMap = new HashMap<Object, Object>();
+        Map<Object, Object> dataMap = new HashMap<Object, Object>();
+        for (Field field : declaredFields){
+            // 设置访问权限
+            field.setAccessible(true);
+            try{
+                // 得到字段的配置
+                Column column = field.getAnnotation(Column.class);
+                if (column == null) {
+                    log.debug("该field没有配置注解不是表中在字段！");
+                    continue;
+                }
+                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+            }catch (Exception e){
+                log.error("操作对象的Field出现异常",e);
+                throw new RuntimeException("操作对象的Field出现异常");
+            }
+        }
+        tableMap.put(tableName.name(), dataMap);
+        if(currentPageVal != null && currentPageVal > 0) {
+            tableMap.put(startKey, startVal);
+            tableMap.put(sizeKey, sizeVal);
+        }
+        if(orderByVal != null && orderByVal.size() > 0) {
+            tableMap.put(orderByKey, orderByVal);
+        }
+        List<Map<String, Object>> query = baseCRUDMapper.select(tableMap);
+
+        List<T> list = new ArrayList<T>();
+        try{
+            for (Map<String, Object> map : query){
+                T newInstance = (T) t.getClass().newInstance();
+                Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+                for (Field field : declaredFields2){
+                    field.setAccessible(true);
+                    // 得到字段的配置
+                    Column column = field.getAnnotation(Column.class);
+                    if (column == null) {
+                        log.debug("该field没有配置注解不是表中在字段！");
+                        continue;
+                    }
+                    String name = ColumnUtils.getColumnName(field);
+                    field.set(newInstance, map.get(name));
+                }
+                list.add(newInstance);
+            }
+        }catch (Exception e){
+            log.error("结果集转对象失败",e);
+            throw new RuntimeException("结果集转对象失败");
+        }
+        if (null != list && list.size() > 0) {
+            pageResultCommand.setData(list);
+            int queryCount = selectCount(t);
+            pageResultCommand.setRecordsFiltered(queryCount);
+            pageResultCommand.setRecordsTotal(queryCount);
+        }
+        return pageResultCommand;
+    }
+
+    /**
+     * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll+分页
+     *
+     * @param t 实体对象(如果要支持分页实体对象可以继承com.gitee.sunchenbin.mybatis.actable.command.BaseModel)
+     *          依赖BaseModel中的currentPage：当前要查询的页码BaseModel默认1，pageSize：当前页要查询多少条BaseModel默认10，
+     *          start：根据currentPage和pageSize自动算出来的开始行数，orderBy：有序的Map结构{key(要排序的字段名),value(desc/asc)}
+     *          注意：如果不想依赖可以在自己的实体类中直接写着三个属性，程序会自动去读
+     * @param <T> 实体类型
+     * @return PageResultCommand分页对象类型
+     */
+    @Override
+    public <T> PageResultCommand<T> search(T t) {
+        String startKey = "start";
+        String sizeKey = "pageSize";
+        String currentPageKey = "currentPage";
+        String orderByKey = "orderBy";
+        Integer startVal = null;
+        Integer sizeVal = null;
+        Integer currentPageVal = null;
+        LinkedHashMap<String,String> orderByVal = null;
+        PageResultCommand<T> pageResultCommand = new PageResultCommand<T>();
+
+        // 得到表名
+        Table tableName = t.getClass().getAnnotation(Table.class);
+        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+            log.error("必须使用model中的对象！");
+            throw new RuntimeException("必须使用model中的对象！");
+        }
+        Field[] declaredFields = FieldUtils.getAllFields(t);
+        Map<Object, Object> tableMap = new HashMap<Object, Object>();
+        Map<Object, Object> dataMap = new HashMap<Object, Object>();
+        for (Field field : declaredFields){
+            // 设置访问权限
+            field.setAccessible(true);
+            try{
+                // 获取分页start和size
+                if(startKey.equals(field.getName())) {
+                    startVal = (Integer) field.get(t);
+                }
+                if(sizeKey.equals(field.getName())) {
+                    sizeVal = (Integer) field.get(t);
+                }
+                if(currentPageKey.equals(field.getName())) {
+                    currentPageVal = (Integer) field.get(t);
+                }
+                if(orderByKey.equals(field.getName())) {
+                    orderByVal = (LinkedHashMap<String,String>) field.get(t);
+                }
+
+                // 得到字段的配置
+                Column column = field.getAnnotation(Column.class);
+                if (column == null) {
+                    log.debug("该field没有配置注解不是表中在字段！");
+                    continue;
+                }
+                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+            }catch (Exception e){
+                log.error("操作对象的Field出现异常",e);
+                throw new RuntimeException("操作对象的Field出现异常");
+            }
+        }
+        tableMap.put(tableName.name(), dataMap);
+        if(currentPageVal != null && currentPageVal > 0) {
+            tableMap.put(startKey, startVal);
+            tableMap.put(sizeKey, sizeVal);
+        }
+        if(orderByVal != null && orderByVal.size() > 0) {
+            tableMap.put(orderByKey, orderByVal);
+        }
+        List<Map<String, Object>> query = baseCRUDMapper.select(tableMap);
+
+        List<T> list = new ArrayList<T>();
+        try{
+            for (Map<String, Object> map : query){
+                T newInstance = (T) t.getClass().newInstance();
+                Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+                for (Field field : declaredFields2){
+                    field.setAccessible(true);
+                    // 得到字段的配置
+                    Column column = field.getAnnotation(Column.class);
+                    if (column == null) {
+                        log.debug("该field没有配置注解不是表中在字段！");
+                        continue;
+                    }
+                    String name = ColumnUtils.getColumnName(field);
+                    field.set(newInstance, map.get(name));
+                }
+                list.add(newInstance);
+            }
+        }catch (Exception e){
+            log.error("结果集转对象失败",e);
+            throw new RuntimeException("结果集转对象失败");
+        }
+        if (null != list && list.size() > 0) {
+            pageResultCommand.setData(list);
+            int queryCount = selectCount(t);
+            pageResultCommand.setRecordsFiltered(queryCount);
+            pageResultCommand.setRecordsTotal(queryCount);
+        }
+        return pageResultCommand;
+    }
+
 }

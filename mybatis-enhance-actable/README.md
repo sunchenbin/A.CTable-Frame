@@ -70,15 +70,21 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <T> boolean updateByPrimaryKeySelective(T t);
         <T> List<T> query(String sql, Class<T> beanClass);
         List<LinkedHashMap<String, Object>> query(String sql);
+31. 迭代issues/I1JC91:工具类BaseCRUDManager新增对分页查询的支持，新增两个search接口一个实体中包含分页字段，一个通过方法参数传递分页字段(版本1.1.1.RELEASE)
+
+    新增工具类BaseCRUDManager的方法列表如下，详细接口文档见文档结尾部分：
+    
+        <T> PageResultCommand<T> search(T t, Integer currentPage, Integer pageSize,LinkedHashMap<String,String> orderby);
+        <T> PageResultCommand<T> search(T t);
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.1.0.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.1.1.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.1.0.RELEASE</version>
+        <version>1.1.1.RELEASE</version>
     </dependency>
 ```
 
@@ -129,7 +135,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.1.0.RELEASE</version>
+        <version>1.1.1.RELEASE</version>
     </dependency>
 ```
     
@@ -157,7 +163,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.1.0.RELEASE</version>
+        <version>1.1.1.RELEASE</version>
     </dependency>
 ```
 
@@ -239,7 +245,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "test")
-public class Test extends BaseModel{
+public class UserEntity extends BaseModel{
 
     private static final long serialVersionUID = 5199200306752426433L;
     
@@ -263,7 +269,6 @@ public class Test extends BaseModel{
     @Index(columns={"login_name","mobile"})
     // 第五种设置索引的方法，可以设置联合索引，这种方法会在数据库创建索引名称为actable_idx_{login_name_mobile},索引字段为login_name和mobile
     @Index(value="t_idx_login_name_mobile",columns={"login_name","mobile"})
-    
     // 唯一约束的注解的使用方法，跟@Index相同
     @Unique
     @Column(name = "login_name",type = MySqlTypeConstant.VARCHAR,length = 111)
@@ -324,6 +329,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return List实体对象列表
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> List<T> select(T t);
  
@@ -332,6 +338,7 @@ public class Test extends BaseModel{
       * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
       * @param <T> 实体对象类型
       * @return 实体对象
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> T selectByPrimaryKey(T t);
  
@@ -340,6 +347,7 @@ public class Test extends BaseModel{
       * @param clasz 实体对象的class
       * @param <T> 实体对象类型
       * @return List实体对象列表
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> List<T> selectAll(Class<T> clasz);
  
@@ -348,6 +356,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 结果数量
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> int selectCount(T t);
  
@@ -356,6 +365,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 实体对象
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> T selectOne(T t);
  
@@ -364,6 +374,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 返回成功条数
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> int delete(T t);
  
@@ -372,6 +383,7 @@ public class Test extends BaseModel{
       * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
       * @param <T> 实体对象类型
       * @return 返回成功条数
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> int deleteByPrimaryKey(T t);
  
@@ -380,6 +392,7 @@ public class Test extends BaseModel{
       * @param t 实体对象(只设置主键值即可，其他字段值不会读取)
       * @param <T> 实体对象类型
       * @return true存在，fasle不存在
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> boolean existsByPrimaryKey(T t);
  
@@ -388,6 +401,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 实体对象
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> T insert(T t);
  
@@ -396,6 +410,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 实体对象
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> T insertSelective(T t);
  
@@ -404,6 +419,7 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 更新结果
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> boolean updateByPrimaryKey(T t);
  
@@ -412,24 +428,51 @@ public class Test extends BaseModel{
       * @param t 实体对象
       * @param <T> 实体对象类型
       * @return 更新结果
+      * @version 支持版本1.1.0.RELEASE
       */
      <T> boolean updateByPrimaryKeySelective(T t);
  
+    /**
+     * 直接根据sql查询数据，并根据指定的对象类型转化后返回
+     *
+     * @param sql 动态sql
+     * @param beanClass 返回list对象类型
+     * @param <T> 实体对象类型
+     * @return list的实体对象类型
+     * @version 支持版本1.1.0.RELEASE
+     */
+    <T> List<T> query(String sql, Class<T> beanClass);
+
+    /**
+     * 直接根据sql查询返回数据
+     *
+     * @param sql 自定义的sql
+     * @return list map结构的数据
+     * @version 支持版本1.1.0.RELEASE
+     */
+    List<LinkedHashMap<String, Object>> query(String sql);
+     
      /**
-      * 动态查询方法
-      * @param <T>
-      * @param sql 动态sql
-      * @param beanClass 返回list对象类型，不传默认返回List(Map(String,Object))格式
-      * @return
+      * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll+分页
+      *
+      * @param t 实体对象
+      * @param currentPage 分页参数查询第几页，默认1
+      * @param pageSize 分页参数每页显示的条数，默认10
+      * @param orderby 分页使用的排序，有序的Map结构{key(要排序的字段名),value(desc/asc)}
+      * @param <T> 实体类型
+      * @return PageResultCommand分页对象类型
+      * @version 支持版本1.1.1.RELEASE
       */
-     <T> List<T> query(String sql, Class<T> beanClass);
+     <T> PageResultCommand<T> search(T t, Integer currentPage, Integer pageSize,LinkedHashMap<String,String> orderby);
  
      /**
-      * 动态查询方法
-      * @param sql 动态sql
-      * @return
+      * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll+分页
+      * @param t 实体对象
+      * @param <T> 实体对象类型
+      * @return PageResultCommand分页对象类型
+      * @version 支持版本1.1.1.RELEASE
       */
-     List<LinkedHashMap<String, Object>> query(String sql);
+     <T> PageResultCommand<T> search(T t);
     
  **BaseCRUDManager使用代码示例**
 ```
@@ -461,6 +504,14 @@ public class TestController{
         int i1 = baseCRUDManager.deleteByPrimaryKey(UserEntity.builder().id(5L).loginName("222").build());
         boolean b2 = baseCRUDManager.existsByPrimaryKey(UserEntity.builder().id(1L).build());
         boolean b3 = baseCRUDManager.existsByPrimaryKey(UserEntity.builder().id(222L).build());
+        UserEntity user = new UserEntity();
+        user.setCurrentPage(1);
+        user.setPageSize(5);
+        LinkedHashMap<String, String> ordermap = new LinkedHashMap<>();
+        ordermap.put("id",BaseModel.ASC);
+        user.setOrderBy(ordermap);
+        PageResultCommand<UserEntity> search = baseCRUDManager.search(user);
+        PageResultCommand<UserEntity> search3 = baseCRUDManager.search(user, 1, 5, ordermap);
         return "success";
 	}
 }

@@ -1,5 +1,7 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.common;
 
+import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -105,18 +107,40 @@ public interface BaseCRUDManager {
     <T> boolean updateByPrimaryKeySelective(T t);
 
     /**
-     * 动态查询方法
-     * @param <T>
+     * 直接根据sql查询数据，并根据指定的对象类型转化后返回
+     *
      * @param sql 动态sql
-     * @param beanClass 返回list对象类型，不传默认返回List(Map(String,Object))格式
-     * @return
+     * @param beanClass 返回list对象类型
+     * @param <T> 实体对象类型
+     * @return list的实体对象类型
      */
     <T> List<T> query(String sql, Class<T> beanClass);
 
     /**
-     * 动态查询方法
-     * @param sql 动态sql
-     * @return
+     * 直接根据sql查询返回数据
+     *
+     * @param sql 自定义的sql
+     * @return list map结构的数据
      */
     List<LinkedHashMap<String, Object>> query(String sql);
+
+    /**
+     * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll+分页
+     *
+     * @param t 实体对象
+     * @param currentPage 分页参数查询第几页，默认1
+     * @param pageSize 分页参数每页显示的条数，默认10
+     * @param orderby 分页使用的排序，有序的Map结构{key(要排序的字段名),value(desc/asc)}
+     * @param <T> 实体类型
+     * @return PageResultCommand分页对象类型
+     */
+    <T> PageResultCommand<T> search(T t, Integer currentPage, Integer pageSize,LinkedHashMap<String,String> orderby);
+
+    /**
+     * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll+分页
+     * @param t 实体对象
+     * @param <T> 实体对象类型
+     * @return PageResultCommand分页对象类型
+     */
+    <T> PageResultCommand<T> search(T t);
 }

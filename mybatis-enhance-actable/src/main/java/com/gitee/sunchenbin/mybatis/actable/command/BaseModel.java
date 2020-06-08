@@ -15,9 +15,9 @@ public class BaseModel implements Serializable{
 	private static final long serialVersionUID = -2467322075253424352L;
 	
 	/**
-	 * 当前页码,请先设置pageSize,否则使用默认的10
+	 * 当前页码,请先设置pageSize,否则使用默认的1
 	 */
-	public int currentPage;
+	public int currentPage = 1;
 	
 	/**
 	 * 每页显示多少条，默认10条
