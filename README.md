@@ -1,5 +1,9 @@
 # mybatis-enhance-actable-1.1.1.RELEASE
 
+ACTable技术交流QQ群：746531106
+
+Java技术交流QQ群：75451341
+
 A.C.Table是对Mybatis做的增强功能，为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis， “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
 A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下：
