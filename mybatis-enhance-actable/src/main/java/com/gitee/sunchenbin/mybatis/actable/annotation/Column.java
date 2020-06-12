@@ -24,12 +24,13 @@ public @interface Column{
 	/**
 	 * 字段名
 	 * 
-	 * @return 字段名
+	 * @return 字段名：不填默认使用属性名作为表字段名
 	 */
 	String name() default "";
 
 	/**
-	 * 字段类型
+	 * 字段类型：不填默认使用属性的数据类型进行转换，转换失败的字段不会添加
+	 * 转换类：com.gitee.sunchenbin.mybatis.actable.command.JavaToMysqlType
 	 * 
 	 * @return 字段类型
 	 */
@@ -37,6 +38,7 @@ public @interface Column{
 
 	/**
 	 * 字段长度，默认是255
+	 * 类型默认长度：com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant
 	 * 
 	 * @return 字段长度，默认是255
 	 */
@@ -44,6 +46,7 @@ public @interface Column{
 
 	/**
 	 * 小数点长度，默认是2
+	 * 类型默认长度：com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant
 	 * 
 	 * @return 小数点长度，默认是2
 	 */
@@ -51,6 +54,7 @@ public @interface Column{
 
 	/**
 	 * 是否为可以为null，true是可以，false是不可以，默认为true
+	 * 也可通过注解实现：com.gitee.sunchenbin.mybatis.actable.annotation.IsNotNull
 	 * 
 	 * @return 是否为可以为null，true是可以，false是不可以，默认为true
 	 */
@@ -58,6 +62,7 @@ public @interface Column{
 
 	/**
 	 * 是否是主键，默认false
+	 *也可通过注解实现：com.gitee.sunchenbin.mybatis.actable.annotation.IsKey
 	 * 
 	 * @return 是否是主键，默认false
 	 */
@@ -65,6 +70,7 @@ public @interface Column{
 
 	/**
 	 * 是否自动递增，默认false 只有主键才能使用
+	 * 也可通过注解实现：com.gitee.sunchenbin.mybatis.actable.annotation.IsAutoIncrement
 	 * 
 	 * @return 是否自动递增，默认false 只有主键才能使用
 	 */
