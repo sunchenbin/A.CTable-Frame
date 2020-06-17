@@ -319,7 +319,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		List<Object> dropKeyFieldList = new ArrayList<Object>();
 		for (SysMysqlColumns sysColumn : tableColumnList) {
 			// 数据库中有该字段时
-			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name());
+			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name().toLowerCase());
 			if (createTableParam != null) {
 				// 原本是主键，现在不是了，那么要去做删除主键的操作
 				if ("PRI".equals(sysColumn.getColumn_key()) && !createTableParam.isFieldIsKey()) {
@@ -350,7 +350,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		List<Object> modifyFieldList = new ArrayList<Object>();
 		for (SysMysqlColumns sysColumn : tableColumnList) {
 			// 数据库中有该字段时，验证是否有更新
-			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name());
+			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name().toLowerCase());
 			if (createTableParam != null) {
 				// 该复制操作时为了解决multiple primary key defined的同时又不会drop primary key
 				CreateTableParam modifyTableParam = createTableParam.clone();
@@ -444,7 +444,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		Map<String, CreateTableParam> fieldMap = new HashMap<String, CreateTableParam>();
 		for (Object obj : allFieldList) {
 			CreateTableParam createTableParam = (CreateTableParam) obj;
-			fieldMap.put(createTableParam.getFieldName(), createTableParam);
+			fieldMap.put(createTableParam.getFieldName().toLowerCase(), createTableParam);
 		}
 		return fieldMap;
 	}
@@ -460,10 +460,11 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 *            model中的所有字段
 	 */
 	private List<Object> getRemoveFieldList(Table table, List<String> columnNames, List<Object> allFieldList) {
+		List<String> toLowerCaseColumnNames = ClassTools.toLowerCase(columnNames);
 		Map<String, CreateTableParam> fieldMap = getAllFieldMap(allFieldList);
 		// 用于存删除的字段
 		List<Object> removeFieldList = new ArrayList<Object>();
-		for (String fieldNm : columnNames) {
+		for (String fieldNm : toLowerCaseColumnNames) {
 			// 判断该字段在新的model结构中是否存在
 			if (fieldMap.get(fieldNm) == null) {
 				// 不存在，做删除处理
@@ -485,11 +486,12 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 * @return 新增的字段
 	 */
 	private List<Object> getAddFieldList(Table table, List<Object> allFieldList, List<String> columnNames) {
+		List<String> toLowerCaseColumnNames = ClassTools.toLowerCase(columnNames);
 		List<Object> addFieldList = new ArrayList<Object>();
 		for (Object obj : allFieldList) {
 			CreateTableParam createTableParam = (CreateTableParam) obj;
 			// 循环新的model中的字段，判断是否在数据库中已经存在
-			if (!columnNames.contains(createTableParam.getFieldName())) {
+			if (!toLowerCaseColumnNames.contains(createTableParam.getFieldName().toLowerCase())) {
 				// 不存在，表示要在数据库中增加该字段
 				addFieldList.add(obj);
 			}
@@ -579,7 +581,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(indexValue)))
 							: Constants.IDX + index.value());
 					param.setFiledIndexValue(
-							indexValue.length == 0 ? Arrays.asList(field.getName()) : Arrays.asList(indexValue));
+							indexValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field)) : Arrays.asList(indexValue));
 				}
 				// 获取当前字段的@Unique注解
 				Unique unique = field.getAnnotation(Unique.class);
@@ -590,7 +592,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 									+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(uniqueValue)))
 							: Constants.UNI + unique.value());
 					param.setFiledUniqueValue(
-							uniqueValue.length == 0 ? Arrays.asList(field.getName()) : Arrays.asList(uniqueValue));
+							uniqueValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field)) : Arrays.asList(uniqueValue));
 				}
 				fieldList.add(param);
 			}
@@ -656,12 +658,12 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		// add是追加模式不做删除和修改操作
 		if(!"add".equals(tableAuto)) {
-			// 4. 删除字段
-			removeFieldsByMap(baseTableMap.get(Constants.REMOVE_TABLE_MAP));
-			// 5. 修改字段类型等
-			modifyFieldsByMap(baseTableMap.get(Constants.MODIFY_TABLE_MAP));
-			// 6. 删除索引和约束
+			// 4. 删除索引和约束
 			dropIndexAndUniqueByMap(baseTableMap.get(Constants.DROPINDEXANDUNIQUE_TABLE_MAP));
+			// 5. 删除字段
+			removeFieldsByMap(baseTableMap.get(Constants.REMOVE_TABLE_MAP));
+			// 6. 修改字段类型等
+			modifyFieldsByMap(baseTableMap.get(Constants.MODIFY_TABLE_MAP));
 		}
 
 		// 7. 创建索引

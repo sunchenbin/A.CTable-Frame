@@ -188,4 +188,20 @@ public class ClassTools{
 		
 		return list;
 	}
+
+	/**
+	 * List中的string转换为大写
+	 * @param list
+	 * @return
+	 */
+	public static List<String> toLowerCase(List<String> list){
+		if(null == list || list.size() == 0){
+			return list;
+		}
+		List<String> upperList = new ArrayList<String>();
+		for (String str : list) {
+			upperList.add(str.toLowerCase());
+		}
+		return upperList;
+	}
 }

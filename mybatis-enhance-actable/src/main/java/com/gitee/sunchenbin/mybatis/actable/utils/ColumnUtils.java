@@ -16,9 +16,17 @@ public class ColumnUtils {
             return null;
         }
         if (StringUtils.isEmpty(column.name())){
-            return field.getName();
+            char[] chars = field.getName().toCharArray();
+            for (int i = 0; chars.length > i; i++){
+                if(Character.isUpperCase(chars[i])){
+                    StringBuilder sb = new StringBuilder(field.getName());
+                    sb.insert(i,"_");
+                    return sb.toString().toLowerCase();
+                }
+            }
+            return field.getName().toLowerCase();
         }
-        return column.name();
+        return column.name().toLowerCase();
     }
 
     public static boolean isKey(Field field){

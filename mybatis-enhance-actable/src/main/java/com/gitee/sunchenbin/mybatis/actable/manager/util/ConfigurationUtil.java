@@ -20,15 +20,42 @@ public class ConfigurationUtil implements ApplicationContextAware {
 	private static ApplicationContext applicationContext;
 
 	private static Properties properties = null;
-	
+
+	/**
+	 * 旧的配置key，兼容老版本用的
+	 */
 	@Value(Constants.TABLE_AUTO_KEY_VALUE)
 	private String tableAuto;
-	
+
+	/**
+	 * 旧的配置key，兼容老版本用的
+	 */
 	@Value(Constants.MODEL_PACK_KEY_VALUE)
 	private String modelPack;
-	
+
+	/**
+	 * 旧的配置key，兼容老版本用的
+	 */
 	@Value(Constants.DATABASE_TYPE_KEY_VALUE)
 	private String databaseType;
+
+	/**
+	 * 新的配置key
+	 */
+	@Value(Constants.ACTABLE_TABLE_AUTO_KEY_VALUE)
+	private String actableAuto;
+
+	/**
+	 * 新的配置key
+	 */
+	@Value(Constants.ACTABLE_MODEL_PACK_KEY_VALUE)
+	private String acmodelPack;
+
+	/**
+	 * 新的配置key
+	 */
+	@Value(Constants.ACTABLE_DATABASE_TYPE_KEY_VALUE)
+	private String acdatabaseType;
 
 	/**
 	 * 实现ApplicationContextAware接口的回调方法，设置上下文环境
@@ -66,19 +93,49 @@ public class ConfigurationUtil implements ApplicationContextAware {
 	 * @return
 	 */
 	public String getConfig(String key) {
-		if(Constants.DATABASE_TYPE_KEY.equals(key) && !Constants.NULL.equals(databaseType)) {
-			return databaseType;
+		if(Constants.ACTABLE_DATABASE_TYPE_KEY.equals(key) || Constants.DATABASE_TYPE_KEY.equals(key)) {
+			if (!Constants.NULL.equals(databaseType)){
+				return databaseType;
+			}else if(!Constants.NULL.equals(acdatabaseType)){
+				return acdatabaseType;
+			}
 		}
-		if(Constants.MODEL_PACK_KEY.equals(key) && !Constants.NULL.equals(modelPack)) {
-			return modelPack;
+		if(Constants.ACTABLE_MODEL_PACK_KEY.equals(key) || Constants.MODEL_PACK_KEY.equals(key)) {
+			if (!Constants.NULL.equals(modelPack)){
+				return modelPack;
+			}else if(!Constants.NULL.equals(acmodelPack)){
+				return acmodelPack;
+			}
 		}
-		if(Constants.TABLE_AUTO_KEY.equals(key) && !Constants.NULL.equals(tableAuto)) {
-			return tableAuto;
+		if(Constants.ACTABLE_TABLE_AUTO_KEY.equals(key) || Constants.TABLE_AUTO_KEY.equals(key)) {
+			if (!Constants.NULL.equals(tableAuto)){
+				return tableAuto;
+			}else if(!Constants.NULL.equals(actableAuto)){
+				return actableAuto;
+			}
 		}
 		if(properties == null) {			
 			initProperties();
 		}
-		Object object = properties.get(key);
+		Object object = null;
+		if(Constants.ACTABLE_DATABASE_TYPE_KEY.equals(key) || Constants.DATABASE_TYPE_KEY.equals(key)) {
+			object = properties.get(Constants.DATABASE_TYPE_KEY);
+			if (null == object){
+				object = properties.get(Constants.ACTABLE_DATABASE_TYPE_KEY);
+			}
+		}
+		if(Constants.ACTABLE_MODEL_PACK_KEY.equals(key) || Constants.MODEL_PACK_KEY.equals(key)) {
+			object = properties.get(Constants.MODEL_PACK_KEY);
+			if (null == object){
+				object = properties.get(Constants.ACTABLE_MODEL_PACK_KEY);
+			}
+		}
+		if(Constants.ACTABLE_TABLE_AUTO_KEY.equals(key) || Constants.TABLE_AUTO_KEY.equals(key)) {
+			object = properties.get(Constants.TABLE_AUTO_KEY);
+			if (null == object){
+				object = properties.get(Constants.ACTABLE_TABLE_AUTO_KEY);
+			}
+		}
 		return object == null ? null : (String)object;
 	}
 

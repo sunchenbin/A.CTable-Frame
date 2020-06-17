@@ -72,7 +72,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         try{
             for (Map<String, Object> map : query){
                 T newInstance = (T) t.getClass().newInstance();
-                Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+                Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
                     // 得到字段的配置
@@ -137,7 +137,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         Map<String, Object> stringObjectMap = query.get(0);
         try{
             T newInstance = (T) t.getClass().newInstance();
-            Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+            Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
             for (Field field : declaredFields2){
                 field.setAccessible(true);
                 // 得到字段的配置
@@ -180,7 +180,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         try{
             for (Map<String, Object> map : query){
                 T newInstance = (T) clasz.newInstance();
-                Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+                Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
                     // 得到字段的配置
@@ -281,7 +281,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         Map<String, Object> stringObjectMap = query.get(0);
         try{
             T newInstance = (T) t.getClass().newInstance();
-            Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+            Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
             for (Field field : declaredFields2){
                 field.setAccessible(true);
                 // 得到字段的配置
@@ -603,7 +603,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 // 如果是主键，并且不是空的时候，这时候应该是更新操作
                 if (ColumnUtils.isKey(field)) {
                     if (field.get(t) != null){
-                        keyFieldMap.put(field.getName(), field.get(t));
+                        keyFieldMap.put(ColumnUtils.getColumnName(field), field.get(t));
                     }else{
                         log.error("主键更新的情况下不能为null！");
                         throw new RuntimeException("主键更新的情况下不能为null！");
@@ -663,7 +663,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 // 如果是主键，并且不是空的时候，这时候应该是更新操作
                 if (ColumnUtils.isKey(field)) {
                     if (field.get(t) != null){
-                        keyFieldMap.put(field.getName(), field.get(t));
+                        keyFieldMap.put(ColumnUtils.getColumnName(field), field.get(t));
                     }else{
                         log.error("主键更新的情况下不能为null！");
                         throw new RuntimeException("主键更新的情况下不能为null！");
@@ -728,8 +728,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] fields = FieldUtils.getAllFields(t);
                 for(Field field : fields){
                     field.setAccessible(true);
-                    Column annotation = field.getAnnotation(Column.class);
-                    String name = (null != annotation && !annotation.name().equals("")) ? annotation.name() : field.getName();
+                    String name = ColumnUtils.getColumnName(field);
                     if(null == map.get(name)){
                         continue;
                     }
@@ -805,7 +804,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         try{
             for (Map<String, Object> map : query){
                 T newInstance = (T) t.getClass().newInstance();
-                Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+                Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
                     // 得到字段的配置
@@ -907,7 +906,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         try{
             for (Map<String, Object> map : query){
                 T newInstance = (T) t.getClass().newInstance();
-                Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
+                Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
                     // 得到字段的配置

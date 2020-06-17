@@ -9,7 +9,15 @@ public class Constants {
 	public static final String DATABASE_TYPE_KEY_VALUE 			= "${mybatis.database.type:NULL}";
 	public static final String MODEL_PACK_KEY_VALUE 			= "${mybatis.model.pack:NULL}";
 	public static final String TABLE_AUTO_KEY_VALUE 			= "${mybatis.table.auto:NULL}";
-	
+
+	public static final String ACTABLE_DATABASE_TYPE_KEY 		= "actable.database.type";
+	public static final String ACTABLE_MODEL_PACK_KEY 			= "actable.model.pack";
+	public static final String ACTABLE_TABLE_AUTO_KEY 			= "actable.table.auto";
+
+	public static final String ACTABLE_DATABASE_TYPE_KEY_VALUE 	= "${actable.database.type:NULL}";
+	public static final String ACTABLE_MODEL_PACK_KEY_VALUE 	= "${actable.model.pack:NULL}";
+	public static final String ACTABLE_TABLE_AUTO_KEY_VALUE 	= "${actable.table.auto:NULL}";
+
 	public static final String NULL 							= "NULL";
 	
 	public static final String NEW_TABLE_MAP					= "newTableMap";

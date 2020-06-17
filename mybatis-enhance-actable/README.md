@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.1.1.RELEASE
+# mybatis-enhance-actable-1.2.0.RELEASE
 
 ACTable技术交流QQ群：746531106
 
@@ -81,39 +81,47 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     新增工具类BaseCRUDManager的方法列表如下，详细接口文档见文档结尾部分：
     
         <T> PageResultCommand<T> search(T t, Integer currentPage, Integer pageSize,LinkedHashMap<String,String> orderby);
-        <T> PageResultCommand<T> search(T t);
+        <T> PageResultCommand<T> search(T t);        
+32. 建表的字段时如果@Column没有设置字段名，那么默认会读属性的名字，根据驼峰转换逻辑，进行转换例如loginName会转换为login_name作为字段名，如果没有驼峰也就是全是小写字母，那么直接作为字段名，如果设置了Column(name="LOGIN_NAME")那么默认创建的字段会转换为小写，也就是login_name，所以字段名都会强制转换为小写(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)
+33. 修复索引约束创建完成后，修改字段名的情况下报错的bug(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)
+34. 为了防止配置信息引起歧义(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)
+
+        mybatis.table.auto      变为      actable.table.auto
+        mybatis.model.pack      变为      actable.model.pack
+        mybatis.database.type   变为      actable.database.type
+ 35. 修复建表时没有读取继承类中的字段信息的问题(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)   
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.1.1.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.2.0.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.1.1.RELEASE</version>
+        <version>1.2.0.RELEASE</version>
     </dependency>
 ```
 
 2. 需要配置对于actable支持的配置
 
 ```
-    mybatis.table.auto=update
-    mybatis.model.pack=com.sunchenbin.store.model
-    mybatis.database.type=mysql
+    actable.table.auto=update
+    actable.model.pack=com.sunchenbin.store.model
+    actable.database.type=mysql
     
     本系统提供四种模式：
     
-    2.1 当mybatis.table.auto=create时，系统启动后，会将所有的表删除掉，然后根据model中配置的结构重新建表，该操作会破坏原有数据。
+    2.1 当actable.table.auto=create时，系统启动后，会将所有的表删除掉，然后根据model中配置的结构重新建表，该操作会破坏原有数据。
     
-    2.2 当mybatis.table.auto=update时，系统会自动判断哪些表是新建的，哪些字段要修改类型等，哪些字段要删除，哪些字段要新增，该操作不会破坏原有数据。
+    2.2 当actable.table.auto=update时，系统会自动判断哪些表是新建的，哪些字段要修改类型等，哪些字段要删除，哪些字段要新增，该操作不会破坏原有数据。
     
-    2.3 当mybatis.table.auto=none时，系统不做任何处理。
+    2.3 当actable.table.auto=none时，系统不做任何处理。
     
-    2.4 当mybatis.table.auto=add，新增表/新增字段/新增索引/新增唯一约束的功能，不做做修改和删除 (只在版本1.0.9.RELEASE及以上支持)。
+    2.4 当actable.table.auto=add，新增表/新增字段/新增索引/新增唯一约束的功能，不做做修改和删除 (只在版本1.0.9.RELEASE及以上支持)。
     
-    2.5 mybatis.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
+    2.5 actable.model.pack这个配置是用来配置要扫描的用于创建表的对象的包名
         
-    2.6 mybatis.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
+    2.6 actable.database.type这个是用来区别数据库的，预计会支持这四种数据库mysql/oracle/sqlserver/postgresql，但目前仅支持mysql
 
 ```
 
@@ -141,17 +149,19 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.1.1.RELEASE</version>
+        <version>1.2.0.RELEASE</version>
     </dependency>
 ```
     
 2. 项目的application.properties文件配置例如下面
 
 ```
-    mybatis.table.auto=update
-    mybatis.model.pack=com.sunchenbin.store.model
-    mybatis.database.type=mysql
-    mybatis.mapperLocations=classpath*:xxxxxx/*.xml,classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+    # actable的配置信息
+    actable.table.auto=update
+    actable.model.pack=com.sunchenbin.store.model
+    actable.database.type=mysql
+    # mybatis的配置信息，key也可能是：mybatis.mapper-locations
+    mybatis.mapperLocations=自己的mapper.xml没有可不填;classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
 ```
 
 3. springboot启动类需要做如下配置
@@ -169,16 +179,16 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.1.1.RELEASE</version>
+        <version>1.2.0.RELEASE</version>
     </dependency>
 ```
 
 2. 在你的web项目上创建个目录比如config下面创建个文件autoCreateTable.properties文件的内容如下：
 
 ```
-    mybatis.table.auto=update
-    mybatis.model.pack=com.sunchenbin.store.model
-    mybatis.database.type=mysql
+    actable.table.auto=update
+    actable.model.pack=com.sunchenbin.store.model
+    actable.database.type=mysql
 ```
 
 3. spring的配置文件中需要做如下配置：
@@ -210,16 +220,16 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         <!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
         <property name="mapperLocations">
             <array>
-              <value>classpath*:com/sunchenbin/store/mapping/*/*.xml</value>
+              <value>classpath*:自己的mappring.xml没有可不填</value>
               <value>classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml</value>
             </array>
         </property>
-        <property name="typeAliasesPackage" value="com.sunchenbin.store.model.*" />
+        <property name="typeAliasesPackage" value="自己的model.*没有可不填" />
         <!-- <property name="configLocation" value="classpath:core/mybatis-configuration.xml" /> -->
     </bean>
     
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.sunchenbin.store.dao.*;com.gitee.sunchenbin.mybatis.actable.dao.*" />
+        <property name="basePackage" value="自己的dao.*没有可不填;com.gitee.sunchenbin.mybatis.actable.dao.*" />
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
     </bean>
 ```
