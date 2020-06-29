@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.2.0.RELEASE
+# mybatis-enhance-actable-1.2.1.RELEASE
 
 ACTable技术交流QQ群：746531106
 
@@ -89,16 +89,17 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         mybatis.table.auto      变为      actable.table.auto
         mybatis.model.pack      变为      actable.model.pack
         mybatis.database.type   变为      actable.database.type
- 35. 修复建表时没有读取继承类中的字段信息的问题(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)   
+35. 修复建表时没有读取继承类中的字段信息的问题(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)   
+36. 迭代issues/I1LUAZ:修复实体对象字段有多个大写，转换为列名时，只转换了第一个下划线，提供对@Table标签的驼峰转换的支持，不填表名默认使用类名驼峰转换(版本1.2.1.RELEASE)
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.2.0.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.2.1.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.2.0.RELEASE</version>
+        <version>1.2.1.RELEASE</version>
     </dependency>
 ```
 
@@ -149,7 +150,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.2.0.RELEASE</version>
+        <version>1.2.1.RELEASE</version>
     </dependency>
 ```
     
@@ -179,7 +180,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.2.0.RELEASE</version>
+        <version>1.2.1.RELEASE</version>
     </dependency>
 ```
 

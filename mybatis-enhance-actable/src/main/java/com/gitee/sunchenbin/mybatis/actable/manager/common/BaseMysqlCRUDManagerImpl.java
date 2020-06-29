@@ -20,6 +20,7 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
 import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseMysqlCRUDMapper;
+import org.springframework.util.StringUtils;
 
 /**
  * 已经废弃请勿使用有bug
@@ -39,8 +40,8 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 	@Override
 	public <T> Integer save(T obj){
 		boolean isSave = true;
-		Table tableName = obj.getClass().getAnnotation(Table.class);
-		if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+		String tableName = ColumnUtils.getTableName(obj.getClass());
+		if (StringUtils.isEmpty(tableName)) {
 			log.error("必须使用model中的对象！");
 			return null;
 		}
@@ -80,14 +81,14 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			}
 		}
 		if (isSave) {
-			tableMap.put(tableName.name(), dataMap);
+			tableMap.put(tableName, dataMap);
 			SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
 			// 执行保存操作
 			baseMysqlCRUDMapper.save(saveOrUpdateDataCommand);
 			return saveOrUpdateDataCommand.getId();
 		}else{
 			dataMap.put(KEYFIELDMAP, keyFieldMap);
-			tableMap.put(tableName.name(), dataMap);
+			tableMap.put(tableName, dataMap);
 			SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
 			// 执行更新操作根据主键
 			baseMysqlCRUDMapper.update(saveOrUpdateDataCommand);
@@ -107,8 +108,8 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 	public <T> void delete(T obj){
 
 		// 得到表名
-		Table tableName = obj.getClass().getAnnotation(Table.class);
-		if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+		String tableName = ColumnUtils.getTableName(obj.getClass());
+		if (StringUtils.isEmpty(tableName)) {
 			log.error("必须使用model中的对象！");
 			return;
 		}
@@ -132,7 +133,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				e.printStackTrace();
 			}
 		}
-		tableMap.put(tableName.name(), dataMap);
+		tableMap.put(tableName, dataMap);
 		baseMysqlCRUDMapper.delete(tableMap);
 	}
 
@@ -149,8 +150,8 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		LinkedHashMap<String,String> orderByVal = null;
 		PageResultCommand<T> pageResultCommand = new PageResultCommand<T>();
 		// 得到表名
-		Table tableName = obj.getClass().getAnnotation(Table.class);
-		if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+		String tableName = ColumnUtils.getTableName(obj.getClass());
+		if (StringUtils.isEmpty(tableName)) {
 			log.error("必须使用model中的对象！");
 			return pageResultCommand;
 		}
@@ -191,7 +192,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				e.printStackTrace();
 			}
 		}
-		tableMap.put(tableName.name(), dataMap);
+		tableMap.put(tableName, dataMap);
 		if(currentPageVal != null && currentPageVal > 0) {
 			tableMap.put(startKey, startVal);
 			tableMap.put(sizeKey, sizeVal);
@@ -309,8 +310,8 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 
     @Override
     public <T> Integer updateWithNull(T obj){
-        Table tableName = obj.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+		String tableName = ColumnUtils.getTableName(obj.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             return null;
         }
@@ -346,7 +347,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
         	return null;
         }
         dataMap.put(KEYFIELDMAP, keyFieldMap);
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
         // 执行更新操作根据主键
         baseMysqlCRUDMapper.updateWithNull(saveOrUpdateDataCommand);

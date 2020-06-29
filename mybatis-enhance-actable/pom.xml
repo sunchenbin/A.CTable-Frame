@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	<artifactId>mybatis-enhance-actable</artifactId>
-	<version>1.2.0.RELEASE</version>
+	<version>1.2.1.RELEASE</version>
 	
 	<parent>
 	    <groupId>org.sonatype.oss</groupId>
@@ -80,7 +80,12 @@
 			<version>1.18.8</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>25.0-jre</version>
+		</dependency>
 	</dependencies>	
 	
 	<build>

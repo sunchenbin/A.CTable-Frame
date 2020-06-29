@@ -1,14 +1,27 @@
 package com.gitee.sunchenbin.mybatis.actable.utils;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
-import com.gitee.sunchenbin.mybatis.actable.annotation.IsAutoIncrement;
-import com.gitee.sunchenbin.mybatis.actable.annotation.IsKey;
-import com.gitee.sunchenbin.mybatis.actable.annotation.IsNotNull;
+import com.gitee.sunchenbin.mybatis.actable.annotation.*;
+import com.google.common.base.CaseFormat;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 
 public class ColumnUtils {
+
+    public static String getTableName(Class<?> clasz){
+        Table tableName = clasz.getAnnotation(Table.class);
+        if (tableName == null && StringUtils.isEmpty(tableName.name()) && StringUtils.isEmpty(tableName.value())){
+            return null;
+        }
+        if (!StringUtils.isEmpty(tableName.name())){
+            return tableName.name();
+        }
+        if (!StringUtils.isEmpty(tableName.value())){
+            return tableName.value();
+        }
+        // 都为空时采用类名按照驼峰格式转会为表名
+        return getBuildLowerName(clasz.getSimpleName());
+    }
     
     public static String getColumnName(Field field){
         Column column = field.getAnnotation(Column.class);
@@ -16,17 +29,14 @@ public class ColumnUtils {
             return null;
         }
         if (StringUtils.isEmpty(column.name())){
-            char[] chars = field.getName().toCharArray();
-            for (int i = 0; chars.length > i; i++){
-                if(Character.isUpperCase(chars[i])){
-                    StringBuilder sb = new StringBuilder(field.getName());
-                    sb.insert(i,"_");
-                    return sb.toString().toLowerCase();
-                }
-            }
-            return field.getName().toLowerCase();
+            return getBuildLowerName(field.getName());
         }
         return column.name().toLowerCase();
+    }
+
+    private static String getBuildLowerName(String name) {
+        return CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE,
+                name).toLowerCase();
     }
 
     public static boolean isKey(Field field){
@@ -70,5 +80,4 @@ public class ColumnUtils {
         }
         return false;
     }
-
 }

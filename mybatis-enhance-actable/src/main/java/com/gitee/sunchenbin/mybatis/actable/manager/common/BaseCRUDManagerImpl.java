@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -41,8 +42,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     public <T> List<T> select(T t) {
 
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -65,7 +66,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         List<Map<String, Object>> query = baseCRUDMapper.select(tableMap);
 
         List<T> list = new ArrayList<T>();
@@ -104,8 +105,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     public <T> T selectByPrimaryKey(T t) {
 
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -129,7 +130,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             log.error("操作对象的Field出现异常",e);
             throw new RuntimeException("操作对象的Field出现异常");
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         List<Map<String, Object>> query = baseCRUDMapper.select(tableMap);
         if (query == null || query.size() == 0){
             return null;
@@ -166,14 +167,14 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> List<T> selectAll(Class<T> clasz) {
         // 得到表名
-        Table tableName = clasz.getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(clasz);
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
         Map<Object, Object> tableMap = new HashMap<Object, Object>();
         Map<Object, Object> dataMap = new HashMap<Object, Object>();
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         List<Map<String, Object>> query = baseCRUDMapper.select(tableMap);
 
         List<T> list = new ArrayList<T>();
@@ -211,8 +212,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> int selectCount(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -235,7 +236,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         return baseCRUDMapper.selectCount(tableMap);
     }
 
@@ -249,8 +250,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> T selectOne(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -273,7 +274,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         List<Map<String, Object>> query = baseCRUDMapper.select(tableMap);
         if (query == null || query.size() == 0){
             return null;
@@ -311,8 +312,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     public <T> int delete(T t) {
 
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -335,7 +336,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         return baseCRUDMapper.delete(tableMap);
     }
 
@@ -349,8 +350,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> int deleteByPrimaryKey(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -374,7 +375,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             log.error("操作对象的Field出现异常",e);
             throw new RuntimeException("操作对象的Field出现异常");
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         return baseCRUDMapper.delete(tableMap);
     }
 
@@ -404,8 +405,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> T insert(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -449,7 +450,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
         // 执行保存操作
         int count = baseCRUDMapper.insert(saveOrUpdateDataCommand);
@@ -493,8 +494,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> T insertSelective(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -538,7 +539,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
         // 执行保存操作
         int count = baseCRUDMapper.insertSelective(saveOrUpdateDataCommand);
@@ -582,8 +583,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> boolean updateByPrimaryKey(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -621,7 +622,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             throw new RuntimeException("不支持对没有主键的表进行更新！");
         }
         dataMap.put(KEYFIELDMAP, keyFieldMap);
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
         // 执行更新操作根据主键
         int count = baseCRUDMapper.updateByPrimaryKey(saveOrUpdateDataCommand);
@@ -642,8 +643,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
     @Override
     public <T> boolean updateByPrimaryKeySelective(T t) {
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -681,7 +682,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             throw new RuntimeException("不支持对没有主键的表进行更新！");
         }
         dataMap.put(KEYFIELDMAP, keyFieldMap);
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         SaveOrUpdateDataCommand saveOrUpdateDataCommand = new SaveOrUpdateDataCommand(tableMap);
         // 执行更新操作根据主键
         int count = baseCRUDMapper.updateByPrimaryKeySelective(saveOrUpdateDataCommand);
@@ -766,8 +767,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         PageResultCommand<T> pageResultCommand = new PageResultCommand<T>();
 
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -790,7 +791,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         if(currentPageVal != null && currentPageVal > 0) {
             tableMap.put(startKey, startVal);
             tableMap.put(sizeKey, sizeVal);
@@ -854,8 +855,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         PageResultCommand<T> pageResultCommand = new PageResultCommand<T>();
 
         // 得到表名
-        Table tableName = t.getClass().getAnnotation(Table.class);
-        if ((tableName == null) || (tableName.name() == null || tableName.name() == "")) {
+        String tableName = ColumnUtils.getTableName(t.getClass());
+        if (StringUtils.isEmpty(tableName)) {
             log.error("必须使用model中的对象！");
             throw new RuntimeException("必须使用model中的对象！");
         }
@@ -892,7 +893,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 throw new RuntimeException("操作对象的Field出现异常");
             }
         }
-        tableMap.put(tableName.name(), dataMap);
+        tableMap.put(tableName, dataMap);
         if(currentPageVal != null && currentPageVal > 0) {
             tableMap.put(startKey, startVal);
             tableMap.put(sizeKey, sizeVal);
