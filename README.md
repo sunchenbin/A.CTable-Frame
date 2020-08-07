@@ -1,5 +1,7 @@
 # mybatis-enhance-actable-1.2.1.RELEASE
 
+作者微信添加时备注Star的昵称，通过后会拉到微信群：sunchenbin
+
 ACTable技术交流QQ群：746531106
 
 Java技术交流QQ群：75451341
