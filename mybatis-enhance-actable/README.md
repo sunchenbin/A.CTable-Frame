@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.3.0.RELEASE(暂未发布)
+# mybatis-enhance-actable-1.3.0.RELEASE
 
 作者微信添加时备注Star的昵称，通过后会拉到微信群：sunchenbin
 
@@ -287,7 +287,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     
     11.增加注解@TableComment用来配置表的注释，可用来替代@Table的comment
 
- **model的写法例子**
+ **model的写法例子(这里的@Table和@Column都是用的actable中的，也支持使用javax.persistence包下的@Table和@Column以及@Id)**
 ```
 @Builder
 @Data
@@ -375,7 +375,115 @@ public class UserEntity extends BaseModel{
 
     3.注意：接口调用方法时传入的对象必须是modle中用于创建表的对象才可以
     
- **共通类BaseCRUDManager的CUDR方法接口文档如下**
+    4.最新版本1.3.0.RELEASE引入了对tk.mybatis的支持，方便更灵活的CUDR，仅限于使用javax.persistence的注解Column/Table/Id时生效
+ 
+ **AC.Table支持tk.mybatis框架的CUDR方法**
+    
+    请参考tk.mybatis官方文档使用即可。
+    
+    import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
+    import com.gitee.sunchenbin.mybatis.actable.annotation.IsAutoIncrement;
+    import com.gitee.sunchenbin.mybatis.actable.annotation.IsKey;
+    import lombok.AllArgsConstructor;
+    import lombok.Builder;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+    
+    import javax.persistence.Column;
+    import javax.persistence.Id;
+    import javax.persistence.Table;
+    import java.io.Serializable;
+    import java.util.Date;
+    
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Table(name = "user_entity")
+    public class UserEntity extends UserEntity1 implements Serializable {
+    
+        @Id
+        @IsKey
+        @IsAutoIncrement
+        @Column
+        private Long id;
+    
+        @Column(name = "login_name")
+        @Index
+        private String loginName;
+    
+        @Column(name = "nick_name")
+        private String nickName;
+    
+        @Column(name = "real_name")
+        private String realName;
+    
+        @Column(name = "password")
+        private String password;
+    
+        @Column(name = "mobile")
+        private String mobile;
+    
+        @Column(name = "istrue")
+        private Boolean isTrue;
+    
+        @Column(name = "it")
+        private Integer it;
+    
+        @Column
+        private Date createTime;
+    
+        @Column
+        private Date modifyTime;
+    }
+    
+    import com.alex.orderapi.dao.entity.UserEntity;
+    import tk.mybatis.mapper.common.Mapper;
+    
+    public interface UserMapper extends Mapper<UserEntity> {
+    
+    }
+    
+    @RequestMapping("/select/user1")
+    public String select1(HttpServletRequest request) {
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("1").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("2").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("3").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("4").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("5").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("6").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("7").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("8").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("9").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("10").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("11").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("12").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("13").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("14").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("2").build());
+        List<UserEntity> userEntities1 = userMapper.selectAll();
+        List<UserEntity> select = userMapper.select(UserEntity.builder().mobile("2").build());
+        Example example = new Example(UserEntity.class);
+        example.createCriteria().andEqualTo("mobile","3").andEqualTo("loginName","s");
+        List<UserEntity> userEntities = userMapper.selectByExample(example);
+        UserEntity v = userMapper.selectOne(UserEntity.builder().id(30L).build());
+        UserEntity userEntity = userMapper.selectByPrimaryKey(10);
+        List<UserEntity> userEntities2 = userMapper.selectByRowBounds(UserEntity.builder().build(), new RowBounds(0, 3));
+        List<UserEntity> userEntities3 = userMapper.selectByExampleAndRowBounds(Example.builder(UserEntity.class).build(), new RowBounds(3, 3));
+        Example example1 = new Example(UserEntity.class);
+        example1.setOrderByClause("id desc");
+        List<UserEntity> userEntities4 = userMapper.selectByExampleAndRowBounds(example1, new RowBounds(0, 3));
+        return "selectAll: " + JSON.toJSONString(userEntities1) +
+                "<p> select: " + JSON.toJSONString(select) +
+                "<p> selectByExample：" + JSON.toJSONString(userEntities) +
+                "<p> selectOne：" + JSON.toJSONString(v) +
+                "<p> selectByPrimaryKey：" + JSON.toJSONString(userEntity) +
+                "<p> selectByRowBounds：" + JSON.toJSONString(userEntities2) +
+                "<p> selectByExampleAndRowBounds：" + JSON.toJSONString(userEntities3) +
+                "<p> selectByExampleAndRowBounds：" + JSON.toJSONString(userEntities4);
+    }
+    
+ **AC.Table支持的共通类BaseCRUDManager的CUDR方法接口文档如下**
  
     /**
       * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll

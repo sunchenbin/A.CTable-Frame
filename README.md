@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.3.0.RELEASE(暂未发布)
+# mybatis-enhance-actable-1.3.0.RELEASE
 
 作者微信添加时备注Star的昵称，通过后会拉到微信群：sunchenbin
 
@@ -265,31 +265,36 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 	
 **代码用途讲解** 
 
-    1.SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
+    1. SysMysqlColumns.java这个对象里面配置的是mysql的数据类型，这里配置的类型越多，意味着创建表时能使用的类型越多
     
-    2.LengthCount.java是一个自定义的注解，用于标记在MySqlTypeConstants.java里面配置的数据类型上的，标记该类型需要设置几个长度，如datetime/varchar(1)/decimal(5,2)，分别是需要设置0个1个2个
+    2. Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
     
-    3.LengthDefault.java时一个自定义的注解，用于跟LengthCount.java配合使用，用来标记在MySqlTypeConstants.java里面配置的数据类型上的，标记改类型如果没有设置长度时默认的长度。
+    3. Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
     
-    4.Column.java也是一个自定义的注解，用于标记model中的字段上，作为创建表的依据如不标记，不会被扫描到，有几个属性用来设置字段名、字段类型、长度等属性的设置，详细请看代码上的注释
+    4. Index.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建索引，有两个属性一个是设置索引名称，一个是设置索引字段，支持多字段联合索引，如果都不设置默认为当前字段创建索引
     
-    5.Table.java也是一个自定义的注解，用于标记在model对象上，有一个属性name，用于设置该model生成表后的表名，如不设置该注解，则该model不会被扫描到
+    5. Unique.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建唯一约束，有两个属性一个是设置约束名称，一个是设置约束字段，支持多字段联合约束，如果都不设置默认为当前字段创建唯一约束
     
-    6.Index.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建索引，有两个属性一个是设置索引名称，一个是设置索引字段，支持多字段联合索引，如果都不设置默认为当前字段创建索引
+    6. 系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
     
-    7.Unique.java是一个自定义注解，用于标记在model中的字段上，表示为该字段创建唯一约束，有两个属性一个是设置约束名称，一个是设置约束字段，支持多字段联合约束，如果都不设置默认为当前字段创建唯一约束
+    7. 新增注解@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 
     
-    8.系统启动后会去自动调用SysMysqlCreateTableManagerImpl.java的createMysqlTable()方法，没错，这就是核心方法了，负责创建、删除、修改表。
+    8. 增加注解@ColumnComment字段注释，用来替代@Column中的comment
     
-    9.新增注解@IsKey/@IsAutoIncrement/@IsNotNull用来代替 @Column中的isKey/isAutoIncrement/isNull三个属性，当然旧的配置方式仍然是支持的 
+    9. 增加注解@DefaultValue字段默认值，用来替代@Column中的defaultValue
+    
+    10.增加注解@ColumnType字段默认值，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量
+    
+    11.增加注解@TableComment用来配置表的注释，可用来替代@Table的comment
 
- **model的写法例子**
+ **model的写法例子(这里的@Table和@Column都是用的actable中的，也支持使用javax.persistence包下的@Table和@Column以及@Id)**
 ```
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "test")
+@TableComment("测试表")
 public class UserEntity extends BaseModel{
 
     private static final long serialVersionUID = 5199200306752426433L;
@@ -302,6 +307,7 @@ public class UserEntity extends BaseModel{
     @IsKey
     @IsAutoIncrement
     @Column
+    @ColumnType(MySqlTypeConstant.INT)
     private Integer	id;
     
     // 第一种设置索引的方法，这种方法会在数据库默认创建索引名称为actable_idx_{login_name},索引字段为login_name
@@ -341,6 +347,8 @@ public class UserEntity extends BaseModel{
     private String	lifecycle;
     
     @Column
+    @DefaultValue("111")
+    @ColumnComment("昵称")
     private String	realName;
 }
 ```
@@ -367,7 +375,115 @@ public class UserEntity extends BaseModel{
 
     3.注意：接口调用方法时传入的对象必须是modle中用于创建表的对象才可以
     
- **共通类BaseCRUDManager的CUDR方法接口文档如下**
+    4.最新版本1.3.0.RELEASE引入了对tk.mybatis的支持，方便更灵活的CUDR，仅限于使用javax.persistence的注解Column/Table/Id时生效
+ 
+ **AC.Table支持tk.mybatis框架的CUDR方法**
+    
+    请参考tk.mybatis官方文档使用即可。
+    
+    import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
+    import com.gitee.sunchenbin.mybatis.actable.annotation.IsAutoIncrement;
+    import com.gitee.sunchenbin.mybatis.actable.annotation.IsKey;
+    import lombok.AllArgsConstructor;
+    import lombok.Builder;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
+    
+    import javax.persistence.Column;
+    import javax.persistence.Id;
+    import javax.persistence.Table;
+    import java.io.Serializable;
+    import java.util.Date;
+    
+    @Builder
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Table(name = "user_entity")
+    public class UserEntity extends UserEntity1 implements Serializable {
+    
+        @Id
+        @IsKey
+        @IsAutoIncrement
+        @Column
+        private Long id;
+    
+        @Column(name = "login_name")
+        @Index
+        private String loginName;
+    
+        @Column(name = "nick_name")
+        private String nickName;
+    
+        @Column(name = "real_name")
+        private String realName;
+    
+        @Column(name = "password")
+        private String password;
+    
+        @Column(name = "mobile")
+        private String mobile;
+    
+        @Column(name = "istrue")
+        private Boolean isTrue;
+    
+        @Column(name = "it")
+        private Integer it;
+    
+        @Column
+        private Date createTime;
+    
+        @Column
+        private Date modifyTime;
+    }
+    
+    import com.alex.orderapi.dao.entity.UserEntity;
+    import tk.mybatis.mapper.common.Mapper;
+    
+    public interface UserMapper extends Mapper<UserEntity> {
+    
+    }
+    
+    @RequestMapping("/select/user1")
+    public String select1(HttpServletRequest request) {
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("1").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("2").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("3").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("4").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("5").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("6").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("7").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("8").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("9").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("10").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("11").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("12").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("13").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("14").build());
+        userMapper.insert(UserEntity.builder().loginName("s").createTime(new Date()).realName("v").password("r").mobile("2").build());
+        List<UserEntity> userEntities1 = userMapper.selectAll();
+        List<UserEntity> select = userMapper.select(UserEntity.builder().mobile("2").build());
+        Example example = new Example(UserEntity.class);
+        example.createCriteria().andEqualTo("mobile","3").andEqualTo("loginName","s");
+        List<UserEntity> userEntities = userMapper.selectByExample(example);
+        UserEntity v = userMapper.selectOne(UserEntity.builder().id(30L).build());
+        UserEntity userEntity = userMapper.selectByPrimaryKey(10);
+        List<UserEntity> userEntities2 = userMapper.selectByRowBounds(UserEntity.builder().build(), new RowBounds(0, 3));
+        List<UserEntity> userEntities3 = userMapper.selectByExampleAndRowBounds(Example.builder(UserEntity.class).build(), new RowBounds(3, 3));
+        Example example1 = new Example(UserEntity.class);
+        example1.setOrderByClause("id desc");
+        List<UserEntity> userEntities4 = userMapper.selectByExampleAndRowBounds(example1, new RowBounds(0, 3));
+        return "selectAll: " + JSON.toJSONString(userEntities1) +
+                "<p> select: " + JSON.toJSONString(select) +
+                "<p> selectByExample：" + JSON.toJSONString(userEntities) +
+                "<p> selectOne：" + JSON.toJSONString(v) +
+                "<p> selectByPrimaryKey：" + JSON.toJSONString(userEntity) +
+                "<p> selectByRowBounds：" + JSON.toJSONString(userEntities2) +
+                "<p> selectByExampleAndRowBounds：" + JSON.toJSONString(userEntities3) +
+                "<p> selectByExampleAndRowBounds：" + JSON.toJSONString(userEntities4);
+    }
+    
+ **AC.Table支持的共通类BaseCRUDManager的CUDR方法接口文档如下**
  
     /**
       * 根据实体对象的非Null字段作为Where条件查询结果集，如果对象的属性值都为null则返回全部数据等同于selectAll
