@@ -12,14 +12,14 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.LengthDefault;
  *     datetime
  *
  * @author sunchenbin
- * @version 2016年6月23日 下午5:59:33 
+ * @version 2016年6月23日 下午5:59:33
  */
 public class MySqlTypeConstant {
 
 	@LengthCount
 	@LengthDefault(length = 11)
 	public static final  String INT = "int";
-	
+
 	@LengthCount
 	@LengthDefault(length = 255)
 	public static final  String VARCHAR = "varchar";
@@ -58,7 +58,7 @@ public class MySqlTypeConstant {
 
 	@LengthCount(LengthCount=0)
 	public static final  String DOUBLE = "double";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String TEXT = "text";
 
@@ -70,16 +70,16 @@ public class MySqlTypeConstant {
 
 	@LengthCount(LengthCount=0)
 	public static final  String DATETIME = "datetime";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String TIMESTAMP = "timestamp";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String DATE = "date";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String TIME = "time";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String FLOAT = "float";
 
@@ -101,16 +101,6 @@ public class MySqlTypeConstant {
 	@LengthCount(LengthCount=0)
 	public static final  String TINYBLOB = "tinyblob";
 
-	/**
-	 * 更新时间 ON UPDATE CURRENT_TIMESTAMP
-	 */
-	@LengthCount(LengthCount = 0)
-	public static final String UPDATE_TIMESTAMP = "timestamp ON UPDATE CURRENT_TIMESTAMP";
-
-	/**
-	 * 新增时间  DEFAULT CURRENT_TIMESTAMP
-	 */
-	@LengthCount(LengthCount = 0)
-	public static final String CREATE_TIMESTAMP = "timestamp DEFAULT CURRENT_TIMESTAMP";
-
+	@LengthCount(LengthCount=0)
+	public static final  String JSON = "json";
 }

@@ -1,26 +1,19 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.common;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
+import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
+import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
+import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseMysqlCRUDMapper;
 import com.gitee.sunchenbin.mybatis.actable.utils.ColumnUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
-import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
-import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
-import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
-import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseMysqlCRUDMapper;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * 已经废弃请勿使用有bug
@@ -31,7 +24,7 @@ import org.springframework.util.StringUtils;
 public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 
 	private static final Logger	log	= LoggerFactory.getLogger(BaseMysqlCRUDManagerImpl.class);
-	
+
 	private static final String KEYFIELDMAP = "keyFieldMap";
 
 	@Autowired
@@ -54,8 +47,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			try{
 				// 私有属性需要设置访问权限
 				field.setAccessible(true);
-				Column column = field.getAnnotation(Column.class);
-				if (column == null) {
+				if (!ColumnUtils.hasColumnAnnotation(field)) {
 					log.debug("该field没有配置注解不是表中在字段！");
 					continue;
 				}
@@ -98,7 +90,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 
 	private <T> Field[] getAllFields(T obj) {
 		Field[] declaredFields = obj.getClass().getDeclaredFields();
-		
+
 		// 递归扫描父类的filed
 		declaredFields = recursionParents(obj.getClass(), declaredFields);
 		return declaredFields;
@@ -119,9 +111,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		for (Field field : declaredFields){
 			// 设置访问权限
 			field.setAccessible(true);
-			// 得到字段的配置
-			Column column = field.getAnnotation(Column.class);
-			if (column == null) {
+			if (!ColumnUtils.hasColumnAnnotation(field)) {
 				log.debug("该field没有配置注解不是表中在字段！");
 				continue;
 			}
@@ -175,15 +165,13 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				if(orderByKey.equals(field.getName())) {
 					orderByVal = (LinkedHashMap<String,String>) field.get(obj);
 				}
-				// 得到字段的配置
-				Column column = field.getAnnotation(Column.class);
-				if (column == null) {
+				if (!ColumnUtils.hasColumnAnnotation(field)) {
 					log.debug("该field没有配置注解不是表中在字段！");
 					continue;
 				}
 				if (field.get(obj) instanceof String && field.get(obj) != null && "".equals(field.get(obj))) {
 					dataMap.put(ColumnUtils.getColumnName(field), null);
-				}else {					
+				}else {
 					dataMap.put(ColumnUtils.getColumnName(field), field.get(obj));
 				}
 			}catch (IllegalArgumentException e){
@@ -201,7 +189,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 			tableMap.put(orderByKey, orderByVal);
 		}
 		List<Map<String, Object>> query = baseMysqlCRUDMapper.search(tableMap);
-		
+
 		List<T> list = new ArrayList<T>();
 		try{
 			for (Map<String, Object> map : query){
@@ -209,9 +197,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 				Field[] declaredFields2 = newInstance.getClass().getDeclaredFields();
 				for (Field field : declaredFields2){
 					field.setAccessible(true);
-					// 得到字段的配置
-					Column column = field.getAnnotation(Column.class);
-					if (column == null) {
+					if (!ColumnUtils.hasColumnAnnotation(field)) {
 						log.debug("该field没有配置注解不是表中在字段！");
 						continue;
 					}
@@ -225,7 +211,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}catch (IllegalAccessException e){
 			e.printStackTrace();
 		}
-		if (null != list) {			
+		if (null != list) {
 			pageResultCommand.setData(list);
 			int queryCount = baseMysqlCRUDMapper.searchCount(tableMap);
 			pageResultCommand.setRecordsFiltered(queryCount);
@@ -233,12 +219,12 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		}
 		return pageResultCommand;
 	}
-	
+
 	@Override
 	public <T> PageResultCommand<T> query(T t) {
 		return search(t);
 	}
-	
+
 	/**
 	 * 递归扫描父类的fields
 	 * @param clas
@@ -276,7 +262,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
 		log.info(value);
 		return baseMysqlCRUDMapper.query(value);
 	}
-	
+
 	@Override
 	public <T> List<T> query(String sql, Class<T> beanClass) {
 		if(null == beanClass){
@@ -324,8 +310,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -341,7 +326,7 @@ public class BaseMysqlCRUDManagerImpl implements BaseMysqlCRUDManager{
                 e.printStackTrace();
             }
         }
-        
+
         if(keyFieldMap.isEmpty()) {
         	log.error("主键不能更新为null！");
         	return null;

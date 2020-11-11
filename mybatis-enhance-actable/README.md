@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.2.1.RELEASE
+# mybatis-enhance-actable-1.3.0.RELEASE(暂未发布)
 
 作者微信添加时备注Star的昵称，通过后会拉到微信群：sunchenbin
 
@@ -93,15 +93,29 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
         mybatis.database.type   变为      actable.database.type
 35. 修复建表时没有读取继承类中的字段信息的问题(版本1.2.0.RELEASE，**该版本对于之前建表字段名使用大写的项目不向下兼容，要升级至此版本需谨慎**)   
 36. 迭代issues/I1LUAZ:修复实体对象字段有多个大写，转换为列名时，只转换了第一个下划线，提供对@Table标签的驼峰转换的支持，不填表名默认使用类名驼峰转换(版本1.2.1.RELEASE)
+37. 支持使用javax.persistence的Column/Table/Id等注解生成及更新表(版本1.3.0.RELEASE)
+    
+        javax.persistence.Column = com.gitee.sunchenbin.mybatis.actable.annotation.Column
+        javax.persistence.Column.name = com.gitee.sunchenbin.mybatis.actable.annotation.Column.name
+        javax.persistence.Column.length = com.gitee.sunchenbin.mybatis.actable.annotation.Column.length
+        javax.persistence.Column.scale = com.gitee.sunchenbin.mybatis.actable.annotation.Column.decimalLength
+        javax.persistence.Table = com.gitee.sunchenbin.mybatis.actable.annotation.Table
+        javax.persistence.Id = com.gitee.sunchenbin.mybatis.actable.annotation.IsKey
+38. 引入对tk.mybatis的支持，方便更灵活的CUDR，仅限于使用javax.persistence包的Column/Table/Id等注解时生效，如使用actable的注解则只支持BaseCRUDManager(版本1.3.0.RELEASE)
+39. 增加对json数据类型的支持(版本1.3.0.RELEASE)
+40. 增加注解@ColumnComment字段注释，用来替代@Column中的comment(版本1.3.0.RELEASE)
+41. 增加注解@DefaultValue字段默认值，用来替代@Column中的defaultValue(版本1.3.0.RELEASE)
+42. 增加注解@ColumnType字段默认值，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量(版本1.3.0.RELEASE)
+43. 增加注解@TableComment用来配置表的注释，可用来替代@Table的comment(版本1.3.0.RELEASE)
 
  **基本使用规范**
-1. 需要依赖mybatis-enhance-actable-1.2.1.RELEASE.jar
+1. 需要依赖mybatis-enhance-actable-1.3.0.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.2.1.RELEASE</version>
+        <version>1.3.0.RELEASE</version>
     </dependency>
 ```
 
@@ -109,7 +123,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 ```
     actable.table.auto=update
-    actable.model.pack=com.sunchenbin.store.model
+    actable.model.pack=com.xxx.store.model(ps:要扫描的model目录)
     actable.database.type=mysql
     
     本系统提供四种模式：
@@ -152,7 +166,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.2.1.RELEASE</version>
+        <version>1.3.0.RELEASE</version>
     </dependency>
 ```
     
@@ -161,7 +175,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 ```
     # actable的配置信息
     actable.table.auto=update
-    actable.model.pack=com.sunchenbin.store.model
+    actable.model.pack=com.xxx.store.model(ps:要扫描的model目录)
     actable.database.type=mysql
     # mybatis的配置信息，key也可能是：mybatis.mapper-locations
     mybatis.mapperLocations=自己的mapper.xml没有可不填;classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
@@ -182,7 +196,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.2.1.RELEASE</version>
+        <version>1.3.0.RELEASE</version>
     </dependency>
 ```
 
@@ -190,7 +204,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
 ```
     actable.table.auto=update
-    actable.model.pack=com.sunchenbin.store.model
+    actable.model.pack=com.xxx.store.model(ps:要扫描的model目录)
     actable.database.type=mysql
 ```
 
@@ -234,6 +248,18 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="自己的dao.*没有可不填;com.gitee.sunchenbin.mybatis.actable.dao.*" />
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+    </bean>
+
+    如果传统springmvc项目要使用tk.mybatis需要将上面这个bean替换成如下：
+
+    <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="自己的dao.*没有可不填;com.gitee.sunchenbin.mybatis.actable.dao.*"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="properties">
+            <value>
+                mappers=tk.mybatis.mapper.common.Mapper,tk.mybatis.mapper.common.special.InsertListMapper
+            </value>
+        </property>
     </bean>
 ```
 	

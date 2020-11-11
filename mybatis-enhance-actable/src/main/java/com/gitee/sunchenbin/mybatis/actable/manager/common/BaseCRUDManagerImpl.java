@@ -1,7 +1,6 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.common;
 
 import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
-import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
 import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseCRUDMapper;
@@ -53,9 +52,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            // 得到字段的配置
-            Column column = field.getAnnotation(Column.class);
-            if (column == null) {
+            if (!ColumnUtils.hasColumnAnnotation(field)) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
@@ -76,9 +73,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    // 得到字段的配置
-                    Column column = field.getAnnotation(Column.class);
-                    if (column == null) {
+                    if (!ColumnUtils.hasColumnAnnotation(field)) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
@@ -119,8 +114,6 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         try {
             // 设置访问权限
             keyField.setAccessible(true);
-            // 得到字段的配置
-            Column column = keyField.getAnnotation(Column.class);
             Object keyValue = keyField.get(t);
             if (null == keyValue){
                 throw new RuntimeException("主键字段不能为null");
@@ -141,9 +134,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
             for (Field field : declaredFields2){
                 field.setAccessible(true);
-                // 得到字段的配置
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -184,9 +175,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    // 得到字段的配置
-                    Column column = field.getAnnotation(Column.class);
-                    if (column == null) {
+                    if (!ColumnUtils.hasColumnAnnotation(field)) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
@@ -223,9 +212,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            // 得到字段的配置
-            Column column = field.getAnnotation(Column.class);
-            if (column == null) {
+            if (!ColumnUtils.hasColumnAnnotation(field)) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
@@ -261,9 +248,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            // 得到字段的配置
-            Column column = field.getAnnotation(Column.class);
-            if (column == null) {
+            if (!ColumnUtils.hasColumnAnnotation(field)) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
@@ -285,9 +270,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
             for (Field field : declaredFields2){
                 field.setAccessible(true);
-                // 得到字段的配置
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -323,9 +306,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            // 得到字段的配置
-            Column column = field.getAnnotation(Column.class);
-            if (column == null) {
+            if (!ColumnUtils.hasColumnAnnotation(field)) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
@@ -364,8 +345,6 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         try {
             // 设置访问权限
             keyField.setAccessible(true);
-            // 得到字段的配置
-            Column column = keyField.getAnnotation(Column.class);
             Object keyValue = keyField.get(t);
             if (null == keyValue){
                 throw new RuntimeException("主键字段不能为null");
@@ -419,8 +398,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -508,8 +486,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -596,8 +573,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -656,8 +632,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -779,9 +754,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             // 设置访问权限
             field.setAccessible(true);
             try{
-                // 得到字段的配置
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field)) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
@@ -808,9 +781,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    // 得到字段的配置
-                    Column column = field.getAnnotation(Column.class);
-                    if (column == null) {
+                    if (!ColumnUtils.hasColumnAnnotation(field)) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
@@ -910,9 +881,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    // 得到字段的配置
-                    Column column = field.getAnnotation(Column.class);
-                    if (column == null) {
+                    if (!ColumnUtils.hasColumnAnnotation(field)) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }

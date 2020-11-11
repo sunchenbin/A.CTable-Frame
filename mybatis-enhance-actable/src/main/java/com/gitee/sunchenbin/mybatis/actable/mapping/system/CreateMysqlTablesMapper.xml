@@ -24,67 +24,91 @@
 		<result property="column_comment" column="column_comment"/>
 	</resultMap>
 
+	<resultMap id="SysMysqlTableResultMap" type="com.gitee.sunchenbin.mybatis.actable.command.SysMysqlTable">
+		<result property="table_catalog" column="table_catalog"/>
+		<result property="table_schema" column="table_schema"/>
+		<result property="table_name" column="table_name"/>
+		<result property="table_type" column="table_type"/>
+		<result property="engine" column="engine"/>
+		<result property="version" column="version"/>
+		<result property="row_format" column="row_format"/>
+		<result property="table_rows" column="table_rows"/>
+		<result property="avg_row_length" column="avg_row_length"/>
+		<result property="data_length" column="data_length"/>
+		<result property="max_data_length" column="max_data_length"/>
+		<result property="index_length" column="index_length"/>
+		<result property="data_free" column="data_free"/>
+		<result property="auto_increment" column="auto_increment"/>
+		<result property="create_time" column="create_time"/>
+		<result property="update_time" column="update_time"/>
+		<result property="check_time" column="check_time"/>
+		<result property="table_collation" column="table_collation"/>
+		<result property="checksum" column="checksum"/>
+		<result property="create_options" column="create_options"/>
+		<result property="table_comment" column="table_comment"/>
+	</resultMap>
+
 	<!-- 抽取出来的公共部分 -->
 	<sql id="commonSql">
 		<if test="fields.fileTypeLength == 0">
-			`${fields.fieldName}` ${fields.fieldType} 
+			`${fields.fieldName}` ${fields.fieldType}
 		</if>
 		<if test="fields.fileTypeLength == 1">
-			`${fields.fieldName}` ${fields.fieldType}(${fields.fieldLength}) 
+			`${fields.fieldName}` ${fields.fieldType}(${fields.fieldLength})
 		</if>
 		<if test="fields.fileTypeLength == 2">
 			`${fields.fieldName}`
-			${fields.fieldType}(${fields.fieldLength},${fields.fieldDecimalLength}) 
+			${fields.fieldType}(${fields.fieldLength},${fields.fieldDecimalLength})
 		</if>
 		<if test="fields.fieldIsNull">
-			NULL 
+			NULL
 		</if>
 		<if test="!fields.fieldIsNull">
-			NOT NULL 
+			NOT NULL
 		</if>
 		<if test="fields.fieldIsAutoIncrement">
-			AUTO_INCREMENT 
+			AUTO_INCREMENT
 		</if>
 		<!-- 不是自增长的才能有默认值 -->
 		<!-- 并且不为null时，因为null是默认的没必要写 -->
 		<if test="!fields.fieldIsAutoIncrement and !fields.fieldIsNull and fields.fieldDefaultValue != 'NULL'">
 			<if test="fields.fieldType == 'bit'">
-				<if test="fields.fieldDefaultValue == 'true'.toString()">				
-					DEFAULT 1 
+				<if test="fields.fieldDefaultValue == 'true'.toString()">
+					DEFAULT 1
 				</if>
-				<if test="fields.fieldDefaultValue == 'false'.toString()">				
-					DEFAULT 0 
+				<if test="fields.fieldDefaultValue == 'false'.toString()">
+					DEFAULT 0
 				</if>
-				<if test="fields.fieldDefaultValue == '1'.toString()">				
-					DEFAULT 1 
+				<if test="fields.fieldDefaultValue == '1'.toString()">
+					DEFAULT 1
 				</if>
-				<if test="fields.fieldDefaultValue == '0'.toString()">				
-					DEFAULT 0 
+				<if test="fields.fieldDefaultValue == '0'.toString()">
+					DEFAULT 0
 				</if>
 			</if>
-			<if test="fields.fieldType != 'bit'">				
-				DEFAULT #{fields.fieldDefaultValue} 
+			<if test="fields.fieldType != 'bit'">
+				DEFAULT #{fields.fieldDefaultValue}
 			</if>
 		</if>
 		<!-- 不是自增长的才能有默认值 -->
 		<!-- 不是非空时，并且默认值不是NUll -->
 		<if test="!fields.fieldIsAutoIncrement and fields.fieldIsNull and fields.fieldDefaultValue != 'NULL'">
 			<if test="fields.fieldType == 'bit'">
-				<if test="fields.fieldDefaultValue == 'true'.toString()">				
-					DEFAULT 1 
+				<if test="fields.fieldDefaultValue == 'true'.toString()">
+					DEFAULT 1
 				</if>
-				<if test="fields.fieldDefaultValue == 'false'.toString()">				
-					DEFAULT 0 
+				<if test="fields.fieldDefaultValue == 'false'.toString()">
+					DEFAULT 0
 				</if>
-				<if test="fields.fieldDefaultValue == '1'.toString()">				
-					DEFAULT 1 
+				<if test="fields.fieldDefaultValue == '1'.toString()">
+					DEFAULT 1
 				</if>
-				<if test="fields.fieldDefaultValue == '0'.toString()">				
-					DEFAULT 0 
+				<if test="fields.fieldDefaultValue == '0'.toString()">
+					DEFAULT 0
 				</if>
 			</if>
-			<if test="fields.fieldType != 'bit'">				
-				DEFAULT #{fields.fieldDefaultValue} 
+			<if test="fields.fieldType != 'bit'">
+				DEFAULT #{fields.fieldDefaultValue}
 			</if>
 		</if>
 		<if test="fields.fieldComment != ''">
@@ -97,94 +121,107 @@
 
 		<foreach collection="tableMap" index="key" item="value">
 			create table `${key}`(
-			<foreach collection="value" item="fields" separator=",">
+			<foreach collection="value.list" item="fields" separator=",">
 				<include refid="commonSql"></include>
 				<if test="fields.fieldIsKey">
 					,PRIMARY KEY (`${fields.fieldName}`)
 				</if>
 			</foreach>
-			);
+			)
+			<foreach collection="value.map" index="ckey" item="cvalue">
+				<if test="ckey == 'table_comment'">
+					COMMENT = #{cvalue}
+				</if>
+			</foreach>
+			;
 		</foreach>
 
 	</select>
-	
+
 	<!-- 验证表是否存在 -->
-	<select id="findTableCountByTableName" resultType="int" parameterType="String">
-		select count(1) from information_schema.tables
+	<select id="findTableByTableName" resultMap="SysMysqlTableResultMap" parameterType="String">
+		select * from information_schema.tables
 		where table_name = #{tableName} and table_schema = (select database())
 	</select>
-	
+
 	<!-- 根据表名查询表的结构 -->
 	<select id="findTableEnsembleByTableName" resultMap="SysMysqlColumnsResultMap" parameterType="String">
 		select * from information_schema.columns where table_name = #{tableName} and table_schema = (select database())
 	</select>
-	
+
 	<!-- 增加字段 -->
 	<select id="addTableField" parameterType="java.util.Map">
-	
+
 		<foreach collection="tableMap" index="key" item="fields" separator=";">
-				alter table `${key}` add 
+				alter table `${key}` add
 				<include refid="commonSql"></include>
 				<if test="fields.fieldIsKey">
-					PRIMARY KEY 
+					PRIMARY KEY
 				</if>
 		</foreach>
-		
+
 	</select>
-	
+
 	<!-- 删除字段 -->
 	<select id="removeTableField" parameterType="java.util.Map">
 		<foreach collection="tableMap" index="key" item="field" separator=";">
 			alter table `${key}` drop `${field}`
 		</foreach>
 	</select>
-	
+
+	<!-- 更新表注释 -->
+	<select id="modifyTableComment" parameterType="java.util.Map">
+		<foreach collection="tableMap" index="key" item="value" separator=";">
+			alter table `${key}` comment #{value}
+		</foreach>
+	</select>
+
 	<!-- 修改字段 -->
 	<select id="modifyTableField" parameterType="java.util.Map">
-	
+
 		<foreach collection="tableMap" index="key" item="fields" separator=";">
-				alter table `${key}` modify 
+				alter table `${key}` modify
 				<include refid="commonSql"></include>
 				<if test="fields.fieldIsKey">
-					PRIMARY KEY 
+					PRIMARY KEY
 				</if>
 		</foreach>
-		
+
 	</select>
-	
-	
+
+
 	<!-- 删除主键字段 -->
 	<select id="dropKeyTableField" parameterType="java.util.Map">
-	
+
 		<foreach collection="tableMap" index="key" item="fields" separator=";">
-				alter table `${key}` modify 
+				alter table `${key}` modify
 				<include refid="commonSql"></include>
 				,drop primary key
 		</foreach>
-		
+
 	</select>
-	
+
 	<!-- 验证表是否存在 -->
 	<select id="dropTableByName" parameterType="String">
 		DROP TABLE IF EXISTS `${tableName}`;
 	</select>
-	
+
 	<!-- 查询当前表存在的索引除了主键索引primary -->
 	<select id="findTableIndexByTableName" resultType="String" parameterType="String">
 		select index_name from information_schema.statistics
 		where table_name = #{tableName} and table_schema = (select database()) and lower(index_name) !='primary' and index_name like 'actable_%'
 	</select>
-	
+
 	<!-- 删除索引 -->
 	<select id="dropTabelIndex" parameterType="java.util.Map">
 		<foreach collection="tableMap" index="tableName" item="indexName">
 				DROP INDEX `${indexName}` on `${tableName}`
 		</foreach>
 	</select>
-	
+
 	<!-- 创建索引 -->
 	<select id="addTableIndex" parameterType="java.util.Map">
-	
+
 		<foreach collection="tableMap" index="tableName" item="fields" separator=";">
 				CREATE INDEX ${fields.filedIndexName}
 				ON `${tableName}` (
@@ -199,14 +236,14 @@
 						</if>
 					</if>
 				</foreach>
-				)				
+				)
 		</foreach>
-		
+
 	</select>
-	
+
 	<!-- 创建唯一约束 -->
 	<select id="addTableUnique" parameterType="java.util.Map">
-		
+
 		<foreach collection="tableMap" index="tableName" item="fields" separator=";">
 				CREATE UNIQUE INDEX ${fields.filedUniqueName}
 				ON `${tableName}` (
@@ -221,8 +258,8 @@
 						</if>
 					</if>
 				</foreach>
-				)				
+				)
 		</foreach>
-		
+
 	</select>
 </mapper>
