@@ -105,7 +105,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 39. 增加对json数据类型的支持(版本1.3.0.RELEASE)
 40. 增加注解@ColumnComment字段注释，用来替代@Column中的comment(版本1.3.0.RELEASE)
 41. 增加注解@DefaultValue字段默认值，用来替代@Column中的defaultValue(版本1.3.0.RELEASE)
-42. 增加注解@ColumnType字段默认值，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量(版本1.3.0.RELEASE)
+42. 增加注解@ColumnType字段类型，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量(版本1.3.0.RELEASE)
 43. 增加注解@TableComment用来配置表的注释，可用来替代@Table的comment(版本1.3.0.RELEASE)
 
  **基本使用规范**
