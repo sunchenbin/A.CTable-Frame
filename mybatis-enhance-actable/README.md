@@ -283,7 +283,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     
     9. 增加注解@DefaultValue字段默认值，用来替代@Column中的defaultValue
     
-    10.增加注解@ColumnType字段默认值，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量
+    10.增加注解@ColumnType字段类型，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量
     
     11.增加注解@TableComment用来配置表的注释，可用来替代@Table的comment
 
