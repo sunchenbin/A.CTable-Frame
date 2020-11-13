@@ -51,10 +51,10 @@ public interface CreateMysqlTablesMapper {
 	public void removeTableField(@Param("tableMap") Map<String, Object> tableMap);
 
 	/**
-	 * 更新表注释
+	 * 更新表属性
 	 * @param tableMap 表结构的map
 	 */
-	public void modifyTableComment(@Param("tableMap") Map<String, Object> tableMap);
+	public void modifyTableProperty(@Param("tableMap") Map<String, TableConfig> tableMap);
 
 	/**
 	 * 修改字段

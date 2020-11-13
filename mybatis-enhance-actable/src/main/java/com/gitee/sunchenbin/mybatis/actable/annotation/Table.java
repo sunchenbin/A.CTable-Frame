@@ -39,4 +39,18 @@ public @interface Table {
 	 * @return
 	 */
 	public String comment() default "";
+
+	/**
+	 * 表字符集，也可以使用@TableCharset注解代替
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant中的常量字符集
+	 * @return
+	 */
+	public String charset() default "";
+
+	/**
+	 * 表引擎，也可以使用@TableEngine注解代替
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant中的引擎类型
+	 * @return
+	 */
+	public String engine() default "";
 }

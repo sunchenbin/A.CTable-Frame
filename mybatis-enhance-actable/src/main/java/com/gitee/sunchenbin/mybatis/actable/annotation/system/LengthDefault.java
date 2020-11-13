@@ -1,10 +1,10 @@
-package com.gitee.sunchenbin.mybatis.actable.annotation;
+package com.gitee.sunchenbin.mybatis.actable.annotation.system;
 
 import java.lang.annotation.*;
 
 
 /**
- * 针对数据库类型加注解，用来标记该类型长度默认值
+ * 系统使用，针对数据库类型加注解，用来标记该类型长度默认值
  * @author sunchenbin
  * @version 2020年5月26日 下午6:13:15
  */
@@ -29,5 +29,5 @@ public @interface LengthDefault {
 	 * @return 小数点长度，默认是2
 	 */
 	public int decimalLength() default 2;
-	
+
 }

@@ -1,6 +1,6 @@
 package com.gitee.sunchenbin.mybatis.actable.constants;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.LengthCount;
+import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
 
 
 /**
@@ -11,22 +11,22 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.LengthCount;
  *     date
  *
  * @author sunchenbin
- * @version 2016年6月23日 下午5:59:33 
+ * @version 2016年6月23日 下午5:59:33
  */
 public class OracleTypeConstant {
 
 	@LengthCount(LengthCount=2)
 	public static final  String NUMBER = "number";
-	
+
 	@LengthCount
 	public static final  String VARCHAR2 = "varchar2";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String CLOB = "clob";
-	
+
 	@LengthCount(LengthCount=0)
 	public static final  String DATE = "date";
-	
+
 	@LengthCount
 	public static final  String CHAR = "char";
 }

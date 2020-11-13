@@ -43,6 +43,36 @@ public class ColumnUtils {
         return "";
     }
 
+    public static String getTableCharset(Class<?> clasz){
+        Table table = clasz.getAnnotation(Table.class);
+        TableCharset charset = clasz.getAnnotation(TableCharset.class);
+        if (!hasTableAnnotation(clasz)){
+            return "";
+        }
+        if (table != null && !StringUtils.isEmpty(table.charset())){
+            return table.charset();
+        }
+        if (charset != null && !StringUtils.isEmpty(charset.value())){
+            return charset.value();
+        }
+        return "";
+    }
+
+    public static String getTableEngine(Class<?> clasz){
+        Table table = clasz.getAnnotation(Table.class);
+        TableEngine engine = clasz.getAnnotation(TableEngine.class);
+        if (!hasTableAnnotation(clasz)){
+            return "";
+        }
+        if (table != null && !StringUtils.isEmpty(table.engine())){
+            return table.engine();
+        }
+        if (engine != null && !StringUtils.isEmpty(engine.value())){
+            return engine.value();
+        }
+        return "";
+    }
+
     public static String getColumnName(Field field){
         Column column = field.getAnnotation(Column.class);
         javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);

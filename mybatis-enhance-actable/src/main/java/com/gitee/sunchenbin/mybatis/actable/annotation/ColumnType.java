@@ -19,7 +19,7 @@ public @interface ColumnType {
 
 	/**
 	 * 字段的类型
-	 * 可取值MySqlTypeConstant中的常量
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant中的常量数据类型
 	 * @return 字段的类型
 	 */
 	public String value();

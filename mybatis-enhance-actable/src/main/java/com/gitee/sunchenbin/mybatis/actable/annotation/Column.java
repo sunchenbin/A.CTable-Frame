@@ -30,7 +30,8 @@ public @interface Column{
 
 	/**
 	 * 字段类型：不填默认使用属性的数据类型进行转换，转换失败的字段不会添加
-	 * 转换类：com.gitee.sunchenbin.mybatis.actable.command.JavaToMysqlType
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant中的常量数据类型
+	 * 不填默认转换类：com.gitee.sunchenbin.mybatis.actable.command.JavaToMysqlType
 	 * 1.3.0版本支持，也可通过注解实现：com.gitee.sunchenbin.mybatis.actable.annotation.Type
 	 * @return 字段类型
 	 */

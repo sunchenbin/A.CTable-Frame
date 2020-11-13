@@ -132,6 +132,12 @@
 				<if test="ckey == 'table_comment'">
 					COMMENT = #{cvalue}
 				</if>
+				<if test="ckey == 'table_collation'">
+					CHARSET = #{cvalue}
+				</if>
+				<if test="ckey == 'engine'">
+					ENGINE = #{cvalue}
+				</if>
 			</foreach>
 			;
 		</foreach>
@@ -169,10 +175,22 @@
 		</foreach>
 	</select>
 
-	<!-- 更新表注释 -->
-	<select id="modifyTableComment" parameterType="java.util.Map">
-		<foreach collection="tableMap" index="key" item="value" separator=";">
-			alter table `${key}` comment #{value}
+	<!-- 更新表属性 -->
+	<select id="modifyTableProperty" parameterType="java.util.Map">
+		<foreach collection="tableMap" index="key" item="value">
+			alter table `${key}`
+			<foreach collection="value.map" index="ckey" item="cvalue">
+				<if test="ckey == 'table_comment'">
+					 COMMENT  #{cvalue}
+				</if>
+				<if test="ckey == 'table_collation'">
+					 CHARSET  #{cvalue}
+				</if>
+				<if test="ckey == 'engine'">
+					 ENGINE  #{cvalue}
+				</if>
+			</foreach>
+			;
 		</foreach>
 	</select>
 

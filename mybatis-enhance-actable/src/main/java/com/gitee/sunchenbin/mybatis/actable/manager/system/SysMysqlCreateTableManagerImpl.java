@@ -5,14 +5,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import com.gitee.sunchenbin.mybatis.actable.annotation.*;
+import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
+import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthDefault;
 import com.gitee.sunchenbin.mybatis.actable.command.*;
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
 import com.gitee.sunchenbin.mybatis.actable.utils.ColumnUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +50,12 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 	// 获取Mysql的类型，以及类型需要设置几个长度
 	private static Map<String, MySqlTypeAndLength> mySqlTypeAndLengthMap = mySqlTypeAndLengthMap();
+
+	// 获取Mysql的字符集
+	private static List<String> mySqlCharsetList = mySqlCharsetList();
+
+	// 获取Mysql的引擎
+	private static List<String> mySqlEngineList = mySqlEngineList();
 
 	/**
 	 * 要扫描的model所在的pack
@@ -124,7 +133,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		// 8.用于存需要增加的唯一约束
 		baseTableMap.put(Constants.ADDUNIQUE_TABLE_MAP, new HashMap<String, TableConfig>());
 		// 9.更新表注释
-		baseTableMap.put(Constants.MODIFY_TABLE_COMMENT_MAP, new HashMap<String, TableConfig>());
+		baseTableMap.put(Constants.MODIFY_TABLE_PROPERTY_MAP, new HashMap<String, TableConfig>());
 		return baseTableMap;
 	}
 
@@ -140,8 +149,15 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		// 获取model的tablename
 		String tableName = ColumnUtils.getTableName(clas);
+
 		// 获取表注释
 		String tableComment = ColumnUtils.getTableComment(clas);
+
+		// 获取表字符集
+		String tableCharset = ColumnUtils.getTableCharset(clas);
+
+		// 获取表引擎
+		String tableEngine = ColumnUtils.getTableEngine(clas);
 
 		// 1. 用于存表的全部字段
 		List<Object> allFieldList = getAllFields(clas);
@@ -161,22 +177,37 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		// 不存在时
 		if (table == null) {
-			Map<String, Object> map = null;
+			Map<String, Object> map = new HashMap<String, Object>();
 			if (!StringUtils.isEmpty(tableComment)){
-				map = new HashMap<String, Object>();
 				map.put(SysMysqlTable.TABLE_COMMENT_KEY, tableComment);
+			}
+			printLog(tableName, tableCharset, tableEngine);
+			if (!StringUtils.isEmpty(tableCharset) && mySqlCharsetList.contains(tableCharset)){
+				map.put(SysMysqlTable.TABLE_COLLATION_KEY, tableCharset);
+			}
+			if (!StringUtils.isEmpty(tableEngine) && mySqlEngineList.contains(tableEngine)){
+				map.put(SysMysqlTable.TABLE_ENGINE_KEY, tableEngine);
 			}
 			baseTableMap.get(Constants.NEW_TABLE_MAP).put(tableName, new TableConfig(allFieldList, map));
 			baseTableMap.get(Constants.ADDINDEX_TABLE_MAP).put(tableName, new TableConfig(getAddIndexList(null, allFieldList)));
 			baseTableMap.get(Constants.ADDUNIQUE_TABLE_MAP).put(tableName, new TableConfig(getAddUniqueList(null, allFieldList)));
 			return;
 		}else{
+			Map<String, Object> map = new HashMap<String, Object>();
 			// 判断表注释是否要更新
-			if (!tableComment.equals(table.getTable_comment())){
-				List<Object> list = new ArrayList<Object>();
-				list.add(tableComment);
-				baseTableMap.get(Constants.MODIFY_TABLE_COMMENT_MAP).put(tableName, new TableConfig(list));
+			if (!StringUtils.isEmpty(tableComment) && !tableComment.equals(table.getTable_comment())){
+				map.put(SysMysqlTable.TABLE_COMMENT_KEY, tableComment);
 			}
+			printLog(tableName, tableCharset, tableEngine);
+			// 判断表字符集是否要更新
+			if (!StringUtils.isEmpty(tableCharset) && !tableCharset.equals(table.getTable_collation().replace(SysMysqlTable.TABLE_COLLATION_SUFFIX, "")) && mySqlCharsetList.contains(tableCharset)){
+				map.put(SysMysqlTable.TABLE_COLLATION_KEY, tableCharset);
+			}
+			// 判断表引擎是否要更新
+			if (!StringUtils.isEmpty(tableEngine) && !tableEngine.equals(table.getEngine()) && mySqlEngineList.contains(tableEngine)){
+				map.put(SysMysqlTable.TABLE_ENGINE_KEY, tableEngine);
+			}
+			baseTableMap.get(Constants.MODIFY_TABLE_PROPERTY_MAP).put(tableName, new TableConfig(map));
 		}
 
 		// 已存在时理论上做修改的操作，这里查出该表的结构
@@ -231,6 +262,15 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		}
 		if (addUniqueFieldList.size() != 0) {
 			baseTableMap.get(Constants.ADDUNIQUE_TABLE_MAP).put(tableName, new TableConfig(addUniqueFieldList));
+		}
+	}
+
+	private void printLog(String tableName, String tableCharset, String tableEngine) {
+		if (!StringUtils.isEmpty(tableCharset) && !mySqlCharsetList.contains(tableCharset)) {
+			log.error("表：{}, 使用了不支持字符集：{}, 请使用MySqlCharsetConstant类中的字符集，本次将默认将使用默认字符集", tableName, tableCharset);
+		}
+		if (!StringUtils.isEmpty(tableEngine) && !mySqlEngineList.contains(tableEngine)) {
+			log.error("表：{}, 使用了不支持引擎：{}, 请使用MySqlEngineConstant类中的引擎，本次将默认将使用默认引擎", tableName, tableEngine);
 		}
 	}
 
@@ -540,19 +580,23 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					}
 					param.setFieldDecimalLength(column.decimalLength());
 					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(type.toLowerCase());
+					if (null == mySqlTypeAndLength){
+						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",type);
+						continue;
+					}
 					int length = mySqlTypeAndLength.getLengthCount() ;
 					param.setFileTypeLength(length);
 				}else{
 					// 类型为空根据字段类型去默认匹配类型
 					String mysqlType = JavaToMysqlType.javaToMysqlTypeMap.get(field.getGenericType().toString());
 					if (StringUtils.isEmpty(mysqlType)){
-						log.error("不支持{}类型转换到mysql类型",field.getGenericType().toString());
+						log.error("不支持{}类型转换到mysql类型，仅支持JavaToMysqlType类中的类型默认转换，本次忽略该字段",field.getGenericType().toString());
 						continue;
 					}
 					param.setFieldType(mysqlType);
 					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(mysqlType.toLowerCase());
 					if (null == mySqlTypeAndLength){
-						log.error("{}类型，没有配置对应的MySqlTypeConstant",mysqlType);
+						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",mysqlType);
 						continue;
 					}
 					int length = mySqlTypeAndLength.getLengthCount();
@@ -621,19 +665,23 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					}
 					param.setFieldDecimalLength(column.scale());
 					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(type.toLowerCase());
+					if (null == mySqlTypeAndLength){
+						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",type);
+						continue;
+					}
 					int length = mySqlTypeAndLength.getLengthCount() ;
 					param.setFileTypeLength(length);
 				}else{
 					// 类型为空根据字段类型去默认匹配类型
 					String mysqlType = JavaToMysqlType.javaToMysqlTypeMap.get(field.getGenericType().toString());
 					if (StringUtils.isEmpty(mysqlType)){
-						log.error("不支持{}类型转换到mysql类型",field.getGenericType().toString());
+						log.error("不支持{}类型转换到mysql类型，仅支持JavaToMysqlType类中的类型默认转换，本次忽略该字段",field.getGenericType().toString());
 						continue;
 					}
 					param.setFieldType(mysqlType);
 					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(mysqlType.toLowerCase());
 					if (null == mySqlTypeAndLength){
-						log.error("{}类型，没有配置对应的MySqlTypeConstant",mysqlType);
+						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",mysqlType);
 						continue;
 					}
 					int length = mySqlTypeAndLength.getLengthCount();
@@ -746,7 +794,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			// 5. 删除字段
 			removeFieldsByMap(baseTableMap.get(Constants.REMOVE_TABLE_MAP));
 			// 6. 修改表注释
-			modifyTableCommentByMap(baseTableMap.get(Constants.MODIFY_TABLE_COMMENT_MAP));
+			modifyTableCommentByMap(baseTableMap.get(Constants.MODIFY_TABLE_PROPERTY_MAP));
 			// 7. 修改字段类型等
 			modifyFieldsByMap(baseTableMap.get(Constants.MODIFY_TABLE_MAP));
 		}
@@ -879,13 +927,15 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		// 做更新的表注释
 		if (modifyTableCommentMap.size() > 0) {
 			for (Entry<String, TableConfig> entry : modifyTableCommentMap.entrySet()) {
-				for (Object obj : entry.getValue().getList()) {
-					Map<String, Object> map = new HashMap<String, Object>();
-					map.put(entry.getKey(), obj);
-					String fieldName = (String) obj;
-					log.info("开始更新表" + entry.getKey() + "的注释" + fieldName);
-					createMysqlTablesMapper.modifyTableComment(map);
-					log.info("完成更新表" + entry.getKey() + "的注释" + fieldName);
+				for (String property : entry.getValue().getMap().keySet()) {
+					Map<String, TableConfig> map = new HashMap<String, TableConfig>();
+					Map<String, Object> tcMap = new HashMap<String, Object>();
+					Object value = entry.getValue().getMap().get(property);
+					tcMap.put(property, value);
+					map.put(entry.getKey(), new TableConfig(tcMap));
+					log.info("开始更新表" + entry.getKey() + "的" + property + "为" + value);
+					createMysqlTablesMapper.modifyTableProperty(map);
+					log.info("完成更新表" + entry.getKey() + "的" + property + "为" + value);
 				}
 			}
 		}
@@ -967,5 +1017,35 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			map.put(field.getName().toLowerCase(), new MySqlTypeAndLength(lengthCount, lengthDefault));
 		}
 		return map;
+	}
+
+	public static List<String> mySqlCharsetList() {
+		MySqlCharsetConstant mySqlCharsetConstant = new MySqlCharsetConstant();
+		Field[] fields = mySqlCharsetConstant.getClass().getDeclaredFields();
+		List<String> list = new ArrayList<String>();
+		for (Field field : fields) {
+			field.setAccessible(true);
+			try {
+				list.add((String) field.get(mySqlCharsetConstant));
+			} catch (IllegalAccessException e) {
+				log.error("初始化MySqlCharsetConstant失败！", e);
+			}
+		}
+		return list;
+	}
+
+	public static List<String> mySqlEngineList() {
+		MySqlEngineConstant mySqlEngineConstant = new MySqlEngineConstant();
+		Field[] fields = mySqlEngineConstant.getClass().getDeclaredFields();
+		List<String> list = new ArrayList<String>();
+		for (Field field : fields) {
+			field.setAccessible(true);
+			try {
+				list.add((String) field.get(mySqlEngineConstant));
+			} catch (IllegalAccessException e) {
+				log.error("初始化mySqlEngineConstant失败！", e);
+			}
+		}
+		return list;
 	}
 }

@@ -26,6 +26,10 @@ public class TableConfig {
         }
     }
 
+    public TableConfig(Map<String, Object> map) {
+        this.map = map;
+    }
+
     public Map<String, Object> getMap() {
         return map;
     }

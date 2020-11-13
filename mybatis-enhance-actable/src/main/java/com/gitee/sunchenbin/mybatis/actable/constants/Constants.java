@@ -24,7 +24,7 @@ public class Constants {
 	public static final String MODIFY_TABLE_MAP					= "modifyTableMap";
 	public static final String ADD_TABLE_MAP					= "addTableMap";
 	public static final String REMOVE_TABLE_MAP					= "removeTableMap";
-	public static final String MODIFY_TABLE_COMMENT_MAP			= "modifyTableCommentMap";
+	public static final String MODIFY_TABLE_PROPERTY_MAP = "modifyTablePropertyMap";
 	public static final String DROPKEY_TABLE_MAP				= "dropKeyTableMap";
 	public static final String DROPINDEXANDUNIQUE_TABLE_MAP		= "dropIndexAndUniqueTableMap";
 	public static final String ADDINDEX_TABLE_MAP				= "addIndexTableMap";

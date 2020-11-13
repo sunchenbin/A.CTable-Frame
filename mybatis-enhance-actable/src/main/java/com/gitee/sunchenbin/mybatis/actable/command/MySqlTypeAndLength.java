@@ -1,7 +1,7 @@
 package com.gitee.sunchenbin.mybatis.actable.command;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.LengthCount;
-import com.gitee.sunchenbin.mybatis.actable.annotation.LengthDefault;
+import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
+import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthDefault;
 import lombok.Data;
 
 @Data
