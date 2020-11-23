@@ -1,6 +1,6 @@
 # mybatis-enhance-actable-1.3.2.RELEASE
 
-作者微信：![作者微信](https://images.gitee.com/uploads/images/2020/1123/184251_f544bd35_688374.jpeg "微信图片_20201123184046.jpg")
+作者微信：![输入图片说明](https://images.gitee.com/uploads/images/2020/1123/184501_0786c4e3_688374.png "微信图片_20201123184448.png")
 
 ACTable技术交流QQ群：746531106
 
