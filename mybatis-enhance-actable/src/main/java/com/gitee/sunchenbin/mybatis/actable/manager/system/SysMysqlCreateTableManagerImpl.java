@@ -168,7 +168,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		// 如果配置文件配置的是create，表示将所有的表删掉重新创建
 		if ("create".equals(tableAuto)) {
-			log.info("由于配置的模式是create，因此先删除表后续根据结构重建");
+			log.info("由于配置的模式是create，因此先删除表后续根据结构重建，删除表：{}", tableName);
 			createMysqlTablesMapper.dropTableByName(tableName);
 		}
 
