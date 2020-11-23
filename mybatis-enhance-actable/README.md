@@ -1,8 +1,8 @@
 # mybatis-enhance-actable-1.3.2.RELEASE
 
-作者微信添加时备注Star的昵称，通过后会拉到微信群：sunchenbin
+作者微信添加时请备注actable：![作者微信](https://images.gitee.com/uploads/images/2020/1123/184824_dcd6730d_688374.png "微信图片_20201123184809.png")
 
-ACTable技术交流QQ群：746531106
+ACTable技术交流QQ群：[746531106](http://shang.qq.com/wpa/qunwpa?idkey=e8aae05f6e166f879b61c1af220a24e8176b1e45736766936b0f2803a6f9d467)
 
 A.C.Table是对Mybatis做的增强功能，支持SpringBoot以及传统的SpringMvc项目结构，简单配置即可，该框架是为了能够使习惯了hibernate框架的开发者能够快速的入手Mybatis， “A.C.Table” 本意是自动建表的意思，A.C.Table是一个基于Spring和Mybatis的Maven项目，增强了Mybatis的功能，过配置model注解的方式来创建表，修改表结构，并且实现了共通的CUDR功能提升开发效率，同时能够兼容tk.mybatis，如需使用依赖tk.mybatis的pom依赖即可，目前仅支持Mysql，后续会扩展针对其他数据库的支持。
 
