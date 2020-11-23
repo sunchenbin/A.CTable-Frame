@@ -1,6 +1,6 @@
 # mybatis-enhance-actable-1.3.2.RELEASE
 
-作者微信添加时备注Star的昵称，通过后会拉到微信群：sunchenbin
+作者微信：![作者微信](https://images.gitee.com/uploads/images/2020/1123/184251_f544bd35_688374.jpeg "微信图片_20201123184046.jpg")
 
 ACTable技术交流QQ群：746531106
 
