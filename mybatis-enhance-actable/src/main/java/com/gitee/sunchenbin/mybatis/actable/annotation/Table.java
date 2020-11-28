@@ -1,11 +1,10 @@
 package com.gitee.sunchenbin.mybatis.actable.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
+
+import java.lang.annotation.*;
+
 
 
 /**
@@ -26,31 +25,31 @@ public @interface Table {
 	 * 表名
 	 * @return 表名
 	 */
-	public String name() default "";
+	String name() default "";
 
 	/**
 	 * 表名
 	 * @return 表名
 	 */
-	public String value() default "";
+	String value() default "";
 
 	/**
 	 * 表注释，也可以使用@TableComment注解代替
 	 * @return
 	 */
-	public String comment() default "";
+	String comment() default "";
 
 	/**
 	 * 表字符集，也可以使用@TableCharset注解代替
-	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant中的常量字符集
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant中的枚举字符集
 	 * @return
 	 */
-	public String charset() default "";
+	MySqlCharsetConstant charset() default MySqlCharsetConstant.DEFAULT;
 
 	/**
 	 * 表引擎，也可以使用@TableEngine注解代替
-	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant中的引擎类型
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant中的存储引擎枚举
 	 * @return
 	 */
-	public String engine() default "";
+	MySqlEngineConstant engine() default MySqlEngineConstant.DEFAULT;
 }

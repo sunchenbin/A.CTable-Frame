@@ -1,8 +1,5 @@
 package com.gitee.sunchenbin.mybatis.actable.constants;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
-
-
 /**
  * 用于配置Oracle数据库中类型，并且该类型需要设置几个长度
  * 这里配置多少个类型决定了，创建表能使用多少类型
@@ -15,18 +12,18 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
  */
 public class OracleTypeConstant {
 
-	@LengthCount(LengthCount=2)
-	public static final  String NUMBER = "number";
-
-	@LengthCount
-	public static final  String VARCHAR2 = "varchar2";
-
-	@LengthCount(LengthCount=0)
-	public static final  String CLOB = "clob";
-
-	@LengthCount(LengthCount=0)
-	public static final  String DATE = "date";
-
-	@LengthCount
-	public static final  String CHAR = "char";
+//	@LengthCount(LengthCount=2)
+//	public static final  String NUMBER = "number";
+//
+//	@LengthCount
+//	public static final  String VARCHAR2 = "varchar2";
+//
+//	@LengthCount(LengthCount=0)
+//	public static final  String CLOB = "clob";
+//
+//	@LengthCount(LengthCount=0)
+//	public static final  String DATE = "date";
+//
+//	@LengthCount
+//	public static final  String CHAR = "char";
 }

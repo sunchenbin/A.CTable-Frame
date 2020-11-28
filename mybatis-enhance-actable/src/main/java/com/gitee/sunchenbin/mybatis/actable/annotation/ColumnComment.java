@@ -21,5 +21,5 @@ public @interface ColumnComment {
 	 * 字段备注
 	 * @return 字段备注
 	 */
-	public String value();
+	String value();
 }

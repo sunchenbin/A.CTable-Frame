@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JavaToMysqlType {
-    public static Map<String, String> javaToMysqlTypeMap = new HashMap<String, String>();
+    public static Map<String, MySqlTypeConstant> javaToMysqlTypeMap = new HashMap<String, MySqlTypeConstant>();
     static {
         javaToMysqlTypeMap.put("class java.lang.String", MySqlTypeConstant.VARCHAR);
         javaToMysqlTypeMap.put("class java.lang.Long", MySqlTypeConstant.BIGINT);

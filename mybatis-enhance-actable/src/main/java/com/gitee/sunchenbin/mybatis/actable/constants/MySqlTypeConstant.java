@@ -1,7 +1,9 @@
 package com.gitee.sunchenbin.mybatis.actable.constants;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
-import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthDefault;
+import com.gitee.sunchenbin.mybatis.actable.command.MySqlTypeAndLength;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -14,93 +16,70 @@ import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthDefault;
  * @author sunchenbin
  * @version 2016年6月23日 下午5:59:33
  */
-public class MySqlTypeConstant {
+public enum MySqlTypeConstant {
 
-	@LengthCount
-	@LengthDefault(length = 11)
-	public static final  String INT = "int";
+	DEFAULT(null,null,null),
+	INT(1, 11, null),
+	VARCHAR(1, 255, null),
+	BINARY(1, 1, null),
+	CHAR(1, 255, null),
+	BIGINT(1, 20, null),
+	BIT(1, 1, null),
+	TINYINT(1, 4, null),
+	SMALLINT(1, 6, null),
+	MEDIUMINT(1, 9, null),
+	DECIMAL(2, 10, 2),
+	DOUBLE(0, null, null),
+	TEXT(0, null, null),
+	MEDIUMTEXT(0, null, null),
+	LONGTEXT(0, null, null),
+	DATETIME(0, null, null),
+	TIMESTAMP(0, null, null),
+	DATE(0, null, null),
+	TIME(0, null, null),
+	FLOAT(0, null, null),
+	YEAR(0, null, null),
+	BLOB(0, null, null),
+	LONGBLOB(0, null, null),
+	MEDIUMBLOB(0, null, null),
+	TINYTEXT(0, null, null),
+	TINYBLOB(0, null, null),
+	JSON(0, null, null);
 
-	@LengthCount
-	@LengthDefault(length = 255)
-	public static final  String VARCHAR = "varchar";
+	private Integer lengthCount;
+	private Integer lengthDefault;
+	private Integer decimalLengthDefault;
 
-	@LengthCount
-	@LengthDefault(length = 1)
-	public static final  String BINARY = "binary";
+	public Integer getLengthCount() {
+		return lengthCount;
+	}
 
-	@LengthCount
-	@LengthDefault(length = 255)
-	public static final  String CHAR = "char";
+	public Integer getLengthDefault() {
+		return lengthDefault;
+	}
 
-	@LengthCount
-	@LengthDefault(length = 20)
-	public static final  String BIGINT = "bigint";
+	public Integer getDecimalLengthDefault() {
+		return decimalLengthDefault;
+	}
 
-	@LengthCount
-	@LengthDefault(length = 1)
-	public static final  String BIT = "bit";
+	MySqlTypeConstant(Integer lengthCount, Integer lengthDefault, Integer decimalLengthDefault){
+		this.lengthCount = lengthCount;
+		this.lengthDefault = lengthDefault;
+		this.decimalLengthDefault = decimalLengthDefault;
+	}
 
-	@LengthCount
-	@LengthDefault(length = 4)
-	public static final  String TINYINT = "tinyint";
+	// 获取Mysql的类型，以及类型需要设置几个长度，如需扩展改变这个对象的值即可
+	/**
+	 * 获取Mysql的类型，以及类型需要设置几个长度，这里构建成map的样式
+	 * 构建Map(字段名(小写),需要设置几个长度(0表示不需要设置，1表示需要设置一个，2表示需要设置两个))
+	 */
+	public static Map<String, MySqlTypeAndLength> mySqlTypeAndLengthMap;
 
-	@LengthCount
-	@LengthDefault(length = 6)
-	public static final  String SMALLINT = "smallint";
+	static {
+		mySqlTypeAndLengthMap = new HashMap<String, MySqlTypeAndLength>();
+		for (MySqlTypeConstant type: MySqlTypeConstant.values()) {
+			mySqlTypeAndLengthMap.put(type.toString().toLowerCase(), new MySqlTypeAndLength(type.getLengthCount(), type.getLengthDefault(), type.getDecimalLengthDefault(), type.toString().toLowerCase()));
+		}
+	}
 
-	@LengthCount
-	@LengthDefault(length = 9)
-	public static final  String MEDIUMINT = "mediumint";
-
-	@LengthCount(LengthCount=2)
-	@LengthDefault(length = 10, decimalLength = 2)
-	public static final  String DECIMAL = "decimal";
-
-	@LengthCount(LengthCount=0)
-	public static final  String DOUBLE = "double";
-
-	@LengthCount(LengthCount=0)
-	public static final  String TEXT = "text";
-
-	@LengthCount(LengthCount=0)
-	public static final  String MEDIUMTEXT = "mediumtext";
-
-	@LengthCount(LengthCount=0)
-	public static final  String LONGTEXT = "longtext";
-
-	@LengthCount(LengthCount=0)
-	public static final  String DATETIME = "datetime";
-
-	@LengthCount(LengthCount=0)
-	public static final  String TIMESTAMP = "timestamp";
-
-	@LengthCount(LengthCount=0)
-	public static final  String DATE = "date";
-
-	@LengthCount(LengthCount=0)
-	public static final  String TIME = "time";
-
-	@LengthCount(LengthCount=0)
-	public static final  String FLOAT = "float";
-
-	@LengthCount(LengthCount=0)
-	public static final  String  YEAR = "year";
-
-	@LengthCount(LengthCount=0)
-	public static final  String BLOB = "blob";
-
-	@LengthCount(LengthCount=0)
-	public static final  String LONGBLOB = "longblob";
-
-	@LengthCount(LengthCount=0)
-	public static final  String MEDIUMBLOB = "mediumblob";
-
-	@LengthCount(LengthCount=0)
-	public static final  String TINYTEXT = "tinytext";
-
-	@LengthCount(LengthCount=0)
-	public static final  String TINYBLOB = "tinyblob";
-
-	@LengthCount(LengthCount=0)
-	public static final  String JSON = "json";
 }

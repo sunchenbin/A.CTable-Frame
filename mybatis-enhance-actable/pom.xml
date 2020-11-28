@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	<artifactId>mybatis-enhance-actable</artifactId>
-	<version>1.3.2.RELEASE</version>
+	<version>1.4.0.RELEASE</version>
 
 	<parent>
 	    <groupId>org.sonatype.oss</groupId>
@@ -91,6 +91,12 @@
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
 			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-annotation</artifactId>
+			<version>3.4.1</version>
 		</dependency>
 	</dependencies>
 

@@ -21,5 +21,5 @@ public @interface TableComment {
      * 表注释
 	 * @return
      */
-	public String value();
+	String value();
 }

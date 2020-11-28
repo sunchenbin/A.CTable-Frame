@@ -1,34 +1,26 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.system;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import com.gitee.sunchenbin.mybatis.actable.annotation.*;
-import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthCount;
-import com.gitee.sunchenbin.mybatis.actable.annotation.system.LengthDefault;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Unique;
 import com.gitee.sunchenbin.mybatis.actable.command.*;
+import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
+import com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper;
+import com.gitee.sunchenbin.mybatis.actable.manager.util.ConfigurationUtil;
+import com.gitee.sunchenbin.mybatis.actable.utils.ClassTools;
 import com.gitee.sunchenbin.mybatis.actable.utils.ColumnUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
-import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
-import com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper;
-import com.gitee.sunchenbin.mybatis.actable.manager.util.ConfigurationUtil;
-import com.gitee.sunchenbin.mybatis.actable.utils.ClassTools;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 项目启动时自动扫描配置的目录中的model，根据配置的规则自动创建或更新表 该逻辑只适用于mysql，其他数据库尚且需要另外扩展，因为sql的语法不同
@@ -47,15 +39,6 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 	@Autowired
 	private ConfigurationUtil springContextUtil;
-
-	// 获取Mysql的类型，以及类型需要设置几个长度
-	private static Map<String, MySqlTypeAndLength> mySqlTypeAndLengthMap = mySqlTypeAndLengthMap();
-
-	// 获取Mysql的字符集
-	private static List<String> mySqlCharsetList = mySqlCharsetList();
-
-	// 获取Mysql的引擎
-	private static List<String> mySqlEngineList = mySqlEngineList();
 
 	/**
 	 * 要扫描的model所在的pack
@@ -154,16 +137,22 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		String tableComment = ColumnUtils.getTableComment(clas);
 
 		// 获取表字符集
-		String tableCharset = ColumnUtils.getTableCharset(clas);
+		MySqlCharsetConstant tableCharset = ColumnUtils.getTableCharset(clas);
 
 		// 获取表引擎
-		String tableEngine = ColumnUtils.getTableEngine(clas);
+		MySqlEngineConstant tableEngine = ColumnUtils.getTableEngine(clas);
 
 		// 1. 用于存表的全部字段
-		List<Object> allFieldList = getAllFields(clas);
-		if (allFieldList.size() == 0) {
-			log.warn("扫描发现" + clas.getName() + "没有建表字段请检查！");
-			return;
+		List<Object> allFieldList;
+		try{
+			allFieldList = getAllFields(clas);
+			if (allFieldList.size() == 0) {
+				log.warn("扫描发现" + clas.getName() + "没有建表字段请检查！");
+				return;
+			}
+		}catch (Exception e){
+			log.error("表：{}，初始化字段结构失败！", tableName);
+			throw new RuntimeException(e);
 		}
 
 		// 如果配置文件配置的是create，表示将所有的表删掉重新创建
@@ -181,12 +170,11 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			if (!StringUtils.isEmpty(tableComment)){
 				map.put(SysMysqlTable.TABLE_COMMENT_KEY, tableComment);
 			}
-			printLog(tableName, tableCharset, tableEngine);
-			if (!StringUtils.isEmpty(tableCharset) && mySqlCharsetList.contains(tableCharset)){
-				map.put(SysMysqlTable.TABLE_COLLATION_KEY, tableCharset);
+			if (tableCharset != null && tableCharset != MySqlCharsetConstant.DEFAULT){
+				map.put(SysMysqlTable.TABLE_COLLATION_KEY, tableCharset.toString().toLowerCase());
 			}
-			if (!StringUtils.isEmpty(tableEngine) && mySqlEngineList.contains(tableEngine)){
-				map.put(SysMysqlTable.TABLE_ENGINE_KEY, tableEngine);
+			if (tableEngine != null && tableEngine != MySqlEngineConstant.DEFAULT){
+				map.put(SysMysqlTable.TABLE_ENGINE_KEY, tableEngine.toString());
 			}
 			baseTableMap.get(Constants.NEW_TABLE_MAP).put(tableName, new TableConfig(allFieldList, map));
 			baseTableMap.get(Constants.ADDINDEX_TABLE_MAP).put(tableName, new TableConfig(getAddIndexList(null, allFieldList)));
@@ -198,14 +186,13 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			if (!StringUtils.isEmpty(tableComment) && !tableComment.equals(table.getTable_comment())){
 				map.put(SysMysqlTable.TABLE_COMMENT_KEY, tableComment);
 			}
-			printLog(tableName, tableCharset, tableEngine);
 			// 判断表字符集是否要更新
-			if (!StringUtils.isEmpty(tableCharset) && !tableCharset.equals(table.getTable_collation().replace(SysMysqlTable.TABLE_COLLATION_SUFFIX, "")) && mySqlCharsetList.contains(tableCharset)){
-				map.put(SysMysqlTable.TABLE_COLLATION_KEY, tableCharset);
+			if (tableCharset != null && tableCharset != MySqlCharsetConstant.DEFAULT && !tableCharset.toString().toLowerCase().equals(table.getTable_collation().replace(SysMysqlTable.TABLE_COLLATION_SUFFIX, ""))){
+				map.put(SysMysqlTable.TABLE_COLLATION_KEY, tableCharset.toString().toLowerCase());
 			}
 			// 判断表引擎是否要更新
-			if (!StringUtils.isEmpty(tableEngine) && !tableEngine.equals(table.getEngine()) && mySqlEngineList.contains(tableEngine)){
-				map.put(SysMysqlTable.TABLE_ENGINE_KEY, tableEngine);
+			if (tableEngine != null && tableEngine != MySqlEngineConstant.DEFAULT && !tableEngine.toString().equals(table.getEngine())){
+				map.put(SysMysqlTable.TABLE_ENGINE_KEY, tableEngine.toString());
 			}
 			baseTableMap.get(Constants.MODIFY_TABLE_PROPERTY_MAP).put(tableName, new TableConfig(map));
 		}
@@ -262,15 +249,6 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		}
 		if (addUniqueFieldList.size() != 0) {
 			baseTableMap.get(Constants.ADDUNIQUE_TABLE_MAP).put(tableName, new TableConfig(addUniqueFieldList));
-		}
-	}
-
-	private void printLog(String tableName, String tableCharset, String tableEngine) {
-		if (!StringUtils.isEmpty(tableCharset) && !mySqlCharsetList.contains(tableCharset)) {
-			log.error("表：{}, 使用了不支持字符集：{}, 请使用MySqlCharsetConstant类中的字符集，本次将默认将使用默认字符集", tableName, tableCharset);
-		}
-		if (!StringUtils.isEmpty(tableEngine) && !mySqlEngineList.contains(tableEngine)) {
-			log.error("表：{}, 使用了不支持引擎：{}, 请使用MySqlEngineConstant类中的引擎，本次将默认将使用默认引擎", tableName, tableEngine);
 		}
 	}
 
@@ -416,14 +394,11 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					continue;
 				}
 				// 3.验证长度个小数点位数
-				// 4.验证小数点位数
-				MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(createTableParam.getFieldType().toLowerCase());
-				int length = mySqlTypeAndLength.getLengthCount();
 				String typeAndLength = createTableParam.getFieldType().toLowerCase();
-				if (length == 1) {
+				if (createTableParam.getFileTypeLength() == 1) {
 					// 拼接出类型加长度，比如varchar(1)
 					typeAndLength = typeAndLength + "(" + createTableParam.getFieldLength() + ")";
-				} else if (length == 2) {
+				} else if (createTableParam.getFileTypeLength() == 2) {
 					// 拼接出类型加长度，比如varchar(1)
 					typeAndLength = typeAndLength + "(" + createTableParam.getFieldLength() + ","
 							+ createTableParam.getFieldDecimalLength() + ")";
@@ -446,14 +421,29 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				// 6.验证默认值
 				if (sysColumn.getColumn_default() == null || sysColumn.getColumn_default().equals("")) {
 					// 数据库默认值是null，model中注解设置的默认值不为NULL时，那么需要更新该字段
-					if (!"NULL".equals(createTableParam.getFieldDefaultValue())) {
+					if (createTableParam.getFieldDefaultValue() != null && !ColumnUtils.DEFAULTVALUE.equals(createTableParam.getFieldDefaultValue())) {
 						modifyFieldList.add(modifyTableParam);
 						continue;
 					}
 				} else if (!sysColumn.getColumn_default().equals(createTableParam.getFieldDefaultValue())) {
-					// 两者不相等时，需要更新该字段
-					modifyFieldList.add(modifyTableParam);
-					continue;
+					if (MySqlTypeConstant.BIT.toString().toLowerCase().equals(createTableParam.getFieldType())){
+						if(("true".equals(createTableParam.getFieldDefaultValue()) || "1".equals(createTableParam.getFieldDefaultValue()))
+								&& !"b'1'".equals(sysColumn.getColumn_default())){
+							// 两者不相等时，需要更新该字段
+							modifyFieldList.add(modifyTableParam);
+							continue;
+						}
+						if(("false".equals(createTableParam.getFieldDefaultValue()) || "0".equals(createTableParam.getFieldDefaultValue()))
+								&& !"b'0'".equals(sysColumn.getColumn_default())){
+							// 两者不相等时，需要更新该字段
+							modifyFieldList.add(modifyTableParam);
+							continue;
+						}
+					}else{
+						// 两者不相等时，需要更新该字段
+						modifyFieldList.add(modifyTableParam);
+						continue;
+					}
 				}
 				// 7.验证是否可以为null(主键不参与是否为null的更新)
 				if (sysColumn.getIs_nullable().equals("NO") && !createTableParam.isFieldIsKey()) {
@@ -556,142 +546,17 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		for (Field field : fields) {
 			// 判断方法中是否有指定注解类型的注解
-			boolean hasAnnotation = field.isAnnotationPresent(Column.class);
-			boolean hasAnnotationCommon = field.isAnnotationPresent(javax.persistence.Column.class);
-			if (hasAnnotation) {
-				// 根据注解类型返回方法的指定类型注解
-				Column column = field.getAnnotation(Column.class);
+			if (ColumnUtils.hasColumnAnnotation(field)) {
 				CreateTableParam param = new CreateTableParam();
 				param.setFieldName(ColumnUtils.getColumnName(field));
-				String type = ColumnUtils.getType(field);
-				// 类型不为空时，因为类型现在可以为空
-				if (type != null){
-					param.setFieldType(type.toLowerCase());
-					// TODO: bit 特殊处理，后期优化
-					if("bit".equals(type)){
-						if(column.length() >= 255){
-							param.setFieldLength(1);
-						}
-						if(column.length() <= 64){
-							param.setFieldLength(column.length());
-						}
-					}else{
-						param.setFieldLength(column.length());
-					}
-					param.setFieldDecimalLength(column.decimalLength());
-					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(type.toLowerCase());
-					if (null == mySqlTypeAndLength){
-						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",type);
-						continue;
-					}
-					int length = mySqlTypeAndLength.getLengthCount() ;
-					param.setFileTypeLength(length);
-				}else{
-					// 类型为空根据字段类型去默认匹配类型
-					String mysqlType = JavaToMysqlType.javaToMysqlTypeMap.get(field.getGenericType().toString());
-					if (StringUtils.isEmpty(mysqlType)){
-						log.error("不支持{}类型转换到mysql类型，仅支持JavaToMysqlType类中的类型默认转换，本次忽略该字段",field.getGenericType().toString());
-						continue;
-					}
-					param.setFieldType(mysqlType);
-					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(mysqlType.toLowerCase());
-					if (null == mySqlTypeAndLength){
-						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",mysqlType);
-						continue;
-					}
-					int length = mySqlTypeAndLength.getLengthCount();
-					param.setFileTypeLength(length);
-					if (length == 1){
-						param.setFieldLength(mySqlTypeAndLength.getLength());
-					}else if (length == 2){
-						param.setFieldLength(mySqlTypeAndLength.getLength());
-						param.setFieldDecimalLength(mySqlTypeAndLength.getDecimalLength());
-					}
-				}
-
-				// 主键时设置必须不为null
-				if (ColumnUtils.isKey(field)) {
-					param.setFieldIsNull(false);
-				} else {
-					param.setFieldIsNull(ColumnUtils.isNull(field));
-				}
-				param.setFieldIsKey(ColumnUtils.isKey(field));
-				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field));
-				param.setFieldDefaultValue(ColumnUtils.getDefaultValue(field));
-				param.setFieldComment(ColumnUtils.getComment(field));
-				// 获取当前字段的@Index注解
-				Index index = field.getAnnotation(Index.class);
-				if (null != index) {
-					String[] indexValue = index.columns();
-					param.setFiledIndexName((index.value() == null || index.value().equals(""))
-							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(indexValue)))
-							: Constants.IDX + index.value());
-					param.setFiledIndexValue(
-							indexValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field)) : Arrays.asList(indexValue));
-				}
-				// 获取当前字段的@Unique注解
-				Unique unique = field.getAnnotation(Unique.class);
-				if (null != unique) {
-					String[] uniqueValue = unique.columns();
-					param.setFiledUniqueName((unique.value() == null || unique.value().equals(""))
-							? (Constants.UNI
-									+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(uniqueValue)))
-							: Constants.UNI + unique.value());
-					param.setFiledUniqueValue(
-							uniqueValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field)) : Arrays.asList(uniqueValue));
-				}
-				fieldList.add(param);
-			}else if (hasAnnotationCommon) {
-				// 根据注解类型返回方法的指定类型注解
-				javax.persistence.Column column = field.getAnnotation(javax.persistence.Column.class);
-				CreateTableParam param = new CreateTableParam();
-				param.setFieldName(ColumnUtils.getColumnName(field));
-				// 数据类型
-				String type = ColumnUtils.getType(field);
-
-				// 类型不为空时，因为类型现在可以为空
-				if (type != null){
-					param.setFieldType(type.toLowerCase());
-					// TODO: bit 特殊处理，后期优化
-					if("bit".equals(type)){
-						if(column.length() >= 255){
-							param.setFieldLength(1);
-						}
-						if(column.length() <= 64){
-							param.setFieldLength(column.length());
-						}
-					}else{
-						param.setFieldLength(column.length());
-					}
-					param.setFieldDecimalLength(column.scale());
-					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(type.toLowerCase());
-					if (null == mySqlTypeAndLength){
-						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",type);
-						continue;
-					}
-					int length = mySqlTypeAndLength.getLengthCount() ;
-					param.setFileTypeLength(length);
-				}else{
-					// 类型为空根据字段类型去默认匹配类型
-					String mysqlType = JavaToMysqlType.javaToMysqlTypeMap.get(field.getGenericType().toString());
-					if (StringUtils.isEmpty(mysqlType)){
-						log.error("不支持{}类型转换到mysql类型，仅支持JavaToMysqlType类中的类型默认转换，本次忽略该字段",field.getGenericType().toString());
-						continue;
-					}
-					param.setFieldType(mysqlType);
-					MySqlTypeAndLength mySqlTypeAndLength = mySqlTypeAndLengthMap.get(mysqlType.toLowerCase());
-					if (null == mySqlTypeAndLength){
-						log.error("{}类型，没有配置对应的MySqlTypeConstant，只支持创建MySqlTypeConstant中类型的字段，本次忽略该字段",mysqlType);
-						continue;
-					}
-					int length = mySqlTypeAndLength.getLengthCount();
-					param.setFileTypeLength(length);
-					if (length == 1){
-						param.setFieldLength(mySqlTypeAndLength.getLength());
-					}else if (length == 2){
-						param.setFieldLength(mySqlTypeAndLength.getLength());
-						param.setFieldDecimalLength(mySqlTypeAndLength.getDecimalLength());
-					}
+				MySqlTypeAndLength mySqlTypeAndLength = ColumnUtils.getMySqlTypeAndLength(field);
+				param.setFieldType(mySqlTypeAndLength.getType().toLowerCase());
+				param.setFileTypeLength(mySqlTypeAndLength.getLengthCount());
+				if (mySqlTypeAndLength.getLengthCount() == 1) {
+					param.setFieldLength(mySqlTypeAndLength.getLength());
+				} else if (mySqlTypeAndLength.getLengthCount() == 2) {
+					param.setFieldLength(mySqlTypeAndLength.getLength());
+					param.setFieldDecimalLength(mySqlTypeAndLength.getDecimalLength());
 				}
 
 				// 主键时设置必须不为null
@@ -784,20 +649,20 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			dropFieldsKeyByMap(baseTableMap.get(Constants.DROPKEY_TABLE_MAP));
 		}
 
-		// 3. 添加新的字段
-		addFieldsByMap(baseTableMap.get(Constants.ADD_TABLE_MAP));
-
 		// add是追加模式不做删除和修改操作
 		if(!"add".equals(tableAuto)) {
-			// 4. 删除索引和约束
+			// 3. 删除索引和约束
 			dropIndexAndUniqueByMap(baseTableMap.get(Constants.DROPINDEXANDUNIQUE_TABLE_MAP));
-			// 5. 删除字段
+			// 4. 删除字段
 			removeFieldsByMap(baseTableMap.get(Constants.REMOVE_TABLE_MAP));
-			// 6. 修改表注释
+			// 5. 修改表注释
 			modifyTableCommentByMap(baseTableMap.get(Constants.MODIFY_TABLE_PROPERTY_MAP));
-			// 7. 修改字段类型等
+			// 6. 修改字段类型等
 			modifyFieldsByMap(baseTableMap.get(Constants.MODIFY_TABLE_MAP));
 		}
+
+		// 7. 添加新的字段
+		addFieldsByMap(baseTableMap.get(Constants.ADD_TABLE_MAP));
 
 		// 8. 创建索引
 		addIndexByMap(baseTableMap.get(Constants.ADDINDEX_TABLE_MAP));
@@ -1002,50 +867,5 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				log.info("完成创建表：" + entry.getKey());
 			}
 		}
-	}
-
-	/**
-	 * 获取Mysql的类型，以及类型需要设置几个长度，这里构建成map的样式
-	 * 构建Map(字段名(小写),需要设置几个长度(0表示不需要设置，1表示需要设置一个，2表示需要设置两个))
-	 */
-	public static Map<String, MySqlTypeAndLength> mySqlTypeAndLengthMap() {
-		Field[] fields = MySqlTypeConstant.class.getDeclaredFields();
-		Map<String, MySqlTypeAndLength> map = new HashMap<String, MySqlTypeAndLength>();
-		for (Field field : fields) {
-			LengthCount lengthCount = field.getAnnotation(LengthCount.class);
-			LengthDefault lengthDefault = field.getAnnotation(LengthDefault.class);
-			map.put(field.getName().toLowerCase(), new MySqlTypeAndLength(lengthCount, lengthDefault));
-		}
-		return map;
-	}
-
-	public static List<String> mySqlCharsetList() {
-		MySqlCharsetConstant mySqlCharsetConstant = new MySqlCharsetConstant();
-		Field[] fields = mySqlCharsetConstant.getClass().getDeclaredFields();
-		List<String> list = new ArrayList<String>();
-		for (Field field : fields) {
-			field.setAccessible(true);
-			try {
-				list.add((String) field.get(mySqlCharsetConstant));
-			} catch (IllegalAccessException e) {
-				log.error("初始化MySqlCharsetConstant失败！", e);
-			}
-		}
-		return list;
-	}
-
-	public static List<String> mySqlEngineList() {
-		MySqlEngineConstant mySqlEngineConstant = new MySqlEngineConstant();
-		Field[] fields = mySqlEngineConstant.getClass().getDeclaredFields();
-		List<String> list = new ArrayList<String>();
-		for (Field field : fields) {
-			field.setAccessible(true);
-			try {
-				list.add((String) field.get(mySqlEngineConstant));
-			} catch (IllegalAccessException e) {
-				log.error("初始化mySqlEngineConstant失败！", e);
-			}
-		}
-		return list;
 	}
 }

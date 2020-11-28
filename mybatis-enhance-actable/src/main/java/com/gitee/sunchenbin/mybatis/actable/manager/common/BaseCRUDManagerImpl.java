@@ -446,9 +446,9 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try {
                 String type = keyField.getGenericType().toString();
                 if (type.equals("class java.lang.Long") || type.equals("long")){
-                    keyField.set(t,saveOrUpdateDataCommand.getId().longValue());
-                }else if(type.equals("class java.lang.Integer") || type.equals("int")){
                     keyField.set(t,saveOrUpdateDataCommand.getId());
+                }else if(type.equals("class java.lang.Integer") || type.equals("int")){
+                    keyField.set(t,saveOrUpdateDataCommand.getId().intValue());
                 }else{
                     log.error("自增主键类型超出程序支持的范围目前只支持(Long/Integer/long/int)");
                 }
@@ -534,9 +534,9 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try {
                 String type = keyField.getGenericType().toString();
                 if (type.equals("class java.lang.Long") || type.equals("long")){
-                    keyField.set(t,saveOrUpdateDataCommand.getId().longValue());
-                }else if(type.equals("class java.lang.Integer") || type.equals("int")){
                     keyField.set(t,saveOrUpdateDataCommand.getId());
+                }else if(type.equals("class java.lang.Integer") || type.equals("int")){
+                    keyField.set(t,saveOrUpdateDataCommand.getId().intValue());
                 }else{
                     log.error("自增主键类型超出程序支持的范围目前只支持(Long/Integer/long/int)");
                 }

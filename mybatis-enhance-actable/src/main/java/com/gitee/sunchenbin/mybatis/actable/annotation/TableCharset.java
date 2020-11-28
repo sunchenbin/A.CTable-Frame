@@ -1,5 +1,7 @@
 package com.gitee.sunchenbin.mybatis.actable.annotation;
 
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
+
 import java.lang.annotation.*;
 
 
@@ -19,8 +21,8 @@ public @interface TableCharset {
 
     /**
      * 表注释
-	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant中的常量字符集
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant中的枚举字符集
 	 * @return
      */
-	public String value();
+	MySqlCharsetConstant value();
 }

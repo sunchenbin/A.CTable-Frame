@@ -1,4 +1,8 @@
-# mybatis-enhance-actable-1.3.2.RELEASE
+# mybatis-enhance-actable-1.4.0.RELEASE
+
+官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
+
+开源项目不容易，如果觉得本项目对您的工作还是有帮助的话，请在帮忙点以下Star，谢谢
 
 作者微信添加时请备注actable：![作者微信](https://images.gitee.com/uploads/images/2020/1123/184824_dcd6730d_688374.png "微信图片_20201123184809.png")
 
@@ -12,13 +16,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **基本使用规范**
 
-1.需要依赖mybatis-enhance-actable-1.3.2.RELEASE.jar
+1.需要依赖mybatis-enhance-actable-1.4.0.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.3.2.RELEASE</version>
+        <version>1.4.0.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -74,7 +78,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.3.2.RELEASE</version>
+        <version>1.4.0.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -93,7 +97,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     actable.model.pack=com.xxx.store.model(ps:要扫描的model目录)
     actable.database.type=mysql
     # mybatis的配置信息，key也可能是：mybatis.mapper-locations
-    mybatis.mapperLocations=自己的mapper.xml没有可不填;classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml
+    mybatis.mapperLocations=classpath*:com/gitee/sunchenbin/mybatis/actable/mapping/*/*.xml;自己的mapper.xml没有可不填
 ```
 
 3. springboot启动类需要做如下配置
@@ -111,7 +115,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.3.2.RELEASE</version>
+        <version>1.4.0.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包 -->
@@ -169,16 +173,14 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     
 
     <!-- 如果不使用tk.mybatis需要使用这个bean成如下： -->
-
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="自己的dao.*没有可不填;com.gitee.sunchenbin.mybatis.actable.dao.*" />
+        <property name="basePackage" value="com.gitee.sunchenbin.mybatis.actable.dao.*;自己的dao.*没有可不填" />
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
     </bean>
 
     <!-- 如果要使用tk.mybatis需要使用这个bean成如下： -->
-
     <bean class="tk.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="自己的dao.*没有可不填;com.gitee.sunchenbin.mybatis.actable.dao.*"/>
+        <property name="basePackage" value="com.gitee.sunchenbin.mybatis.actable.dao.*;自己的dao.*没有可不填"/>
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
         <property name="properties">
             <value>
@@ -208,11 +210,11 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     
     9. @DefaultValue字段默认值，用来替代@Column中的defaultValue
     
-    10.@ColumnType字段类型，用来替代@Column中的type，取值范围MySqlTypeConstant.java中的常量
+    10.@ColumnType字段类型，用来替代@Column中的type，取值范围MySqlTypeConstant.java中的枚举
     
-    11.@TableCharset表字符集，用来替代@Table中的charset，取值范围MySqlCharsetConstant.java中的常量
+    11.@TableCharset表字符集，用来替代@Table中的charset，取值范围MySqlCharsetConstant.java中的枚举
     
-    12.@TableEngine表引擎类型，用来替代@Table中的engine，取值范围MySqlEngineConstant.java中的常量
+    12.@TableEngine表引擎类型，用来替代@Table中的engine，取值范围MySqlEngineConstant.java中的枚举
     
     13.支持javax.persistence包中的部分注解，用于对tk.mybatis做支持
     
@@ -712,8 +714,17 @@ public class TestController{
 39. 增加对json数据类型的支持(版本1.3.0.RELEASE)
 40. 增加注解@ColumnComment字段注释，用来替代@Column中的comment(版本1.3.0.RELEASE)
 41. 增加注解@DefaultValue字段默认值，用来替代@Column中的defaultValue(版本1.3.0.RELEASE)
-42. 增加注解@ColumnType字段类型，用来替代@Column中的type，取值范围MySqlTypeConstant中的常量(版本1.3.0.RELEASE)
+42. 增加注解@ColumnType字段类型，用来替代@Column中的type，取值范围MySqlTypeConstant中的枚举(版本1.3.0.RELEASE)
 43. 增加注解@TableComment用来配置表的注释，可用来替代@Table的comment(版本1.3.0.RELEASE)
-44. 迭代issues/I24UU4:增加注解@TableCharset用来配置表的字符集，可用来替代@Table的charset，取值范围MySqlCharsetConstant中的常量(版本1.3.1.RELEASE)
-45. 增加注解@TableEngine用来配置表的注释，可用来替代@Table的engine，取值范围MySqlEngineConstant中的常量(版本1.3.1.RELEASE)
+44. 迭代issues/I24UU4:增加注解@TableCharset用来配置表的字符集，可用来替代@Table的charset，取值范围MySqlCharsetConstant中的枚举(版本1.3.1.RELEASE)
+45. 增加注解@TableEngine用来配置表的注释，可用来替代@Table的engine，取值范围MySqlEngineConstant中的枚举(版本1.3.1.RELEASE)
 46. 删除默认依赖tk.mybatis的pom配置，避免跟其他框架冲突，如需使用自行依赖即可，只要依赖tk.mybatis的pom，actable可以完全兼容使用(版本1.3.2.RELEASE)
+47. 修复bug，当设置bit类型的默认值时，启动时会一直日志输出修改改字段的日志记录(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+48. 修复bug，当使用默认的字段类型时，可以通过@Column的length和decimalLength来配置长度(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+49. @ColumnType增加length和decimalLength两个属性用来配置该类型的长度(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+50. 优化注解@Column的type字段以及注解@ColumnType的value字段，类型从String改为枚举类型，枚举类为MySqlTypeConstant(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+51. 优化注解@TableCharset的value和@TableEngine的value字段类型从String改为枚举类型，枚举类为MySqlCharsetConstant和MySqlEngineConstant(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+52. 修复bug，当id使用Long类型时，采用BaseCRUDManagerImpl中的保存和更新方法时报错的问题(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+53. 优化引入对mybatis-plus的支持，方便更灵活的CUDR，支持@TableName/@TableField/@TableId三个注解(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+54. 移除@LengthCount和@LengthDefault两个注解(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+

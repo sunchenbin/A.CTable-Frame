@@ -1,5 +1,7 @@
 package com.gitee.sunchenbin.mybatis.actable.annotation;
 
+import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
+
 import java.lang.annotation.*;
 
 
@@ -19,8 +21,8 @@ public @interface TableEngine {
 
     /**
      * 表引擎
-	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant中的引擎类型
+	 * 仅支持com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant中的存储引擎枚举
 	 * @return
      */
-	public String value();
+	MySqlEngineConstant value();
 }

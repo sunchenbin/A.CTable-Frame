@@ -21,5 +21,5 @@ public @interface DefaultValue {
 	 * 字段的默认值
 	 * @return 字段的默认值
 	 */
-	public String value();
+	String value();
 }
