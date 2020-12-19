@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.*;
+import com.gitee.sunchenbin.mybatis.actable.annotation.impl.ColumnImpl;
 import com.gitee.sunchenbin.mybatis.actable.command.JavaToMysqlType;
 import com.gitee.sunchenbin.mybatis.actable.command.MySqlTypeAndLength;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.Id;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class ColumnUtils {
 
@@ -88,12 +90,12 @@ public class ColumnUtils {
         return null;
     }
 
-    public static String getColumnName(Field field){
-        Column column = field.getAnnotation(Column.class);
+    public static String getColumnName(Field field, Class<?> clasz){
+        Column column = getColumn(field, clasz);
         javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);
         TableField tableField = field.getAnnotation(TableField.class);
         TableId tableId = field.getAnnotation(TableId.class);
-        if(!hasColumnAnnotation(field)){
+        if(!hasColumnAnnotation(field, clasz)){
             return null;
         }
         if (column != null && !StringUtils.isEmpty(column.name())){
@@ -119,9 +121,9 @@ public class ColumnUtils {
                 name).toLowerCase();
     }
 
-    public static boolean isKey(Field field){
-        Column column = field.getAnnotation(Column.class);
-        if(!hasColumnAnnotation(field)){
+    public static boolean isKey(Field field, Class<?> clasz){
+        Column column = getColumn(field, clasz);
+        if(!hasColumnAnnotation(field,clasz)){
             return false;
         }
         IsKey isKey = field.getAnnotation(IsKey.class);
@@ -139,9 +141,9 @@ public class ColumnUtils {
         return false;
     }
 
-    public static boolean isAutoIncrement(Field field){
-        Column column = field.getAnnotation(Column.class);
-        if(!hasColumnAnnotation(field)){
+    public static boolean isAutoIncrement(Field field, Class<?> clasz){
+        Column column = getColumn(field, clasz);
+        if(!hasColumnAnnotation(field, clasz)){
             return false;
         }
         IsAutoIncrement isAutoIncrement = field.getAnnotation(IsAutoIncrement.class);
@@ -153,10 +155,10 @@ public class ColumnUtils {
         return false;
     }
 
-    public static Boolean isNull(Field field){
-        Column column = field.getAnnotation(Column.class);
+    public static Boolean isNull(Field field, Class<?> clasz){
+        Column column = getColumn(field, clasz);
         javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);
-        if(!hasColumnAnnotation(field)){
+        if(!hasColumnAnnotation(field,clasz)){
             return true;
         }
         IsNotNull isNotNull = field.getAnnotation(IsNotNull.class);
@@ -170,10 +172,10 @@ public class ColumnUtils {
         return true;
     }
 
-    public static String getComment(Field field){
-        Column column = field.getAnnotation(Column.class);
+    public static String getComment(Field field, Class<?> clasz){
+        Column column = getColumn(field, clasz);
         ColumnComment comment = field.getAnnotation(ColumnComment.class);
-        if(!hasColumnAnnotation(field)){
+        if(!hasColumnAnnotation(field,clasz)){
             return null;
         }
         if (column != null && !StringUtils.isEmpty(column.comment())){
@@ -185,10 +187,10 @@ public class ColumnUtils {
         return "";
     }
 
-    public static String getDefaultValue(Field field){
-        Column column = field.getAnnotation(Column.class);
+    public static String getDefaultValue(Field field, Class<?> clasz){
+        Column column = getColumn(field,clasz);
         DefaultValue defaultValue = field.getAnnotation(DefaultValue.class);
-        if(!hasColumnAnnotation(field)){
+        if(!hasColumnAnnotation(field,clasz)){
             return null;
         }
         if (column != null && !DEFAULTVALUE.equals(column.defaultValue())){
@@ -200,11 +202,11 @@ public class ColumnUtils {
         return null;
     }
 
-    public static MySqlTypeAndLength getMySqlTypeAndLength(Field field){
-        Column column = field.getAnnotation(Column.class);
+    public static MySqlTypeAndLength getMySqlTypeAndLength(Field field, Class<?> clasz){
+        Column column = getColumn(field,clasz);
         javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);
         ColumnType type = field.getAnnotation(ColumnType.class);
-        if(!hasColumnAnnotation(field)){
+        if(!hasColumnAnnotation(field, clasz)){
             throw new RuntimeException("字段名：" + field.getName() +"没有字段标识的注解，异常抛出！");
         }
         if (column != null && column.type() != MySqlTypeConstant.DEFAULT){
@@ -253,20 +255,6 @@ public class ColumnUtils {
         return targetMySqlTypeAndLength;
     }
 
-    public static boolean hasColumnAnnotation(Field field){
-        Column column = field.getAnnotation(Column.class);
-        javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);
-        TableField tableField = field.getAnnotation(TableField.class);
-        IsKey isKey = field.getAnnotation(IsKey.class);
-        Id id = field.getAnnotation(Id.class);
-        TableId tableId = field.getAnnotation(TableId.class);
-        if(column == null && columnCommon == null && (tableField == null || !tableField.exist())
-                && isKey == null && id == null && tableId == null){
-            return false;
-        }
-        return true;
-    }
-
     public static boolean hasTableAnnotation(Class<?> clasz){
         Table tableName = clasz.getAnnotation(Table.class);
         javax.persistence.Table tableNameCommon = clasz.getAnnotation(javax.persistence.Table.class);
@@ -275,5 +263,68 @@ public class ColumnUtils {
             return false;
         }
         return true;
+    }
+
+    public static boolean hasColumnAnnotation(Field field, Class<?> clasz){
+        // 是否开启simple模式
+        boolean isSimple = isSimple(clasz);
+        // 不参与建表的字段
+        String[] excludeFields = excludeFields(clasz);
+        // 当前属性名在排除建表的字段内
+        if (Arrays.asList(excludeFields).contains(field.getName())){
+            return false;
+        }
+        Column column = field.getAnnotation(Column.class);
+        javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);
+        TableField tableField = field.getAnnotation(TableField.class);
+        IsKey isKey = field.getAnnotation(IsKey.class);
+        Id id = field.getAnnotation(Id.class);
+        TableId tableId = field.getAnnotation(TableId.class);
+        if(column == null && columnCommon == null && (tableField == null || !tableField.exist())
+                && isKey == null && id == null && tableId == null){
+            // 开启了simple模式
+            if (isSimple){
+                return true;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private static Column getColumn(Field field, Class<?> clasz){
+        // 不参与建表的字段
+        String[] excludeFields = excludeFields(clasz);
+        if (Arrays.asList(excludeFields).contains(field.getName())){
+            return null;
+        }
+        Column column = field.getAnnotation(Column.class);
+        if (column != null){
+            return column;
+        }
+        // 是否开启simple模式
+        boolean isSimple = isSimple(clasz);
+        // 开启了simple模式
+        if (isSimple){
+            return new ColumnImpl();
+        }
+        return null;
+    }
+
+    private static String[] excludeFields(Class<?> clasz) {
+        String[] excludeFields = {};
+        Table tableName = clasz.getAnnotation(Table.class);
+        if (tableName != null){
+            excludeFields = tableName.excludeFields();
+        }
+        return excludeFields;
+    }
+
+    private static boolean isSimple(Class<?> clasz) {
+        boolean isSimple = false;
+        Table tableName = clasz.getAnnotation(Table.class);
+        if (tableName != null){
+            isSimple = tableName.isSimple();
+        }
+        return isSimple;
     }
 }

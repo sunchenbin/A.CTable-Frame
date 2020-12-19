@@ -20,6 +20,9 @@ public class JavaToMysqlType {
         javaToMysqlTypeMap.put("class java.util.Date", MySqlTypeConstant.DATE);
         javaToMysqlTypeMap.put("class java.sql.Timestamp", MySqlTypeConstant.DATETIME);
         javaToMysqlTypeMap.put("class java.sql.Time", MySqlTypeConstant.TIME);
+        javaToMysqlTypeMap.put("class java.time.LocalDateTime", MySqlTypeConstant.DATETIME);
+        javaToMysqlTypeMap.put("class java.time.LocalDate", MySqlTypeConstant.DATE);
+        javaToMysqlTypeMap.put("class java.time.LocalTime", MySqlTypeConstant.TIME);
         javaToMysqlTypeMap.put("long", MySqlTypeConstant.BIGINT);
         javaToMysqlTypeMap.put("int", MySqlTypeConstant.INT);
         javaToMysqlTypeMap.put("boolean", MySqlTypeConstant.BIT);

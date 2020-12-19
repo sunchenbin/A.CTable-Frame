@@ -64,7 +64,6 @@ public @interface Column{
 	 * 1.3.0版本支持，类同javax.persistence.Column.nullable
 	 * @return 是否为可以为null，true是可以，false是不可以，默认为true
 	 */
-	@Deprecated
 	boolean isNull() default true;
 
 	/**
@@ -73,7 +72,6 @@ public @interface Column{
 	 * 1.3.0版本支持，类同javax.persistence.Id
 	 * @return 是否是主键，默认false
 	 */
-	@Deprecated
 	boolean isKey() default false;
 
 	/**
@@ -82,7 +80,6 @@ public @interface Column{
 	 *
 	 * @return 是否自动递增，默认false 只有主键才能使用
 	 */
-	@Deprecated
 	boolean isAutoIncrement() default false;
 
 	/**

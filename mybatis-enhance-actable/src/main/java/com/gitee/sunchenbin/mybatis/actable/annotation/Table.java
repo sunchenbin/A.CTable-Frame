@@ -52,4 +52,16 @@ public @interface Table {
 	 * @return
 	 */
 	MySqlEngineConstant engine() default MySqlEngineConstant.DEFAULT;
+
+	/**
+	 * 是否开启simple模式配置，默认不开启，开启后Field不写注解@Column也可以采用默认的驼峰转换法创建字段
+	 * @return
+	 */
+	boolean isSimple() default false;
+
+	/**
+	 * 需要排除的属性名，排除掉的属性不参与建表
+	 * @return
+	 */
+	String[] excludeFields() default {"serialVersionUID"};
 }

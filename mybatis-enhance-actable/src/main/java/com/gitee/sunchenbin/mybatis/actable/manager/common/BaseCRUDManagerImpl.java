@@ -1,6 +1,5 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.common;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
 import com.gitee.sunchenbin.mybatis.actable.command.PageResultCommand;
 import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 import com.gitee.sunchenbin.mybatis.actable.dao.common.BaseCRUDMapper;
@@ -14,6 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -52,12 +54,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            if (!ColumnUtils.hasColumnAnnotation(field)) {
+            if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
             try{
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             }catch (Exception e){
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -73,12 +75,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    if (!ColumnUtils.hasColumnAnnotation(field)) {
+                    if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
-                    String name = ColumnUtils.getColumnName(field);
-                    field.set(newInstance, map.get(name));
+                    String name = ColumnUtils.getColumnName(field,t.getClass());
+                    buildFieldValue(map, newInstance, field, name);
                 }
                 list.add(newInstance);
             }
@@ -118,7 +120,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             if (null == keyValue){
                 throw new RuntimeException("主键字段不能为null");
             }
-            dataMap.put(ColumnUtils.getColumnName(keyField), keyField.get(t));
+            dataMap.put(ColumnUtils.getColumnName(keyField,t.getClass()), keyField.get(t));
         } catch (IllegalAccessException e) {
             log.error("操作对象的Field出现异常",e);
             throw new RuntimeException("操作对象的Field出现异常");
@@ -134,12 +136,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
             for (Field field : declaredFields2){
                 field.setAccessible(true);
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
-                String name = ColumnUtils.getColumnName(field);
-                field.set(newInstance, stringObjectMap.get(name));
+                String name = ColumnUtils.getColumnName(field,t.getClass());
+                buildFieldValue(stringObjectMap, newInstance, field, name);
             }
             return newInstance;
         }catch (Exception e){
@@ -175,12 +177,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    if (!ColumnUtils.hasColumnAnnotation(field)) {
+                    if (!ColumnUtils.hasColumnAnnotation(field,clasz)) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
-                    String name = ColumnUtils.getColumnName(field);
-                    field.set(newInstance, map.get(name));
+                    String name = ColumnUtils.getColumnName(field,clasz);
+                    buildFieldValue(map, newInstance, field, name);
                 }
                 list.add(newInstance);
             }
@@ -212,12 +214,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            if (!ColumnUtils.hasColumnAnnotation(field)) {
+            if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
             try{
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             }catch (Exception e){
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -248,12 +250,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            if (!ColumnUtils.hasColumnAnnotation(field)) {
+            if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
             try{
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             }catch (Exception e){
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -270,12 +272,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
             for (Field field : declaredFields2){
                 field.setAccessible(true);
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
-                String name = ColumnUtils.getColumnName(field);
-                field.set(newInstance, stringObjectMap.get(name));
+                String name = ColumnUtils.getColumnName(field,t.getClass());
+                buildFieldValue(stringObjectMap, newInstance, field, name);
             }
             return newInstance;
         }catch (Exception e){
@@ -306,12 +308,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
         for (Field field : declaredFields){
             // 设置访问权限
             field.setAccessible(true);
-            if (!ColumnUtils.hasColumnAnnotation(field)) {
+            if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                 log.debug("该field没有配置注解不是表中在字段！");
                 continue;
             }
             try{
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             }catch (Exception e){
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -349,7 +351,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             if (null == keyValue){
                 throw new RuntimeException("主键字段不能为null");
             }
-            dataMap.put(ColumnUtils.getColumnName(keyField), keyField.get(t));
+            dataMap.put(ColumnUtils.getColumnName(keyField,t.getClass()), keyField.get(t));
         } catch (IllegalAccessException e) {
             log.error("操作对象的Field出现异常",e);
             throw new RuntimeException("操作对象的Field出现异常");
@@ -398,14 +400,14 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
                 // 是否主键字段
-                boolean isKey = ColumnUtils.isKey(field);
+                boolean isKey = ColumnUtils.isKey(field,t.getClass());
                 // 是否自增
-                boolean autoIncrement = ColumnUtils.isAutoIncrement(field);
+                boolean autoIncrement = ColumnUtils.isAutoIncrement(field,t.getClass());
                 if(isKey){
                     keyField = field;
                 }
@@ -422,7 +424,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                     continue;
                 }
 
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             } catch (IllegalAccessException e) {
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -441,7 +443,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             return selectOne(t);
         }
         // 表示是自增
-        if(ColumnUtils.isAutoIncrement(keyField)){
+        if(ColumnUtils.isAutoIncrement(keyField,t.getClass())){
             keyField.setAccessible(true);
             try {
                 String type = keyField.getGenericType().toString();
@@ -486,14 +488,14 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
                 // 是否主键字段
-                boolean isKey = ColumnUtils.isKey(field);
+                boolean isKey = ColumnUtils.isKey(field,t.getClass());
                 // 是否自增
-                boolean autoIncrement = ColumnUtils.isAutoIncrement(field);
+                boolean autoIncrement = ColumnUtils.isAutoIncrement(field,t.getClass());
                 if(isKey){
                     keyField = field;
                 }
@@ -510,7 +512,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                     continue;
                 }
 
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             } catch (IllegalAccessException e) {
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -529,7 +531,7 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             return selectOne(t);
         }
         // 表示是自增
-        if(ColumnUtils.isAutoIncrement(keyField)){
+        if(ColumnUtils.isAutoIncrement(keyField,t.getClass())){
             keyField.setAccessible(true);
             try {
                 String type = keyField.getGenericType().toString();
@@ -573,20 +575,20 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
                 // 如果是主键，并且不是空的时候，这时候应该是更新操作
-                if (ColumnUtils.isKey(field)) {
+                if (ColumnUtils.isKey(field,t.getClass())) {
                     if (field.get(t) != null){
-                        keyFieldMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                        keyFieldMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
                     }else{
                         log.error("主键更新的情况下不能为null！");
                         throw new RuntimeException("主键更新的情况下不能为null！");
                     }
                 }
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             } catch (IllegalAccessException e) {
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -632,20 +634,20 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             try{
                 // 私有属性需要设置访问权限
                 field.setAccessible(true);
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
                 // 如果是主键，并且不是空的时候，这时候应该是更新操作
-                if (ColumnUtils.isKey(field)) {
+                if (ColumnUtils.isKey(field,t.getClass())) {
                     if (field.get(t) != null){
-                        keyFieldMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                        keyFieldMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
                     }else{
                         log.error("主键更新的情况下不能为null！");
                         throw new RuntimeException("主键更新的情况下不能为null！");
                     }
                 }
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             } catch (IllegalAccessException e) {
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -704,11 +706,11 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] fields = FieldUtils.getAllFields(t);
                 for(Field field : fields){
                     field.setAccessible(true);
-                    String name = ColumnUtils.getColumnName(field);
+                    String name = ColumnUtils.getColumnName(field,t.getClass());
                     if(null == map.get(name)){
                         continue;
                     }
-                    field.set(t, map.get(name));
+                    buildFieldValue(map, t, field, name);
                 }
                 list.add(t);
             }catch(Exception e){
@@ -754,11 +756,11 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             // 设置访问权限
             field.setAccessible(true);
             try{
-                if (!ColumnUtils.hasColumnAnnotation(field)) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             }catch (Exception e){
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -781,12 +783,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    if (!ColumnUtils.hasColumnAnnotation(field)) {
+                    if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
-                    String name = ColumnUtils.getColumnName(field);
-                    field.set(newInstance, map.get(name));
+                    String name = ColumnUtils.getColumnName(field,t.getClass());
+                    buildFieldValue(map, newInstance, field, name);
                 }
                 list.add(newInstance);
             }
@@ -852,13 +854,11 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                     orderByVal = (LinkedHashMap<String,String>) field.get(t);
                 }
 
-                // 得到字段的配置
-                Column column = field.getAnnotation(Column.class);
-                if (column == null) {
+                if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                     log.debug("该field没有配置注解不是表中在字段！");
                     continue;
                 }
-                dataMap.put(ColumnUtils.getColumnName(field), field.get(t));
+                dataMap.put(ColumnUtils.getColumnName(field,t.getClass()), field.get(t));
             }catch (Exception e){
                 log.error("操作对象的Field出现异常",e);
                 throw new RuntimeException("操作对象的Field出现异常");
@@ -881,12 +881,12 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
                 Field[] declaredFields2 = FieldUtils.getAllFields(newInstance);
                 for (Field field : declaredFields2){
                     field.setAccessible(true);
-                    if (!ColumnUtils.hasColumnAnnotation(field)) {
+                    if (!ColumnUtils.hasColumnAnnotation(field,t.getClass())) {
                         log.debug("该field没有配置注解不是表中在字段！");
                         continue;
                     }
-                    String name = ColumnUtils.getColumnName(field);
-                    field.set(newInstance, map.get(name));
+                    String name = ColumnUtils.getColumnName(field,t.getClass());
+                    buildFieldValue(map, newInstance, field, name);
                 }
                 list.add(newInstance);
             }
@@ -901,6 +901,18 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             pageResultCommand.setRecordsTotal(queryCount);
         }
         return pageResultCommand;
+    }
+
+    private <T> void buildFieldValue(Map<String, Object> map, T newInstance, Field field, String name) throws IllegalAccessException {
+        if (field.getGenericType().toString().equals("class java.time.LocalDateTime") && map.get(name) != null) {
+            field.set(newInstance, Timestamp.valueOf(map.get(name).toString()).toLocalDateTime());
+        } else if (field.getGenericType().toString().equals("class java.time.LocalDate") && map.get(name) != null) {
+            field.set(newInstance, Date.valueOf(map.get(name).toString()).toLocalDate());
+        } else if (field.getGenericType().toString().equals("class java.time.LocalTime") && map.get(name) != null) {
+            field.set(newInstance, Time.valueOf(map.get(name).toString()).toLocalTime());
+        } else {
+            field.set(newInstance, map.get(name));
+        }
     }
 
 }

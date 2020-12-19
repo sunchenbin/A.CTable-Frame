@@ -1,8 +1,5 @@
 package com.gitee.sunchenbin.mybatis.actable.utils;
 
-import com.gitee.sunchenbin.mybatis.actable.annotation.Column;
-import com.gitee.sunchenbin.mybatis.actable.annotation.IsKey;
-
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,21 +7,12 @@ import java.util.List;
 
 public class FieldUtils {
 
-    public static <T> Field getFieldByName(T obj, String name) {
-        try {
-            return obj.getClass().getField(name);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public static <T> Field getKeyField(T obj) {
         Field[] allFields = getAllFields(obj);
         for (Field field : allFields){
             // 设置访问权限
             field.setAccessible(true);
-            if(ColumnUtils.isKey(field)){
+            if(ColumnUtils.isKey(field,obj.getClass())){
                 return field;
             }
         }

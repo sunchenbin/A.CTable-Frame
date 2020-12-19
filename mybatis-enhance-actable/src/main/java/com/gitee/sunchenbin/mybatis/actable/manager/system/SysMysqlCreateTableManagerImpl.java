@@ -76,6 +76,9 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		// 初始化用于存储各种操作表结构的容器
 		Map<String, Map<String, TableConfig>> baseTableMap = initTableMap();
 
+		// 表名集合
+		List<String> tableNames = new ArrayList<String>();
+
 		// 循环全部的model
 		for (Class<?> clas : classes) {
 
@@ -84,12 +87,22 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				log.warn("{}，没有@Table注解直接跳过", clas.getName());
 				continue;
 			}
+			// 禁止出现重名表
+			checkTableName(tableNames, clas);
 			// 构建出全部表的增删改的map
 			buildTableMapConstruct(clas, baseTableMap);
 		}
 
 		// 根据传入的map，分别去创建或修改表结构
 		createOrModifyTableConstruct(baseTableMap);
+	}
+
+	private void checkTableName(List<String> tableNames, Class<?> clas) {
+		String tableName = ColumnUtils.getTableName(clas);
+		if (tableNames.contains(tableName)){
+			throw new RuntimeException(tableName + "表名出现重复，禁止创建！");
+		}
+		tableNames.add(tableName);
 	}
 
 	/**
@@ -546,10 +559,10 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 
 		for (Field field : fields) {
 			// 判断方法中是否有指定注解类型的注解
-			if (ColumnUtils.hasColumnAnnotation(field)) {
+			if (ColumnUtils.hasColumnAnnotation(field,clas)) {
 				CreateTableParam param = new CreateTableParam();
-				param.setFieldName(ColumnUtils.getColumnName(field));
-				MySqlTypeAndLength mySqlTypeAndLength = ColumnUtils.getMySqlTypeAndLength(field);
+				param.setFieldName(ColumnUtils.getColumnName(field,clas));
+				MySqlTypeAndLength mySqlTypeAndLength = ColumnUtils.getMySqlTypeAndLength(field,clas);
 				param.setFieldType(mySqlTypeAndLength.getType().toLowerCase());
 				param.setFileTypeLength(mySqlTypeAndLength.getLengthCount());
 				if (mySqlTypeAndLength.getLengthCount() == 1) {
@@ -560,24 +573,24 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				}
 
 				// 主键时设置必须不为null
-				if (ColumnUtils.isKey(field)) {
+				if (ColumnUtils.isKey(field,clas)) {
 					param.setFieldIsNull(false);
 				} else {
-					param.setFieldIsNull(ColumnUtils.isNull(field));
+					param.setFieldIsNull(ColumnUtils.isNull(field,clas));
 				}
-				param.setFieldIsKey(ColumnUtils.isKey(field));
-				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field));
-				param.setFieldDefaultValue(ColumnUtils.getDefaultValue(field));
-				param.setFieldComment(ColumnUtils.getComment(field));
+				param.setFieldIsKey(ColumnUtils.isKey(field,clas));
+				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field,clas));
+				param.setFieldDefaultValue(ColumnUtils.getDefaultValue(field,clas));
+				param.setFieldComment(ColumnUtils.getComment(field,clas));
 				// 获取当前字段的@Index注解
 				Index index = field.getAnnotation(Index.class);
 				if (null != index) {
 					String[] indexValue = index.columns();
 					param.setFiledIndexName((index.value() == null || index.value().equals(""))
-							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(indexValue)))
+							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field,clas) : stringArrFormat(indexValue)))
 							: Constants.IDX + index.value());
 					param.setFiledIndexValue(
-							indexValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field)) : Arrays.asList(indexValue));
+							indexValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field,clas)) : Arrays.asList(indexValue));
 				}
 				// 获取当前字段的@Unique注解
 				Unique unique = field.getAnnotation(Unique.class);
@@ -585,10 +598,10 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					String[] uniqueValue = unique.columns();
 					param.setFiledUniqueName((unique.value() == null || unique.value().equals(""))
 							? (Constants.UNI
-							+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field) : stringArrFormat(uniqueValue)))
+							+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field,clas) : stringArrFormat(uniqueValue)))
 							: Constants.UNI + unique.value());
 					param.setFiledUniqueValue(
-							uniqueValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field)) : Arrays.asList(uniqueValue));
+							uniqueValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field,clas)) : Arrays.asList(uniqueValue));
 				}
 				fieldList.add(param);
 			}
