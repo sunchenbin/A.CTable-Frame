@@ -727,4 +727,8 @@ public class TestController{
 52. 修复bug，当id使用Long类型时，采用BaseCRUDManagerImpl中的保存和更新方法时报错的问题(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
 53. 优化引入对mybatis-plus的支持，方便更灵活的CUDR，支持@TableName/@TableField/@TableId三个注解(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
 54. 移除@LengthCount和@LengthDefault两个注解(版本1.4.0.RELEASE，该版本不向下兼容需修改少量代码，谨慎升级)
+55. issues/I28XQY：新增java默认转换LocalDateTime/LocalDate/LocalTime数据类型的支持(版本1.4.1.RELEASE)
+56. 修正DOUBLE和FLOAT支持设置小数长度(版本1.4.1.RELEASE)
+57. Table标签新增属性isSimple表示是否开启简单的配置模式，如果开启，实体的属性可以不打@Column的标签全部按照默认规则驼峰转换创建字段，默认为false不开启(版本1.4.1.RELEASE)
+58. Table标签新增属性excludeFields用来标记排除属性名，排除掉的属性不参与建表(版本1.4.1.RELEASE)
 
