@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.4.0.RELEASE
+# mybatis-enhance-actable-1.4.1.RELEASE
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
@@ -16,13 +16,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **基本使用规范**
 
-1.需要依赖mybatis-enhance-actable-1.4.0.RELEASE.jar
+1.需要依赖mybatis-enhance-actable-1.4.1.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.0.RELEASE</version>
+        <version>1.4.1.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -78,7 +78,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.0.RELEASE</version>
+        <version>1.4.1.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -115,7 +115,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.0.RELEASE</version>
+        <version>1.4.1.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包 -->
