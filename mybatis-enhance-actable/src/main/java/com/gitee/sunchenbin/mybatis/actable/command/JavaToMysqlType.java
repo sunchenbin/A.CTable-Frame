@@ -15,6 +15,7 @@ public class JavaToMysqlType {
         javaToMysqlTypeMap.put("class java.math.BigInteger", MySqlTypeConstant.BIGINT);
         javaToMysqlTypeMap.put("class java.lang.Float", MySqlTypeConstant.FLOAT);
         javaToMysqlTypeMap.put("class java.lang.Double", MySqlTypeConstant.DOUBLE);
+        javaToMysqlTypeMap.put("class java.lang.Short", MySqlTypeConstant.SMALLINT);
         javaToMysqlTypeMap.put("class java.math.BigDecimal", MySqlTypeConstant.DECIMAL);
         javaToMysqlTypeMap.put("class java.sql.Date", MySqlTypeConstant.DATE);
         javaToMysqlTypeMap.put("class java.util.Date", MySqlTypeConstant.DATE);
@@ -28,7 +29,6 @@ public class JavaToMysqlType {
         javaToMysqlTypeMap.put("boolean", MySqlTypeConstant.BIT);
         javaToMysqlTypeMap.put("float", MySqlTypeConstant.FLOAT);
         javaToMysqlTypeMap.put("double", MySqlTypeConstant.DOUBLE);
-        javaToMysqlTypeMap.put("byte", MySqlTypeConstant.TINYINT);
         javaToMysqlTypeMap.put("short", MySqlTypeConstant.SMALLINT);
         javaToMysqlTypeMap.put("char", MySqlTypeConstant.VARCHAR);
     }

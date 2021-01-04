@@ -910,6 +910,8 @@ public class BaseCRUDManagerImpl implements BaseCRUDManager {
             field.set(newInstance, Date.valueOf(map.get(name).toString()).toLocalDate());
         } else if (field.getGenericType().toString().equals("class java.time.LocalTime") && map.get(name) != null) {
             field.set(newInstance, Time.valueOf(map.get(name).toString()).toLocalTime());
+        } else if (field.getGenericType().toString().equals("class java.lang.Short") && map.get(name) != null) {
+            field.set(newInstance, Short.parseShort(map.get(name).toString()));
         } else {
             field.set(newInstance, map.get(name));
         }
