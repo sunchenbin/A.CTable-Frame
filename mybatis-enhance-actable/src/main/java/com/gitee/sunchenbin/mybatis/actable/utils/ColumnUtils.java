@@ -66,7 +66,7 @@ public class ColumnUtils {
         if (!hasTableAnnotation(clasz)){
             return null;
         }
-        if (table != null && !StringUtils.isEmpty(table.charset())){
+        if (table != null && table.charset() != MySqlCharsetConstant.DEFAULT){
             return table.charset();
         }
         if (charset != null && !StringUtils.isEmpty(charset.value())){
@@ -81,7 +81,7 @@ public class ColumnUtils {
         if (!hasTableAnnotation(clasz)){
             return null;
         }
-        if (table != null && !StringUtils.isEmpty(table.engine())){
+        if (table != null && table.engine() != MySqlEngineConstant.DEFAULT){
             return table.engine();
         }
         if (engine != null && !StringUtils.isEmpty(engine.value())){

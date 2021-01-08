@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.4.2.RELEASE
+# mybatis-enhance-actable-1.4.3.RELEASE
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
@@ -16,13 +16,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **基本使用规范**
 
-1.需要依赖mybatis-enhance-actable-1.4.2.RELEASE.jar
+1.需要依赖mybatis-enhance-actable-1.4.3.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.2.RELEASE</version>
+        <version>1.4.3.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -78,7 +78,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.2.RELEASE</version>
+        <version>1.4.3.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -115,7 +115,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.2.RELEASE</version>
+        <version>1.4.3.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包 -->
@@ -731,5 +731,7 @@ public class TestController{
 56. 修正DOUBLE和FLOAT支持设置小数长度(版本1.4.1.RELEASE)
 57. Table标签新增属性isSimple表示是否开启简单的配置模式，如果开启，实体的属性可以不打@Column的标签全部按照默认规则驼峰转换创建字段，默认为false不开启(版本1.4.1.RELEASE)
 58. Table标签新增属性excludeFields用来标记排除属性名，排除掉的属性不参与建表(版本1.4.1.RELEASE)
-59. issues/I2BL9O：新增数据包装数据类型Short，删除byte类型的支持(版本1.4.2.RELEASE)
+59. 检查实体类有重名的表名会抛异常(版本1.4.1.RELEASE)
+60. issues/I2BL9O：新增数据包装数据类型Short，删除byte类型的支持(版本1.4.2.RELEASE)
+61. 修复bug，当使用@TableEngine和@TableCharset是失效的问题(版本1.4.3.RELEASE)
 
