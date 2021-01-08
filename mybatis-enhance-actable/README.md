@@ -2,7 +2,7 @@
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
-开源项目不容易，如果觉得本项目对您的工作还是有帮助的话，请在帮忙点以下Star，谢谢
+开源项目不容易，如果觉得本项目对您的工作还是有帮助的话，请在帮忙点以下Star(页面右上角)，谢谢
 
 作者微信添加时请备注actable：![作者微信](https://images.gitee.com/uploads/images/2020/1123/184824_dcd6730d_688374.png "微信图片_20201123184809.png")
 
