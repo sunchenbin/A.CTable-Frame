@@ -166,8 +166,12 @@ public class ColumnUtils {
             return false;
         }else if(column != null && column.isNull()){
             return true;
+        }else if(column != null && !column.isNull()){
+            return false;
         }else if(columnCommon != null && columnCommon.nullable()){
             return true;
+        }else if(columnCommon != null && !columnCommon.nullable()){
+            return false;
         }
         return true;
     }
