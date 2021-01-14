@@ -164,14 +164,10 @@ public class ColumnUtils {
         IsNotNull isNotNull = field.getAnnotation(IsNotNull.class);
         if(null != isNotNull){
             return false;
-        }else if(column != null && column.isNull()){
-            return true;
-        }else if(column != null && !column.isNull()){
-            return false;
-        }else if(columnCommon != null && columnCommon.nullable()){
-            return true;
-        }else if(columnCommon != null && !columnCommon.nullable()){
-            return false;
+        }else if(column != null){
+            return column.isNull();
+        }else if(columnCommon != null){
+            return columnCommon.nullable();
         }
         return true;
     }
