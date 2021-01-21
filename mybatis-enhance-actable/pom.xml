@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
 	<artifactId>mybatis-enhance-actable</artifactId>
-	<version>1.4.4.RELEASE</version>
+	<version>1.4.5.RELEASE</version>
 
 	<parent>
 	    <groupId>org.sonatype.oss</groupId>
