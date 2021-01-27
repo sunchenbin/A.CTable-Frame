@@ -202,6 +202,16 @@ public class ColumnUtils {
         return null;
     }
 
+    public static boolean getDefaultValueNative(Field field, Class<?> clasz){
+        if(field.getGenericType().toString().equals("class java.lang.String")
+                || field.getGenericType().toString().equals("char")
+                || field.getGenericType().toString().equals("class java.lang.Boolean")
+                || field.getGenericType().toString().equals("boolean")){
+            return false;
+        }
+        return true;
+    }
+
     public static MySqlTypeAndLength getMySqlTypeAndLength(Field field, Class<?> clasz){
         Column column = getColumn(field,clasz);
         javax.persistence.Column columnCommon = field.getAnnotation(javax.persistence.Column.class);

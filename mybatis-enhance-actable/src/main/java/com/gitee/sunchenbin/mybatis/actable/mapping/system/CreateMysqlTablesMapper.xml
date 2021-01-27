@@ -72,7 +72,7 @@
 		<!-- 不是自增长的才能有默认值 -->
 		<!-- 并且不为null时，因为null是默认的没必要写 -->
 		<if test="!fields.fieldIsAutoIncrement and !fields.fieldIsNull and fields.fieldDefaultValue != null">
-			<if test="fields.fieldType == 'bit'">
+			<if test="fields.fieldType == 'bit' and !fields.fieldDefaultValueNative">
 				<if test="fields.fieldDefaultValue == 'true'.toString()">
 					DEFAULT 1
 				</if>
@@ -86,14 +86,22 @@
 					DEFAULT 0
 				</if>
 			</if>
+			<if test="fields.fieldType == 'bit' and fields.fieldDefaultValueNative">
+				DEFAULT ${fields.fieldDefaultValue}
+			</if>
 			<if test="fields.fieldType != 'bit'">
-				DEFAULT #{fields.fieldDefaultValue}
+				<if test="fields.fieldDefaultValueNative">
+					DEFAULT ${fields.fieldDefaultValue}
+				</if>
+				<if test="!fields.fieldDefaultValueNative">
+					DEFAULT #{fields.fieldDefaultValue}
+				</if>
 			</if>
 		</if>
 		<!-- 不是自增长的才能有默认值 -->
-		<!-- 不是非空时，并且默认值不是NUll -->
+		<!-- 允许是空时，并且默认值不是NUll -->
 		<if test="!fields.fieldIsAutoIncrement and fields.fieldIsNull and fields.fieldDefaultValue != null">
-			<if test="fields.fieldType == 'bit'">
+			<if test="fields.fieldType == 'bit' and !fields.fieldDefaultValueNative">
 				<if test="fields.fieldDefaultValue == 'true'.toString()">
 					DEFAULT 1
 				</if>
@@ -107,8 +115,16 @@
 					DEFAULT 0
 				</if>
 			</if>
+			<if test="fields.fieldType == 'bit' and fields.fieldDefaultValueNative">
+				DEFAULT ${fields.fieldDefaultValue}
+			</if>
 			<if test="fields.fieldType != 'bit'">
-				DEFAULT #{fields.fieldDefaultValue}
+				<if test="fields.fieldDefaultValueNative">
+					DEFAULT ${fields.fieldDefaultValue}
+				</if>
+				<if test="!fields.fieldDefaultValueNative">
+					DEFAULT #{fields.fieldDefaultValue}
+				</if>
 			</if>
 		</if>
 		<if test="fields.fieldComment != ''">

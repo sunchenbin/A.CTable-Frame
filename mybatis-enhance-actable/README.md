@@ -736,3 +736,4 @@ public class TestController{
 61. 修复bug，当使用@TableEngine和@TableCharset是失效的问题(版本1.4.3.RELEASE)
 62. 修复bug，@Column.isNull()和@javax.persistence.Column.nullable()(版本1.4.4.RELEASE)
 63. 修复bug，float和double类型默认小数位数为2，如果强制指定0的情况下会失效，修复后效果为默认效数位数0，人工指定则按照人工指定的来(版本1.4.5.RELEASE)
+64. issues/I2DU0K，优化默认值指定的缺陷，之前无法指定某些特殊类型的默认值，例如CURRENT_TIMESTAMP这种，现在支持了，会根据字段类型来决定，目前只有String和Boolean采用字符串传参的方式使用的是'#{}'，其他类型均使用原生方式拼接sql使用的是'${}'(版本1.4.6.RELEASE)

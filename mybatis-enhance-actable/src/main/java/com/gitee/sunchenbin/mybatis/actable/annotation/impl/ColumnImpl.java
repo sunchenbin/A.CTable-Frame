@@ -112,6 +112,18 @@ public class ColumnImpl implements Column {
         return ColumnUtils.DEFAULTVALUE;
     }
 
+//    /**
+//     * 开启默认值原生模式
+//     * 原生模式介绍：默认是false表示非原生，此时value只支持字符串形式，会将value值以字符串的形式设置到字段的默认值，例如value="aa" 即sql为 DEFAULT "aa"
+//     * 如果设置isNative=true，此时如果value="current_timestamp"，即sql为 DEFAULT current_timestamp
+//     *
+//     * @return
+//     */
+//    @Override
+//    public boolean isNativeDefValue() {
+//        return false;
+//    }
+
     /**
      * 数据表字段备注
      * 1.3.0版本支持，也可通过注解实现：com.gitee.sunchenbin.mybatis.actable.annotation.Comment

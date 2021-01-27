@@ -51,6 +51,11 @@ public class CreateTableParam implements Cloneable{
 	private String	fieldDefaultValue;
 
 	/**
+	 * 字段默认值是否原生，原生使用$,非原生使用#
+	 */
+	private boolean fieldDefaultValueNative;
+
+	/**
 	 * 该类型需要几个长度（例如，需要小数位数的，那么总长度和小数长度就是2个长度）一版只有0、1、2三个可选值，自动从配置的类型中获取的
 	 */
 	private int		fileTypeLength;
@@ -147,6 +152,14 @@ public class CreateTableParam implements Cloneable{
 
 	public void setFieldDefaultValue(String fieldDefaultValue) {
 		this.fieldDefaultValue = fieldDefaultValue;
+	}
+
+	public boolean isFieldDefaultValueNative() {
+		return fieldDefaultValueNative;
+	}
+
+	public void setFieldDefaultValueNative(boolean fieldDefaultValueNative) {
+		this.fieldDefaultValueNative = fieldDefaultValueNative;
 	}
 
 	public int getFileTypeLength() {

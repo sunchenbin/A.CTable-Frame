@@ -439,7 +439,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 						continue;
 					}
 				} else if (!sysColumn.getColumn_default().equals(createTableParam.getFieldDefaultValue())) {
-					if (MySqlTypeConstant.BIT.toString().toLowerCase().equals(createTableParam.getFieldType())){
+					if (MySqlTypeConstant.BIT.toString().toLowerCase().equals(createTableParam.getFieldType()) && !createTableParam.isFieldDefaultValueNative()){
 						if(("true".equals(createTableParam.getFieldDefaultValue()) || "1".equals(createTableParam.getFieldDefaultValue()))
 								&& !"b'1'".equals(sysColumn.getColumn_default())){
 							// 两者不相等时，需要更新该字段
@@ -581,6 +581,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				param.setFieldIsKey(ColumnUtils.isKey(field,clas));
 				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field,clas));
 				param.setFieldDefaultValue(ColumnUtils.getDefaultValue(field,clas));
+				param.setFieldDefaultValueNative(ColumnUtils.getDefaultValueNative(field,clas));
 				param.setFieldComment(ColumnUtils.getComment(field,clas));
 				// 获取当前字段的@Index注解
 				Index index = field.getAnnotation(Index.class);
