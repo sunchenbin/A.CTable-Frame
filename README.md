@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.4.6.RELEASE
+# mybatis-enhance-actable-1.4.7.RELEASE
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
@@ -16,13 +16,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **基本使用规范**
 
-1.需要依赖mybatis-enhance-actable-1.4.6.RELEASE.jar
+1.需要依赖mybatis-enhance-actable-1.4.7.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.6.RELEASE</version>
+        <version>1.4.7.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -78,7 +78,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.6.RELEASE</version>
+        <version>1.4.7.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -115,7 +115,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.6.RELEASE</version>
+        <version>1.4.7.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包 -->
@@ -737,3 +737,8 @@ public class TestController{
 62. 修复bug，@Column.isNull()和@javax.persistence.Column.nullable()(版本1.4.4.RELEASE)
 63. 修复bug，float和double类型默认小数位数为2，如果强制指定0的情况下会失效，修复后效果为默认效数位数0，人工指定则按照人工指定的来(版本1.4.5.RELEASE)
 64. issues/I2DU0K，优化默认值指定的缺陷，之前无法指定某些特殊类型的默认值，例如CURRENT_TIMESTAMP这种，现在支持了，会根据字段类型来决定，目前只有String和Boolean采用字符串传参的方式使用的是'#{}'，其他类型均使用原生方式拼接sql使用的是'${}'(版本1.4.6.RELEASE)
+65. 新增注解@IsNativeDefValue值的范围是true或者false基于上一版本64条更新日志，系统会自动根据数据类型判断是否使用原生的值作为DEFAULT，这里增加这个注解用来可以手动指定，增加了一些灵活性(版本1.4.7.RELEASE)
+66. 新增两个配置项，允许自行指定生成的索引和约束的前缀，不指定默认使用actable_idx_和actable_uni_
+        
+        actable.index.prefix=自己定义的索引前缀
+        actable.unique.prefix=自己定义的唯一约束前缀
