@@ -551,6 +551,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 * @return 表的全部字段
 	 */
 	private List<Object> getAllFields(Class<?> clas) {
+		String idxPrefix = springContextUtil.getConfig(Constants.TABLE_INDEX_KEY);
+		String uniPrefix = springContextUtil.getConfig(Constants.TABLE_UNIQUE_KEY);
 		List<Object> fieldList = new ArrayList<Object>();
 		Field[] fields = clas.getDeclaredFields();
 
@@ -571,13 +573,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 					param.setFieldLength(mySqlTypeAndLength.getLength());
 					param.setFieldDecimalLength(mySqlTypeAndLength.getDecimalLength());
 				}
-
-				// 主键时设置必须不为null
-				if (ColumnUtils.isKey(field,clas)) {
-					param.setFieldIsNull(false);
-				} else {
-					param.setFieldIsNull(ColumnUtils.isNull(field,clas));
-				}
+				param.setFieldIsNull(ColumnUtils.isNull(field,clas));
 				param.setFieldIsKey(ColumnUtils.isKey(field,clas));
 				param.setFieldIsAutoIncrement(ColumnUtils.isAutoIncrement(field,clas));
 				param.setFieldDefaultValue(ColumnUtils.getDefaultValue(field,clas));
@@ -588,8 +584,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				if (null != index) {
 					String[] indexValue = index.columns();
 					param.setFiledIndexName((index.value() == null || index.value().equals(""))
-							? (Constants.IDX + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field,clas) : stringArrFormat(indexValue)))
-							: Constants.IDX + index.value());
+							? (idxPrefix + ((indexValue.length == 0) ? ColumnUtils.getColumnName(field,clas) : stringArrFormat(indexValue)))
+							: idxPrefix + index.value());
 					param.setFiledIndexValue(
 							indexValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field,clas)) : Arrays.asList(indexValue));
 				}
@@ -598,9 +594,9 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				if (null != unique) {
 					String[] uniqueValue = unique.columns();
 					param.setFiledUniqueName((unique.value() == null || unique.value().equals(""))
-							? (Constants.UNI
+							? (uniPrefix
 							+ ((uniqueValue.length == 0) ? ColumnUtils.getColumnName(field,clas) : stringArrFormat(uniqueValue)))
-							: Constants.UNI + unique.value());
+							: uniPrefix + unique.value());
 					param.setFiledUniqueValue(
 							uniqueValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field,clas)) : Arrays.asList(uniqueValue));
 				}

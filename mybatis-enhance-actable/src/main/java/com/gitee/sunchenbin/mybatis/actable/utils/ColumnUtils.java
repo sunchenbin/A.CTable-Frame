@@ -161,6 +161,12 @@ public class ColumnUtils {
         if(!hasColumnAnnotation(field,clasz)){
             return true;
         }
+        boolean iskey = isKey(field, clasz);
+        // 主键默认为非空
+        if (iskey){
+            return false;
+        }
+
         IsNotNull isNotNull = field.getAnnotation(IsNotNull.class);
         if(null != isNotNull){
             return false;
@@ -203,6 +209,10 @@ public class ColumnUtils {
     }
 
     public static boolean getDefaultValueNative(Field field, Class<?> clasz){
+        IsNativeDefValue isNativeDefValue = field.getAnnotation(IsNativeDefValue.class);
+        if (isNativeDefValue != null){
+            return isNativeDefValue.value();
+        }
         if(field.getGenericType().toString().equals("class java.lang.String")
                 || field.getGenericType().toString().equals("char")
                 || field.getGenericType().toString().equals("class java.lang.Boolean")

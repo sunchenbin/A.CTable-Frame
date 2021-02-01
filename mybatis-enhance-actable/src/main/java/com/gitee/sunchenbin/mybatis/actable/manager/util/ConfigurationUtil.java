@@ -58,6 +58,18 @@ public class ConfigurationUtil implements ApplicationContextAware {
 	private String acdatabaseType;
 
 	/**
+	 * 指定生成索引前缀
+	 */
+	@Value(Constants.TABLE_INDEX_KEY_VALUE)
+	private String actableIndex;
+
+	/**
+	 * 指定生成唯一约束前缀
+	 */
+	@Value(Constants.TABLE_UNIQUE_KEY_VALUE)
+	private String actableUnique;
+
+	/**
 	 * 实现ApplicationContextAware接口的回调方法，设置上下文环境
 	 */
 	@Override
@@ -67,7 +79,7 @@ public class ConfigurationUtil implements ApplicationContextAware {
 
 	/**
 	 * 获得spring上下文
-	 * 
+	 *
 	 * @return ApplicationContext spring上下文
 	 */
 	public ApplicationContext getApplicationContext() {
@@ -76,7 +88,7 @@ public class ConfigurationUtil implements ApplicationContextAware {
 
 	/**
 	 * 获取bean
-	 * 
+	 *
 	 * @param name
 	 *            service注解方式name为小驼峰格式
 	 * @return Object bean的实例对象
@@ -87,7 +99,7 @@ public class ConfigurationUtil implements ApplicationContextAware {
 
 	/**
 	 * 获取配置文件的值，兼容传统spring项目和springboot项目
-	 * 
+	 *
 	 * @param key
 	 *            properties
 	 * @return
@@ -114,7 +126,13 @@ public class ConfigurationUtil implements ApplicationContextAware {
 				return actableAuto;
 			}
 		}
-		if(properties == null) {			
+		if(Constants.TABLE_INDEX_KEY.equals(key) && !Constants.NULL.equals(actableIndex)) {
+			return actableIndex;
+		}
+		if (Constants.TABLE_UNIQUE_KEY.equals(key) && !Constants.NULL.equals(actableUnique)){
+			return actableUnique;
+		}
+		if(properties == null) {
 			initProperties();
 		}
 		Object object = null;
@@ -136,11 +154,17 @@ public class ConfigurationUtil implements ApplicationContextAware {
 				object = properties.get(Constants.ACTABLE_TABLE_AUTO_KEY);
 			}
 		}
+		if(Constants.TABLE_INDEX_KEY.equals(key)) {
+			object = properties.get(Constants.TABLE_INDEX_KEY);
+		}
+		if (Constants.TABLE_UNIQUE_KEY.equals(key)){
+			object = properties.get(Constants.TABLE_UNIQUE_KEY);
+		}
 		return object == null ? null : (String)object;
 	}
 
 	private void initProperties() {
-		
+
 		properties = new Properties();
 		try {
 			String[] postProcessorNames = applicationContext.getBeanNamesForType(BeanFactoryPostProcessor.class, true,

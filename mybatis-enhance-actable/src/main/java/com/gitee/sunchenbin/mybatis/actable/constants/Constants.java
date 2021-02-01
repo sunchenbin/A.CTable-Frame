@@ -30,7 +30,10 @@ public class Constants {
 	public static final String ADDINDEX_TABLE_MAP				= "addIndexTableMap";
 	public static final String ADDUNIQUE_TABLE_MAP				= "addUniqueTableMap";
 
-	public static final String IDX								= "actable_idx_";
-	public static final String UNI								= "actable_uni_";
+	public static final String TABLE_INDEX_KEY 					= "actable.index.prefix";
+	public static final String TABLE_UNIQUE_KEY 				= "actable.unique.prefix";
+
+	public static final String TABLE_INDEX_KEY_VALUE 			= "${actable.index.prefix:actable_idx_}";
+	public static final String TABLE_UNIQUE_KEY_VALUE 			= "${actable.unique.prefix:actable_uni_}";
 
 }

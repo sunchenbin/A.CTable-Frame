@@ -88,14 +88,6 @@ public @interface Column{
 	 * @return 默认值
 	 */
 	String defaultValue() default ColumnUtils.DEFAULTVALUE;
-//
-//	/**
-//	 * 开启默认值原生模式
-//	 * 原生模式介绍：默认是false表示非原生，此时value只支持字符串形式，会将value值以字符串的形式设置到字段的默认值，例如value="aa" 即sql为 DEFAULT "aa"
-//	 * 如果设置isNative=true，此时如果value="current_timestamp"，即sql为 DEFAULT current_timestamp
-//	 * @return
-//	 */
-//	boolean isNativeDefValue() default false;
 
 	/**
 	 * 数据表字段备注
