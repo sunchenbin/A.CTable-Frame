@@ -230,8 +230,14 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		// 5. 找出需要删除主键的字段
 		List<Object> dropKeyFieldList = getDropKeyFieldList(tableColumnList, allFieldList);
 
+		String uniPrefix = springContextUtil.getConfig(Constants.TABLE_UNIQUE_KEY);
+		String idxPrefix = springContextUtil.getConfig(Constants.TABLE_INDEX_KEY);
+		Map<String, String> paramMap = new HashMap<String, String>();
+		paramMap.put("tableName", tableName);
+		paramMap.put("uniquePrefix",uniPrefix);
+		paramMap.put("indexPrefix",idxPrefix);
 		// 查询当前表中全部acteble创建的索引和唯一约束，也就是名字前缀是actable_和actable_的
-		Set<String> allIndexAndUniqueNames = createMysqlTablesMapper.findTableIndexByTableName(tableName);
+		Set<String> allIndexAndUniqueNames = createMysqlTablesMapper.findTableIndexByTableName(paramMap);
 
 		// 6. 找出需要删除的索引和唯一约束
 		List<Object> dropIndexAndUniqueFieldList = getDropIndexAndUniqueList(allIndexAndUniqueNames, allFieldList);

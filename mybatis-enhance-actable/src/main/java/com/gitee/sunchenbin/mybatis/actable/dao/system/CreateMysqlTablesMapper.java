@@ -76,10 +76,10 @@ public interface CreateMysqlTablesMapper {
 
 	/**
 	 * 查询当前表存在的索引(除了主键索引primary)
-	 * @param tableName 表名
+	 * @param tableMap 表名
 	 * @return 索引名列表
 	 */
-	public Set<String> findTableIndexByTableName(@Param("tableName") String tableName);
+	public Set<String> findTableIndexByTableName(@Param("tableMap") Map<String, String> tableMap);
 
 	/**
 	 * 删除表索引

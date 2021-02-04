@@ -241,9 +241,25 @@
 	</select>
 
 	<!-- 查询当前表存在的索引除了主键索引primary -->
-	<select id="findTableIndexByTableName" resultType="String" parameterType="String">
+	<select id="findTableIndexByTableName" resultType="String" parameterType="java.util.Map">
 		select index_name from information_schema.statistics
-		where table_name = #{tableName} and table_schema = (select database()) and lower(index_name) !='primary' and index_name like 'actable_%'
+		where
+		<foreach collection="tableMap" index="key" item="value">
+			<if test="key == 'tableName'">
+				table_name = #{value}
+			</if>
+		</foreach>
+		and table_schema = (select database()) and lower(index_name) !='primary' and (
+		<foreach collection="tableMap" index="key" item="value">
+			<if test="key == 'uniquePrefix'">
+				index_name like '${value}%'
+			</if>
+		</foreach>
+		<foreach collection="tableMap" index="key" item="value">
+			<if test="key == 'indexPrefix'">
+				or index_name like '${value}%')
+			</if>
+		</foreach>
 	</select>
 
 	<!-- 删除索引 -->

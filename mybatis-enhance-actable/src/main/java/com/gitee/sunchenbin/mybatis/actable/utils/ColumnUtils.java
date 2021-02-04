@@ -22,6 +22,8 @@ public class ColumnUtils {
 
     public static final String DEFAULTVALUE = "DEFAULT";
 
+    public static final String SQL_ESCAPE_CHARACTER = "`";
+
     public static String getTableName(Class<?> clasz){
         Table tableName = clasz.getAnnotation(Table.class);
         javax.persistence.Table tableNameCommon = clasz.getAnnotation(javax.persistence.Table.class);
@@ -99,21 +101,21 @@ public class ColumnUtils {
             return null;
         }
         if (column != null && !StringUtils.isEmpty(column.name())){
-            return column.name().toLowerCase();
+            return column.name().toLowerCase().replace(SQL_ESCAPE_CHARACTER, "");
         }
         if (column != null && !StringUtils.isEmpty(column.value())){
-            return column.value().toLowerCase();
+            return column.value().toLowerCase().replace(SQL_ESCAPE_CHARACTER, "");
         }
         if (columnCommon != null && !StringUtils.isEmpty(columnCommon.name())){
-            return columnCommon.name().toLowerCase();
+            return columnCommon.name().toLowerCase().replace(SQL_ESCAPE_CHARACTER, "");
         }
         if (tableField != null && !StringUtils.isEmpty(tableField.value()) && tableField.exist()){
-            return tableField.value().toLowerCase();
+            return tableField.value().toLowerCase().replace(SQL_ESCAPE_CHARACTER, "");
         }
         if (tableId != null && !StringUtils.isEmpty(tableId.value())){
-            return tableId.value();
+            return tableId.value().replace(SQL_ESCAPE_CHARACTER, "");
         }
-        return getBuildLowerName(field.getName());
+        return getBuildLowerName(field.getName()).replace(SQL_ESCAPE_CHARACTER, "");
     }
 
     private static String getBuildLowerName(String name) {
