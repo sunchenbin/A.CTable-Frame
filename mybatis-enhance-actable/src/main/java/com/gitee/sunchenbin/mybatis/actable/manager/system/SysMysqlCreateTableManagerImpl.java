@@ -1,6 +1,8 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.system;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
+import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Unique;
 import com.gitee.sunchenbin.mybatis.actable.command.*;
 import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
@@ -9,6 +11,7 @@ import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import com.gitee.sunchenbin.mybatis.actable.dao.system.CreateMysqlTablesMapper;
 import com.gitee.sunchenbin.mybatis.actable.manager.util.ConfigurationUtil;
+import com.gitee.sunchenbin.mybatis.actable.utils.ClassScaner;
 import com.gitee.sunchenbin.mybatis.actable.utils.ClassTools;
 import com.gitee.sunchenbin.mybatis.actable.utils.ColumnUtils;
 import org.slf4j.Logger;
@@ -70,8 +73,11 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			return;
 		}
 
+		// 拆成多个pack，支持多个
+		String[] packs = pack.split(",|;");
+
 		// 从包package中获取所有的Class
-		Set<Class<?>> classes = ClassTools.getClasses(pack);
+		Set<Class> classes = ClassScaner.scan(packs, Table.class, TableName.class, javax.persistence.Table.class);
 
 		// 初始化用于存储各种操作表结构的容器
 		Map<String, Map<String, TableConfig>> baseTableMap = initTableMap();
@@ -556,7 +562,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 	 *            准备做为创建表依据的class
 	 * @return 表的全部字段
 	 */
-	private List<Object> getAllFields(Class<?> clas) {
+	@Override
+	public List<Object> getAllFields(Class<?> clas) {
 		String idxPrefix = springContextUtil.getConfig(Constants.TABLE_INDEX_KEY);
 		String uniPrefix = springContextUtil.getConfig(Constants.TABLE_UNIQUE_KEY);
 		List<Object> fieldList = new ArrayList<Object>();
@@ -636,7 +643,15 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			Class clsSup = clas.getSuperclass();
 			List<Field> fieldList = new ArrayList<Field>();
 			fieldList.addAll(Arrays.asList(fields));
-			fieldList.addAll(Arrays.asList(clsSup.getDeclaredFields()));
+			// 获取当前class的所有fields的name列表
+			List<String> fdNames = getFieldNames(fieldList);
+			for (Field pfd : Arrays.asList(clsSup.getDeclaredFields())){
+				// 避免重载属性
+				if (fdNames.contains(pfd.getName())){
+					continue;
+				}
+				fieldList.add(pfd);
+			}
 			fields = new Field[fieldList.size()];
 			int i = 0;
 			for (Object field : fieldList.toArray()) {
@@ -646,6 +661,14 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 			fields = recursionParents(clsSup, fields);
 		}
 		return fields;
+	}
+
+	private List<String> getFieldNames(List<Field> fieldList) {
+		List<String> fdNames = new ArrayList<String>();
+		for (Field fd : fieldList){
+			fdNames.add(fd.getName());
+		}
+		return fdNames;
 	}
 
 	/**

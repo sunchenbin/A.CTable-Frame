@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.4.8.RELEASE
+# mybatis-enhance-actable-1.4.9.RELEASE
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
@@ -16,13 +16,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **基本使用规范**
 
-1.需要依赖mybatis-enhance-actable-1.4.8.RELEASE.jar
+1.需要依赖mybatis-enhance-actable-1.4.9.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.8.RELEASE</version>
+        <version>1.4.9.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -78,7 +78,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.8.RELEASE</version>
+        <version>1.4.9.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -115,7 +115,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.8.RELEASE</version>
+        <version>1.4.9.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包 -->
@@ -744,3 +744,6 @@ public class TestController{
         actable.unique.prefix=自己定义的唯一约束前缀
 67. 如果字段名中包含 ` 关键字会默认忽略掉，因为actable建表时自动给所有字段名增加过了，这个主要是为了避免字段名是数据库的关键字(版本1.4.8.RELEASE)
 68. 修复66条自定义索引和唯一约束前缀的功能bug(版本1.4.8.RELEASE)
+69. SysMysqlCreateTableManagerImpl.getAllFields方法改为public可被重写(版本1.4.9.RELEASE)
+70. issues/I38G7Q：修复避免子类重写付类属性时创建重复字段报错的问题(版本1.4.9.RELEASE)
+71. issues/I2CVCS：迭代优化actable.model.pack配置属性支持模糊扫描，支持类似com.bz.**.entity且支持配置多个路径英文逗号或者分号隔开(版本1.4.9.RELEASE)
