@@ -11,12 +11,14 @@ import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlTypeConstant;
 import com.google.common.base.CaseFormat;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Id;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Date;
 
 public class ColumnUtils {
 
@@ -28,23 +30,31 @@ public class ColumnUtils {
         Table tableName = clasz.getAnnotation(Table.class);
         javax.persistence.Table tableNameCommon = clasz.getAnnotation(javax.persistence.Table.class);
         TableName tableNamePlus = clasz.getAnnotation(TableName.class);
+        EnableTimeSuffix enableTimeSuffix = clasz.getAnnotation(EnableTimeSuffix.class);
         if (!hasTableAnnotation(clasz)){
             return null;
         }
-        if (tableName != null && !StringUtils.isEmpty(tableName.name())){
-            return tableName.name();
+        String finalTableName = "";
+        if (tableName != null && !StringUtils.isEmpty(tableName.name())) {
+            finalTableName = tableName.name();
         }
-        if (tableName != null && !StringUtils.isEmpty(tableName.value())){
-            return tableName.value();
+        if (tableName != null && !StringUtils.isEmpty(tableName.value())) {
+            finalTableName = tableName.value();
         }
-        if (tableNameCommon != null && !StringUtils.isEmpty(tableNameCommon.name())){
-            return tableNameCommon.name();
+        if (tableNameCommon != null && !StringUtils.isEmpty(tableNameCommon.name())) {
+            finalTableName = tableNameCommon.name();
         }
-        if (tableNamePlus != null && !StringUtils.isEmpty(tableNamePlus.value())){
-            return tableNamePlus.value();
+        if (tableNamePlus != null && !StringUtils.isEmpty(tableNamePlus.value())) {
+            finalTableName = tableNamePlus.value();
         }
-        // 都为空时采用类名按照驼峰格式转会为表名
-        return getBuildLowerName(clasz.getSimpleName());
+        if (StringUtils.isEmpty(finalTableName)) {
+            // 都为空时采用类名按照驼峰格式转会为表名
+            finalTableName = getBuildLowerName(clasz.getSimpleName());
+        }
+        if(null != enableTimeSuffix && enableTimeSuffix.value()){
+            finalTableName = appendTimeSuffix(finalTableName, enableTimeSuffix.pattern());
+        }
+        return finalTableName;
     }
 
     public static String getTableComment(Class<?> clasz){
@@ -348,5 +358,23 @@ public class ColumnUtils {
             isSimple = tableName.isSimple();
         }
         return isSimple;
+    }
+
+
+    /**
+     * 添加时间后缀
+     *
+     * @param tableName 表名
+     * @param pattern 时间格式
+     * @return
+     */
+    public static String appendTimeSuffix(String tableName, String pattern) {
+        String suffix = "";
+        try {
+            suffix = DateFormatUtils.format(new Date(), pattern);
+        } catch (Exception e) {
+            throw new RuntimeException("无法转换时间格式" + pattern);
+        }
+        return tableName + "_" + suffix;
     }
 }
