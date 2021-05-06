@@ -1,10 +1,15 @@
 package com.gitee.sunchenbin.mybatis.actable.manager.system;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.gitee.sunchenbin.mybatis.actable.annotation.IgnoreUpdate;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Index;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Table;
 import com.gitee.sunchenbin.mybatis.actable.annotation.Unique;
-import com.gitee.sunchenbin.mybatis.actable.command.*;
+import com.gitee.sunchenbin.mybatis.actable.command.CreateTableParam;
+import com.gitee.sunchenbin.mybatis.actable.command.MySqlTypeAndLength;
+import com.gitee.sunchenbin.mybatis.actable.command.SysMysqlColumns;
+import com.gitee.sunchenbin.mybatis.actable.command.SysMysqlTable;
+import com.gitee.sunchenbin.mybatis.actable.command.TableConfig;
 import com.gitee.sunchenbin.mybatis.actable.constants.Constants;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlCharsetConstant;
 import com.gitee.sunchenbin.mybatis.actable.constants.MySqlEngineConstant;
@@ -14,6 +19,7 @@ import com.gitee.sunchenbin.mybatis.actable.manager.util.ConfigurationUtil;
 import com.gitee.sunchenbin.mybatis.actable.utils.ClassScaner;
 import com.gitee.sunchenbin.mybatis.actable.utils.ClassTools;
 import com.gitee.sunchenbin.mybatis.actable.utils.ColumnUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * 项目启动时自动扫描配置的目录中的model，根据配置的规则自动创建或更新表 该逻辑只适用于mysql，其他数据库尚且需要另外扩展，因为sql的语法不同
@@ -399,7 +411,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		for (SysMysqlColumns sysColumn : tableColumnList) {
 			// 数据库中有该字段时，验证是否有更新
 			CreateTableParam createTableParam = fieldMap.get(sysColumn.getColumn_name().toLowerCase());
-			if (createTableParam != null) {
+			if (createTableParam != null && !createTableParam.getIgnoreUpdate()) {
 				// 该复制操作时为了解决multiple primary key defined的同时又不会drop primary key
 				CreateTableParam modifyTableParam = createTableParam.clone();
 				// 1.验证主键
@@ -612,6 +624,11 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 							: uniPrefix + unique.value());
 					param.setFiledUniqueValue(
 							uniqueValue.length == 0 ? Arrays.asList(ColumnUtils.getColumnName(field,clas)) : Arrays.asList(uniqueValue));
+				}
+				// 获取当前字段的@IgnoreUpdate注解
+				IgnoreUpdate ignoreUpdate = field.getAnnotation(IgnoreUpdate.class);
+				if (null != ignoreUpdate){
+					param.setIgnoreUpdate(ignoreUpdate.value());
 				}
 				fieldList.add(param);
 			}
