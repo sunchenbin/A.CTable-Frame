@@ -90,6 +90,19 @@ public class CreateTableParam implements Cloneable{
 	 */
 	private String fieldComment;
 
+	/**
+	 * 是否忽略更新
+	 */
+	private Boolean ignoreUpdate;
+
+	public Boolean getIgnoreUpdate() {
+		return ignoreUpdate;
+	}
+
+	public void setIgnoreUpdate(Boolean ignoreUpdate) {
+		this.ignoreUpdate = ignoreUpdate;
+	}
+
 	public String getFieldName() {
 		return fieldName;
 	}
