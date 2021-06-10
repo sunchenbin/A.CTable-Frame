@@ -297,6 +297,14 @@ public class ColumnUtils {
         return true;
     }
 
+    public static boolean hasIgnoreTableAnnotation(Class<?> clasz){
+        IgnoreTable ignoreTable = clasz.getAnnotation(IgnoreTable.class);
+        if (ignoreTable == null){
+            return false;
+        }
+        return true;
+    }
+
     public static boolean hasColumnAnnotation(Field field, Class<?> clasz){
         // 是否开启simple模式
         boolean isSimple = isSimple(clasz);

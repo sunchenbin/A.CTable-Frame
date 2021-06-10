@@ -5,13 +5,10 @@ import com.gitee.sunchenbin.mybatis.actable.constants.DateTimeFormatConstant;
 import java.lang.annotation.*;
 
 /**
- * <p>
  * 表名时间后缀
- * </p>
  *
  * @author Elphen
- * @version 1.0.0
- * @date 2021-03-11 11:17
+ * @version 2021年03月11日 上午11:17:37
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

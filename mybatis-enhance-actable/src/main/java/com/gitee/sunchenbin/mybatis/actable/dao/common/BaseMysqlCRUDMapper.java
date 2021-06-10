@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
  */
 @Transactional
 @Deprecated
+@InterceptorIgnore(tenantLine = "true")
 public interface BaseMysqlCRUDMapper {
 
 	/**
@@ -24,19 +26,19 @@ public interface BaseMysqlCRUDMapper {
 	 * @param saveOrUpdateDataCommand id+表结构的map
 	 */
 	public void save(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
-	
+
 	/**
 	 * 更新
 	 * @param saveOrUpdateDataCommand id+表结构的map
 	 */
 	public void update(SaveOrUpdateDataCommand saveOrUpdateDataCommand);
-	
+
 	/**
 	 * 删除
 	 * @param tableMap 表结构的map
 	 */
 	public void delete(@Param("tableMap") Map<Object, Map<Object, Object>> tableMap);
-	
+
 	/**
 	 * 查询
 	 * @param tableMap 表结构的map
@@ -48,7 +50,7 @@ public interface BaseMysqlCRUDMapper {
 	 * @param tableMap 表结构的map
 	 */
 	public int searchCount(@Param("tableMap") Map<Object, Object> tableMap);
-	
+
 	/**
 	 * 查询
 	 * @param value 动态sql

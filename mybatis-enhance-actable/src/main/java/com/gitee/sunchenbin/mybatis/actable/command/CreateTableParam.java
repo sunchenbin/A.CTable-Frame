@@ -93,13 +93,13 @@ public class CreateTableParam implements Cloneable{
 	/**
 	 * 是否忽略更新
 	 */
-	private Boolean ignoreUpdate;
+	private boolean ignoreUpdate;
 
-	public Boolean getIgnoreUpdate() {
+	public boolean getIgnoreUpdate() {
 		return ignoreUpdate;
 	}
 
-	public void setIgnoreUpdate(Boolean ignoreUpdate) {
+	public void setIgnoreUpdate(boolean ignoreUpdate) {
 		this.ignoreUpdate = ignoreUpdate;
 	}
 

@@ -100,9 +100,9 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		// 循环全部的model
 		for (Class<?> clas : classes) {
 
-			// 没有打注解不需要创建表
-			if (!ColumnUtils.hasTableAnnotation(clas)) {
-				log.warn("{}，没有@Table注解直接跳过", clas.getName());
+			// 没有打注解不需要创建表 或者配置了忽略建表的注解
+			if (!ColumnUtils.hasTableAnnotation(clas) || ColumnUtils.hasIgnoreTableAnnotation(clas)) {
+				log.warn("{}，没有@Table或配置了@IgnoreTable注解直接跳过", clas.getName());
 				continue;
 			}
 			// 禁止出现重名表

@@ -1,5 +1,6 @@
 package com.gitee.sunchenbin.mybatis.actable.dao.common;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.gitee.sunchenbin.mybatis.actable.command.SaveOrUpdateDataCommand;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import java.util.Map;
  *
  */
 @Transactional
+@InterceptorIgnore(tenantLine = "true")
 public interface BaseCRUDMapper {
 
 	/**

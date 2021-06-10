@@ -1,13 +1,10 @@
 package com.gitee.sunchenbin.mybatis.actable.constants;
 
 /**
- * <p>
  * 日期时间格式常量类
- * </p>
  *
  * @author Liu YuanPeng
- * @version 1.0.0
- * @date 2021-03-10 14:57
+ * @version 2021年03月11日 上午11:17:37
  */
 public class DateTimeFormatConstant {
     /**

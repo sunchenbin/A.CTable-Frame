@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.4.9.RELEASE
+# mybatis-enhance-actable-1.5.0.RELEASE
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
@@ -16,13 +16,13 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
 
  **基本使用规范**
 
-1.需要依赖mybatis-enhance-actable-1.4.9.RELEASE.jar
+1.需要依赖mybatis-enhance-actable-1.5.0.RELEASE.jar
 
 ```
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.9.RELEASE</version>
+        <version>1.5.0.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -78,7 +78,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.9.RELEASE</version>
+        <version>1.5.0.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包，之前1.3.1和1.3.0版本默认依赖了，但是有的小伙伴使用mybatis-plus会有冲突，所以这一版本默认不依赖，如需使用自行依赖即可 -->
@@ -115,7 +115,7 @@ A.C.Table是采用了Spring、Mybatis技术的Maven结构，详细介绍如下�
     <dependency>
         <groupId>com.gitee.sunchenbin.mybatis.actable</groupId>
         <artifactId>mybatis-enhance-actable</artifactId>
-        <version>1.4.9.RELEASE</version>
+        <version>1.5.0.RELEASE</version>
     </dependency>
 
     <!-- 如需使用tk.mybatis同时需要依赖该jar包 -->
@@ -747,3 +747,7 @@ public class TestController{
 69. SysMysqlCreateTableManagerImpl.getAllFields方法改为public可被重写(版本1.4.9.RELEASE)
 70. issues/I38G7Q：修复避免子类重写付类属性时创建重复字段报错的问题(版本1.4.9.RELEASE)
 71. issues/I2CVCS：迭代优化actable.model.pack配置属性支持模糊扫描，支持类似com.bz.**.entity且支持配置多个路径英文逗号或者分号隔开(版本1.4.9.RELEASE)
+72. 增加注解@EnableTimeSuffix，支持表名添加时间后缀(版本1.5.0.RELEASE)
+73. issues/I3PRVK：添加@IgnoreUpdate注解 标注当前字段参与创建不参与更新，解决使用@DefaultValue("NULL ON UPDATE CURRENT_TIMESTAMP")时当前字段每次重启项目都会进行更新操作的问题(版本1.5.0.RELEASE)
+74. issues/I3NGD2：添加@IgnoreTable注解 设置某个model实体不参与建表操作(版本1.5.0.RELEASE)
+75. issues/I3TNMB：修复使用mybatisplus时使用了多租户的插件时，使用@ColumnComment注解报错的问题(版本1.5.0.RELEASE)
