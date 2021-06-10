@@ -1,4 +1,4 @@
-# mybatis-enhance-actable-1.4.9.RELEASE
+# mybatis-enhance-actable
 
 官方文档：[ACTable官方文档地址](https://www.yuque.com/sunchenbin/actable/nfz097)
 
