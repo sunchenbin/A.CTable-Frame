@@ -447,6 +447,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				}
 
 				// 判断类型+长度是否相同
+
 				if (!sysColumn.getColumn_type().toLowerCase().equals(typeAndLength)) {
 					modifyFieldList.add(modifyTableParam);
 					continue;
@@ -664,6 +665,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		if (clas.getSuperclass() != null) {
 			Class clsSup = clas.getSuperclass();
 			List<Field> fieldList = new ArrayList<Field>();
+			//把父类属性字段放到最前面
+			List<Field> superFieldList = new ArrayList<Field>();
 			fieldList.addAll(Arrays.asList(fields));
 			// 获取当前class的所有fields的name列表
 			List<String> fdNames = getFieldNames(fieldList);
@@ -674,6 +677,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				}
 				fieldList.add(pfd);
 			}
+			fieldList.addAll(0, superFieldList);
 			fields = new Field[fieldList.size()];
 			int i = 0;
 			for (Object field : fieldList.toArray()) {
