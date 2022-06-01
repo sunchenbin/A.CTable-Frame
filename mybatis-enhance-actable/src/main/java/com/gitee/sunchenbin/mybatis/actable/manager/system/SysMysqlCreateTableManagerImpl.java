@@ -433,8 +433,13 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				// 3.验证长度个小数点位数
 				String typeAndLength = createTableParam.getFieldType().toLowerCase();
 				if (createTableParam.getFileTypeLength() == 1) {
-					// 拼接出类型加长度，比如varchar(1)
-					typeAndLength = typeAndLength + "(" + createTableParam.getFieldLength() + ")";
+					//如果是int类型，mysql5.6及以下版本为int(11)，mysql5.7及以上版本为int，此处兼容处理
+					if("int".equalsIgnoreCase(typeAndLength) && "int".equalsIgnoreCase(sysColumn.getColumn_type())) {
+						//只有类型，不需要拼接长度,mysql5.7后int型不能设置长度
+					} else {
+						// 拼接出类型加长度，比如varchar(1)
+						typeAndLength = typeAndLength + "(" + createTableParam.getFieldLength() + ")";
+					}
 				} else if (createTableParam.getFileTypeLength() == 2) {
 					// 拼接出类型加长度，比如varchar(1)
 					typeAndLength = typeAndLength + "(" + createTableParam.getFieldLength() + ","
@@ -442,6 +447,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				}
 
 				// 判断类型+长度是否相同
+
 				if (!sysColumn.getColumn_type().toLowerCase().equals(typeAndLength)) {
 					modifyFieldList.add(modifyTableParam);
 					continue;
@@ -659,6 +665,8 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 		if (clas.getSuperclass() != null) {
 			Class clsSup = clas.getSuperclass();
 			List<Field> fieldList = new ArrayList<Field>();
+			//把父类属性字段放到最前面
+			List<Field> superFieldList = new ArrayList<Field>();
 			fieldList.addAll(Arrays.asList(fields));
 			// 获取当前class的所有fields的name列表
 			List<String> fdNames = getFieldNames(fieldList);
@@ -669,6 +677,7 @@ public class SysMysqlCreateTableManagerImpl implements SysMysqlCreateTableManage
 				}
 				fieldList.add(pfd);
 			}
+			fieldList.addAll(0, superFieldList);
 			fields = new Field[fieldList.size()];
 			int i = 0;
 			for (Object field : fieldList.toArray()) {
