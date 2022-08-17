@@ -93,8 +93,10 @@ public class ClassScaner implements ResourceLoaderAware {
                     if ((includeFilters.size() == 0 && excludeFilters.size() == 0)
                             || matches(metadataReader)) {
                         try {
-                            classes.add(Class.forName(metadataReader
-                                    .getClassMetadata().getClassName()));
+                            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+                            Class<?> clazz = contextClassLoader.loadClass(metadataReader.getClassMetadata().getClassName());
+                            classes.add(clazz);
+//                            classes.add(Class.forName(metadataReader.getClassMetadata().getClassName()));
                         } catch (ClassNotFoundException e) {
                             e.printStackTrace();
                         }
