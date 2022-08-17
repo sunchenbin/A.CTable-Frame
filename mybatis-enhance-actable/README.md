@@ -751,3 +751,6 @@ public class TestController{
 73. issues/I3PRVK：添加@IgnoreUpdate注解 标注当前字段参与创建不参与更新，解决使用@DefaultValue("NULL ON UPDATE CURRENT_TIMESTAMP")时当前字段每次重启项目都会进行更新操作的问题(版本1.5.0.RELEASE)
 74. issues/I3NGD2：添加@IgnoreTable注解 设置某个model实体不参与建表操作(版本1.5.0.RELEASE)
 75. issues/I3TNMB：修复使用mybatisplus时使用了多租户的插件时，使用@ColumnComment注解报错的问题(版本1.5.0.RELEASE)
+76. issues/#19：修复 mysql MySQL5.7以上 int类型字段每次更新问题 [#19](https://github.com/sunchenbin/A.CTable-Frame/issues/19) [zhouwm808](https://github.com/zhouwm808/A.CTable-Frame) (版本1.5.0.PORTER.ORG.CN)
+77. issues/#20：修复 实体类存在父类时,父类字段在表末尾问题 [#20](https://github.com/sunchenbin/A.CTable-Frame/issues/20) [zhouwm808](https://github.com/zhouwm808/A.CTable-Frame) (版本1.5.0.PORTER.ORG.CN)
+78. 修复 mybatis-enhance-actable 包打入到 lib 时,类加载器不一致导致的 model 类无法找到的问题 [yanzhaoyl](https://github.com/yanzhaoyl/A.CTable-Frame) (版本1.5.0.PORTER.ORG.CN)
